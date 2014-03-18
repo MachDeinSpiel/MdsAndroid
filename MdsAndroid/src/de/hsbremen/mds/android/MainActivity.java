@@ -30,15 +30,14 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
-import de.hsbremen.mds.interfaces.GuiInterface;
+import de.hsbremen.mds.common.interfaces.GuiInterface;
+import de.hsbremen.mds.common.listener.AndroidListener;
+import de.hsbremen.mds.common.valueobjects.MdsImage;
+import de.hsbremen.mds.common.valueobjects.MdsMap;
+import de.hsbremen.mds.common.valueobjects.MdsText;
+import de.hsbremen.mds.common.valueobjects.MdsVideo;
 import de.hsbremen.mds.interpreter.Interpreter;
-import de.hsbremen.mds.listener.AndroidInitiater;
-import de.hsbremen.mds.listener.AndroidListener;
 import de.hsbremen.mds.mdsandroid.R;
-import de.hsbremen.mds.valueobjects.MdsImage;
-import de.hsbremen.mds.valueobjects.MdsMap;
-import de.hsbremen.mds.valueobjects.MdsText;
-import de.hsbremen.mds.valueobjects.MdsVideo;
 
 public class MainActivity extends FragmentActivity implements TabListener,
 		LocationListener, GuiInterface {

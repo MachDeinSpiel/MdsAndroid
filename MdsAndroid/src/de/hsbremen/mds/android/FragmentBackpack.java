@@ -19,8 +19,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
-import de.hsbremen.mds.valueobjects.MdsItem;
 
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.

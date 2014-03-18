@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Vector;
 
 import android.util.Log;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.interpreter.exceptions.InvalidFsmException;
-import de.hsbremen.mds.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.valueobjects.statemachine.MdsState;
-import de.hsbremen.mds.valueobjects.statemachine.MdsTransition;
 
 /**
  * @author JG, NH, JW 

@@ -3,14 +3,14 @@ package de.hsbremen.mds.interpreter;
 import java.io.File;
 
 import android.util.Log;
-import de.hsbremen.mds.interfaces.GuiInterface;
-import de.hsbremen.mds.interfaces.InterpreterInterface;
+import de.hsbremen.mds.common.interfaces.GuiInterface;
+import de.hsbremen.mds.common.interfaces.InterpreterInterface;
+import de.hsbremen.mds.common.listener.AndroidListener;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.interpreter.exceptions.InvalidFsmException;
-import de.hsbremen.mds.listener.AndroidListener;
 import de.hsbremen.mds.parser.Parser;
-import de.hsbremen.mds.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.valueobjects.statemachine.MdsObjectContainer;
-import de.hsbremen.mds.valueobjects.statemachine.MdsState;
 
 /**
  * @author JG, NH, JW

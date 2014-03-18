@@ -14,14 +14,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.hsbremen.mds.interfaces.InterpreterInterface;
-import de.hsbremen.mds.valueobjects.statemachine.MdsAction;
-import de.hsbremen.mds.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.valueobjects.statemachine.MdsExhibit;
-import de.hsbremen.mds.valueobjects.statemachine.MdsObjectContainer;
-import de.hsbremen.mds.valueobjects.statemachine.MdsPlayer;
-import de.hsbremen.mds.valueobjects.statemachine.MdsState;
-import de.hsbremen.mds.valueobjects.statemachine.MdsTransition;
+import de.hsbremen.mds.common.interfaces.InterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsPlayer;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 
 public class Parser {
 

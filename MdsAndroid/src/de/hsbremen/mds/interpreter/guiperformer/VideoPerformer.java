@@ -2,8 +2,8 @@ package de.hsbremen.mds.interpreter.guiperformer;
 
 import java.util.HashMap;
 
-import de.hsbremen.mds.interfaces.GuiInterface;
-import de.hsbremen.mds.valueobjects.MdsVideo;
+import de.hsbremen.mds.common.interfaces.GuiInterface;
+import de.hsbremen.mds.common.valueobjects.MdsVideo;
 
 public class VideoPerformer extends GuiPerformer {
 

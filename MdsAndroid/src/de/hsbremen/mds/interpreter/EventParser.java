@@ -5,12 +5,12 @@ import java.util.List;
 
 import android.location.Location;
 import android.util.Log;
-import de.hsbremen.mds.valueobjects.statemachine.MdsAttribute;
-import de.hsbremen.mds.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.valueobjects.statemachine.MdsExhibit;
-import de.hsbremen.mds.valueobjects.statemachine.MdsItem;
-import de.hsbremen.mds.valueobjects.statemachine.MdsPlayer;
-import de.hsbremen.mds.valueobjects.statemachine.MdsTrigger;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsAttribute;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsPlayer;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTrigger;
 
 /**
  * @author JG, NH, JW

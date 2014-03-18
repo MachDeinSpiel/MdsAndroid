@@ -5,15 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.util.Log;
-import de.hsbremen.mds.interfaces.GuiInterface;
+import de.hsbremen.mds.common.interfaces.GuiInterface;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsActionExecutable;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsAttribute;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsPlayer;
 import de.hsbremen.mds.interpreter.guiperformer.GuiPerformer;
-import de.hsbremen.mds.valueobjects.statemachine.MdsAction;
-import de.hsbremen.mds.valueobjects.statemachine.MdsActionExecutable;
-import de.hsbremen.mds.valueobjects.statemachine.MdsAttribute;
-import de.hsbremen.mds.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.valueobjects.statemachine.MdsExhibit;
-import de.hsbremen.mds.valueobjects.statemachine.MdsItem;
-import de.hsbremen.mds.valueobjects.statemachine.MdsPlayer;
 
 /**
  * @author JG, NH, JW

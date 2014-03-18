@@ -1,7 +1,7 @@
 package de.hsbremen.mds.interpreter;
 
-import de.hsbremen.mds.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 /**
  * @author JG, NH, JW
  */

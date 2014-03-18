@@ -2,7 +2,7 @@ package de.hsbremen.mds.interpreter.guiperformer;
 
 import java.util.HashMap;
 
-import de.hsbremen.mds.interfaces.GuiInterface;
+import de.hsbremen.mds.common.interfaces.GuiInterface;
 
 public abstract class GuiPerformer {
 
