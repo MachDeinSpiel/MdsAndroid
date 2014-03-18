@@ -1,0 +1,182 @@
+{	
+	"action": [
+				  {
+					"ident": "showVideo",
+					"defaults":	{
+								"url": "www.youtube.com"
+								}
+				  },
+				  {
+					"ident": "showInfo",
+					"defaults":	{
+								"text": "text"
+								}
+				  },
+				  {
+				   "ident": "showMap",
+				   "defaults": {
+							  "target": "self"
+				   
+							 }
+				  }
+			  ],
+	
+	"player":	{
+				"name": "Player",
+				"longitude": 43.40338,
+				"latitute": 43.40338
+				},
+				
+	"groups":[
+		{
+			"name": "exhibits",
+			"members":[
+				    {
+					"name": "Roland",
+					"url": "http://www.youtube.com/watch?v=9jAEtbhXgz4",
+					"text": "Willkommen beim Roland",
+					"latitude": 53.075934,
+				    "longitude": 8.807341,    	
+					"moveable": false
+					},
+					{
+					"name": "HSB",
+					"url": "http://www.youtube.com/watch?v=esGOl-tMIZs",
+					"text": "Willkommen bei der Hochschule Bremen",
+					"latitude": 53.055142,
+					"longitude": 8.783204,
+					"moveable": false
+					},
+					{
+					"name": "Stadtmusikanten",
+					"url": "http://www.youtube.com/watch?v=nLSOIaT_IGA",
+					"text": "Willkommen bei den Bremer Stadtmusikanten",
+					"latitude": 53.07616,
+					"longitude": 8.807489,
+					"moveable": false
+					},
+					{
+					"name": "McDonalds",
+					"url" : "todo",
+					"text": "Ich liebe es!",
+					"latitude" : 53.053983,
+					"longitude" : 8.783383,
+					"moveable": false
+					}
+					
+			]
+		}
+	],
+		
+
+	"state": [ 
+		{
+			"ID": "0",
+			"name": "move around",
+			"startstate": true,
+			"finalstate": false,
+			"doAction": {
+						  "name": "showMap"
+						},
+			"startAction": "",
+			"endAction": "",
+			"transition": [
+				{ 	"target": "show info", 
+					"event":
+							  
+							  {													 
+								"type": "gameEvent",
+								"name": "nearby",
+								"params": {
+											"quantifier": 1,     
+											"target": "exhibits",
+											"who": "self",
+											"radius": 20
+										  }
+							  }
+				},
+				{ 	"target": "game over",
+					"event": {
+								"type": "uiEvent",
+								"name": "endGame"
+							 } 
+				}
+			]
+		},
+		{
+			"ID": "1",
+			"name": "show info",
+			"startstate": false,
+			"finalstate": false,
+			"doAction": {
+						 "name": "showInfo",
+						 "params": {
+							"text": "trigger.object.params('text')"
+						 }
+						},
+			"startAction": "",
+			"endAction": "",
+			"transition": [
+				{	"target": "show video",
+				 	"event": {
+								"type": "uiEvent",
+								"name": "showVideo"
+							 }
+				  
+				},
+				{	"target": "move around",
+					"event": {
+								"type": "uiEvent",
+								"name": "proceedWalk"
+							 }
+				},
+				{ 	"target": "game over", 
+					"event": {
+								"type": "uiEvent",
+								"name": "endGame"
+							 }
+				}
+			]
+		},							
+		{
+			"ID": "2",
+			"name": "show video",
+			"startstate": false,
+			"finalstate": false,
+			"doAction": {
+						"name": "showVideo",
+						"params":	{
+									"url": "trigger.object.params('url')",    
+									"text": "test"
+									}
+						},
+			"startAction": "",
+			"endAction": "",
+			"transition": [
+				{	"target": "show info",
+					"event": {
+								"type": "uiEvent",
+								"name": "proceedBack"
+							 }
+					
+				}
+			]
+		},							
+		{
+			"ID": "3",
+			"name": "game over",
+			"startstate": false,
+			"finalstate": true,
+			"doAction": {
+						  "name": "showInfo",
+						  "params": {
+									 "text": "TschÃ¼ÃŸ!"
+									}
+						},			
+			"startAction": "",
+			"endAction": "",
+			"transition": []
+			
+		}						
+	]
+}				
