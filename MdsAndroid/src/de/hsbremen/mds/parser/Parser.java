@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -36,7 +35,7 @@ public class Parser {
 		 
 		try {
 			
-			Object obj = parser.parse(new FileReader(jsonFile));
+			Object obj = parser.parse(new FileReader("TourismApp_2.0_Client.json"));
 	 
 			JSONObject jsonObject = (JSONObject) obj;
 			
@@ -82,44 +81,12 @@ public class Parser {
 			
 	
 			double longitude = Double.parseDouble(MdsPlayer.get("longitude").toString());
-			double latitude = Double.parseDouble(MdsPlayer.get("latitute").toString());
+			double latitude = Double.parseDouble(MdsPlayer.get("latitude").toString());
 			
 			// erzeugen des MdsPlayers
 			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
 			
 			MdsExhibit[] allMdsExhibits = null;
-			JSONArray groups = (JSONArray) jsonObject.get("groups");
-			
-			for(int i = 0; i < groups.size(); i++) {
-				JSONObject groupsElement = (JSONObject) groups.get(i);
-				
-				name = groupsElement.get("name").toString();
-				System.out.println(name);
-				
-				JSONArray MdsExhibits = (JSONArray) groupsElement.get("members");
-				
-				allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
-				String url, text;
-				boolean movable;
-				
-				for(int j = 0; j < MdsExhibits.size(); j++){
-					
-					JSONObject element = (JSONObject) MdsExhibits.get(j);
-					
-					name = element.get("name").toString();
-					url = element.get("url").toString();
-					text = element.get("text").toString();
-					
-					longitude = Double.parseDouble(element.get("longitude").toString());
-					latitude = Double.parseDouble(element.get("latitude").toString());
-									
-					if(element.get("moveable").equals(false))
-						movable = false;
-					else movable = true;
-					
-					allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
-				}
-			}			
 			
 			JSONArray MdsState = (JSONArray) jsonObject.get("state");	// lesen des MdsState arrays aus der JSON datei
 			
@@ -137,11 +104,13 @@ public class Parser {
 				id = Integer.parseInt(element.get("ID").toString());
 				name = (String) element.get("name");
 				
-				if(element.get("startstate").equals(false)) 
+				String parentState = element.get("parentState").toString();
+				
+				if(element.get("startState").equals(false)) 
 					startMdsState = false;
 				else startMdsState = true;
 				
-				if(element.get("finalstate").equals(false)) 
+				if(element.get("finalState").equals(false)) 
 					finalMdsState = false;
 				else finalMdsState = true;
 				
@@ -178,7 +147,7 @@ public class Parser {
 							}
 					}
 				}
-				allMdsStates[i] = new MdsState(id, name, doMdsAction, startMdsState, finalMdsState);
+				allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startMdsState, finalMdsState);
 			}
 			
 			for(int i = 0; i < MdsState.size(); i++) {
@@ -238,7 +207,7 @@ public class Parser {
 			}
 			
 			
-			/* ---- ausgabe der Objekte ---- 
+			 /*---- ausgabe der Objekte ---- 
 			
 			for(int i = 0; i < allMdsActions.length; i++) {
 				System.out.println("-------- Action (" + i + ") --------");
@@ -250,20 +219,11 @@ public class Parser {
 			System.out.println("-------- Player --------");
 			System.out.println("name: " + player.getName());
 			System.out.println("position: x: " + player.getLongtitude() + " y: " + player.getLatitude());
-			
-			for(int i = 0; i < allMdsExhibits.length; i++) {
-				System.out.println("-------- Exhibit (" + i + ") --------");
-				//Ausgabe der Items
-				System.out.println("name: " + allMdsExhibits[i].getName());
-				System.out.println("url: " + allMdsExhibits[i].getUrl());
-				System.out.println("text: " + allMdsExhibits[i].getText());
-				System.out.println("position: x: " + allMdsExhibits[i].getLongitude() + " y: " +allMdsExhibits[i].getLatitute());
-				System.out.println("movable: " + allMdsExhibits[i].isMovable());
-			}
-			
+						
 			for(int i = 0; i < allMdsStates.length; i++) {
 				System.out.println("-------- State (" + i + ") --------");
 				System.out.println("Zustand: " + allMdsStates[i].getName());
+				System.out.println("parentState: " + allMdsStates[i].getParentState());
 				System.out.println("Startzustand: " + allMdsStates[i].isStartState());
 				System.out.println("Endzustand: " + allMdsStates[i].getFinalState());
 				System.out.println("Do-Aktion: " + allMdsStates[i].getDoAction().getIdent() + " - " + allMdsStates[i].getDoAction().getParams());
@@ -291,7 +251,7 @@ public class Parser {
 			List<MdsState> states = Arrays.asList(allMdsStates);
 			List<MdsAction> actions = Arrays.asList(allMdsActions);
 			List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
-			//List<MdsItem> item = Arrays.asList(allMdsItems);
+			List<MdsItem> item = Arrays.asList(allMdsItems);
 			
 			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
 			
