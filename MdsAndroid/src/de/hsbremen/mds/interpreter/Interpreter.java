@@ -45,7 +45,7 @@ public class Interpreter implements InterpreterInterface, FsmInterface{
 	}
 
 	@Override
-	public void onStateChange(MdsEvent e) {
+	public void onStateChange(MdsState next, MdsState current, MdsEvent e) {
 		// TODO Auto-generated method stub
 		
 	}

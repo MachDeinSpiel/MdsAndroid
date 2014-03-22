@@ -12,10 +12,10 @@ import de.hsbremen.mds.exceptions.NoStartStateException;
 /**
  * @author JW
  */
-public class FsmManager{
+public class FsmManager implements FsmInterface{
 	private List<MdsState> states;
 	private List<FsmInterface> listeners = new Vector<FsmInterface>();
-	private EventParser = new EventParser();
+	private EventParser eParser = new EventParser();
 	private MdsState currentState;
 	
 	
@@ -76,6 +76,12 @@ public class FsmManager{
 	
 	public void onEvent(MdsEvent e) {
 		// TODO checkevent aufrufen 
+		
+	}
+
+	@Override
+	public void onStateChange(MdsState next, MdsState current, MdsEvent e) {
+		// TODO Auto-generated method stub
 		
 	}
 

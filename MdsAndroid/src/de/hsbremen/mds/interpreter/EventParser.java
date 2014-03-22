@@ -67,13 +67,13 @@ public class EventParser {
 	
 	private List<MdsItem> checkLocationItems(List<MdsItem> items, Location loc, int radius ) {
 		
-		Location pos = new Location(loc);
 		List<MdsItem> result = new ArrayList<MdsItem>();
 		
 		for (MdsItem i : items) {
-			// TODO: Position für Items erzeugen?
-			Location itemPos = new Location("i.itemPos");
-			if(itemPos.distanceTo(pos) <= radius) {
+			Location itemPos = new Location("ItemPos");
+			itemPos.setLatitude(i.getLatitude());
+			itemPos.setLatitude(i.getLongitude());
+			if(itemPos.distanceTo(loc) <= radius) {
 				result.add(i);
 			}
 		}
