@@ -35,6 +35,7 @@ import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
+import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
@@ -61,6 +62,12 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		ServerClientConnector conn = new ServerClientConnector();
+		
+		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
+		
+		conn.objectToJsonString(item);
+		
 		mfa = new MdsFragmentAdapter(getSupportFragmentManager());
 
 		// Initiater für die Listener registrierung

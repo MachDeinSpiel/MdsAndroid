@@ -1,17 +1,20 @@
 package de.hsbremen.mds.interpreter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.location.Location;
+import de.hsbremen.mds.common.valueobjects.MdsObject;
+import de.hsbremen.mds.common.valueobjects.MdsValueObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 
 public class EventParser {
 	
-	public MdsTransition checkEvents(List<MdsItem> items, Location loc, List<MdsTransition> transitions) {
+	public MdsTransition checkEvents(HashMap<String, MdsItem> items, Location loc, MdsTransition[] mdsTransitions) {
 		
-		for(MdsTransition t : transitions) {
+		for(MdsTransition t : mdsTransitions) {
 			// alle mit Typ gameEvent
 			if (t.getEvent().getType().equals("gameEvent")) {
 				if(t.getEvent().getName().equals("nearby")) {
@@ -65,16 +68,16 @@ public class EventParser {
 		return null;	
 	}
 	
-	private List<MdsItem> checkLocationItems(List<MdsItem> items, Location loc, int radius ) {
+	private List<MdsItem> checkLocationItems(HashMap<String, MdsItem> items, Location loc, int radius ) {
 		
 		List<MdsItem> result = new ArrayList<MdsItem>();
 		
-		for (MdsItem i : items) {
+		for (String key : items.keySet()) {
 			Location itemPos = new Location("ItemPos");
-			itemPos.setLatitude(i.getLatitude());
-			itemPos.setLatitude(i.getLongitude());
+			itemPos.setLatitude(items.get(key).getLatitude());
+			itemPos.setLatitude(items.get(key).getLongitude());
 			if(itemPos.distanceTo(loc) <= radius) {
-				result.add(i);
+				result.add(items.get(key));
 			}
 		}
 		return result;

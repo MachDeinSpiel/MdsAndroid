@@ -35,7 +35,7 @@ public class Interpreter implements InterpreterInterface, FsmInterface, AndroidL
 		Log.d("Interpreter", "Geparste Objekte vo Parser bekommen");
 		//this.actionParser = new ActionParser(objectContainer.getPlayer(), objectContainer.getExhibits(), objectContainer.getItems());
 		this.eventParser = new EventParser();
-		fsmManager = new FsmManager(objectContainer.getStates(),eventParser);
+		fsmManager = new FsmManager(objectContainer.getStates(),eventParser, whiteboard);
 		// Listener
 		fsmManager.addStateChangedListener(this);
 		this.gui.setAndroidListener(this, 5);
