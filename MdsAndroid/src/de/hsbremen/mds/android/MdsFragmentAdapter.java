@@ -35,7 +35,7 @@ public class MdsFragmentAdapter extends FragmentPagerAdapter{
 		for (int i = 0 ; i < this.fragmentList.size() ; i++){
 			
 			if(i == pos){
-				fragment = (Fragment) Class.forName("de.hsbremen.mds.android."+fragmentList.get(i)).newInstance();
+				fragment = (Fragment) Class.forName("de.hsbremen.mds.android.fragment."+fragmentList.get(i)).newInstance();
 				break;
 			}
 			
