@@ -47,7 +47,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	ActionBar actionBar;
 	ViewPager viewPager;
 	Location location;
-	AndroidInitiater initiater;
+	public AndroidInitiater initiater;
 	LocationManager manager;
 	double longitude;
 	double latitude;
