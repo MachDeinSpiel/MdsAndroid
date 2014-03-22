@@ -255,8 +255,6 @@ public class Parser {
 			List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
 			
 			// TODO: Hier wird noch null für allMdsItems gemacht, ändern!
-			MdsItem[] allMdsItems = null;
-			List<MdsItem> item = Arrays.asList(allMdsItems);
 			
 			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
 			

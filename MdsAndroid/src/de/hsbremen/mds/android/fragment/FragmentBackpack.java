@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.fragment;
 
 import java.util.ArrayList;
 

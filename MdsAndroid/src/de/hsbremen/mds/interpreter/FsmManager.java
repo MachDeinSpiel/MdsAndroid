@@ -19,13 +19,14 @@ public class FsmManager implements FsmInterface{
 	private MdsState currentState;
 	
 	
-	public FsmManager(List<MdsState> states){
+	public FsmManager(List<MdsState> states, EventParser eParser){
 		this.states = states;
 		try{
 			this.currentState = this.getFirstState();
 		} catch (NoStartStateException e){
 			e.printStackTrace();
 		}
+		this.eParser = eParser;
 	}
 		
 	public void addLister(FsmInterface toAdd){
@@ -81,6 +82,16 @@ public class FsmManager implements FsmInterface{
 
 	@Override
 	public void onStateChange(MdsState next, MdsState current, MdsEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addStateChangedListener(Interpreter interpreter) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void checkEvents() {
 		// TODO Auto-generated method stub
 		
 	}
