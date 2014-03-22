@@ -17,6 +17,7 @@ import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsPlayer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
@@ -147,7 +148,8 @@ public class Parser {
 							}
 					}
 				}
-				allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startMdsState, finalMdsState);
+				// TODO: Parentstate (im Moment null) muss noch ersetzt werden
+				allMdsStates[i] = new MdsState(id, name, null, doMdsAction, startMdsState, finalMdsState);
 			}
 			
 			for(int i = 0; i < MdsState.size(); i++) {
@@ -251,6 +253,9 @@ public class Parser {
 			List<MdsState> states = Arrays.asList(allMdsStates);
 			List<MdsAction> actions = Arrays.asList(allMdsActions);
 			List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
+			
+			// TODO: Hier wird noch null für allMdsItems gemacht, ändern!
+			MdsItem[] allMdsItems = null;
 			List<MdsItem> item = Arrays.asList(allMdsItems);
 			
 			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
