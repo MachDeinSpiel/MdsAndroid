@@ -9,6 +9,8 @@ public class ServerClientConnector {
 
 		Gson gson = new GsonBuilder().create();
 
+		System.out.println(gson.toJson(obj));
+		
 		return gson.toJson(obj);
 
 	}
