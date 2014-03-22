@@ -7,7 +7,7 @@ import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
-import de.hsbremen.mds.interpreter.exceptions.NoStartStateExcetpion;
+import de.hsbremen.mds.exceptions.NoStartStateException;
 
 /**
  * @author JW
@@ -23,7 +23,7 @@ public class FsmManager implements FsmInterface{
 		this.states = states;
 		try{
 			this.currentState = this.getFirstState();
-		} catch (NoStartStateExcetpion e){
+		} catch (NoStartStateException e){
 			e.printStackTrace();
 		}
 		
@@ -34,7 +34,7 @@ public class FsmManager implements FsmInterface{
 	 * Ersten State raussuchen und zurückgeben / wenn nicht vorhanden: exception
 	 * @return
 	 */
-	private MdsState getFirstState() throws NoStartStateExcetpion{
+	private MdsState getFirstState() throws NoStartStateException{
 		for(MdsState state: this.states){
 			if(state.isStartState() && state.getParentState() == null){
 				return state;
@@ -44,7 +44,7 @@ public class FsmManager implements FsmInterface{
 		 * Wenn null returned wird muss noch eine exception geworfen werden
 		 * eg. FsmNoStatestateExcepption
 		 */
-		throw new NoStartStateExcetpion();
+		throw new NoStartStateException();
 	}
 	
 	/**
