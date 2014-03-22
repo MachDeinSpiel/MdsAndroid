@@ -12,7 +12,7 @@ import de.hsbremen.mds.exceptions.NoStartStateException;
 /**
  * @author JW
  */
-public class FsmManager implements FsmInterface{
+public class FsmManager{
 	private List<MdsState> states;
 	private List<FsmInterface> listeners = new Vector<FsmInterface>();
 	private EventParser = new EventParser();
@@ -26,9 +26,11 @@ public class FsmManager implements FsmInterface{
 		} catch (NoStartStateException e){
 			e.printStackTrace();
 		}
-		
 	}
-
+		
+	public void addLister(FsmInterface toAdd){
+		this.listeners.add(toAdd);
+	}
 	
 	/**
 	 * Ersten State raussuchen und zurückgeben / wenn nicht vorhanden: exception
@@ -50,28 +52,32 @@ public class FsmManager implements FsmInterface{
 	/**
 	 * hier läuft die finit state maschine
 	 */
-	private void fsm(){
+	private MdsState checkEvent(MdsEvent e){
 		
-	}
-	
-	
-	
-	private void changeState(){
-		
-	}
-
-
-	@Override
-	public void onEvent(MdsEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public MdsAction getAction() {
-		// TODO Auto-generated method stub
-		
+		//TODO: die transitionen des Currentstate mit dem Eventparser auf erfüllung (.)(.) prüfen dann in den nächsten state wechseln und returnen 
 		return null;
 	}
+	
+	
+	/**
+	 * Benachrichtigt alle Listerns 
+	 * 
+	 * @param next der nächste state
+	 * @param current der alte state
+	 * @param e das event
+	 */
+	private void notifyListeners(MdsState next, MdsState current, MdsEvent e){
+		for(FsmInterface f:this.listeners){
+			f.onStateChange(next,current,e);
+		}
+	}
+
+
+	
+	public void onEvent(MdsEvent e) {
+		// TODO checkevent aufrufen 
+		
+	}
+
+
 }

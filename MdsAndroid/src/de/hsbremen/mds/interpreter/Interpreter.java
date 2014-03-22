@@ -7,6 +7,7 @@ import de.hsbremen.mds.android.MainActivity;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
@@ -14,7 +15,7 @@ import de.hsbremen.mds.parser.Parser;
 /**
  * @author JW
  */
-public class Interpreter implements InterpreterInterface{
+public class Interpreter implements InterpreterInterface, FsmInterface{
 	private List<MdsAction> actions;
 	private List<MdsState> states;
 	private List<MdsItem> items;
@@ -40,6 +41,12 @@ public class Interpreter implements InterpreterInterface{
 		 * Erstellen des FsmManagers
 		 */
 		fsmmgr = new FsmManager(this.states);
+		
+	}
+
+	@Override
+	public void onStateChange(MdsEvent e) {
+		// TODO Auto-generated method stub
 		
 	}
 }
