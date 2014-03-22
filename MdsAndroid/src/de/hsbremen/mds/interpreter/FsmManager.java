@@ -3,10 +3,12 @@ package de.hsbremen.mds.interpreter;
 import java.util.List;
 import java.util.Vector;
 
+import android.location.Location;
+import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
 /**
@@ -14,12 +16,15 @@ import de.hsbremen.mds.exceptions.NoStartStateException;
  */
 public class FsmManager implements FsmInterface{
 	private List<MdsState> states;
+	private Location pos;
+	// TODO wofür ist denn das?
 	private List<FsmInterface> listeners = new Vector<FsmInterface>();
 	private EventParser eParser = new EventParser();
 	private MdsState currentState;
+	private Whiteboard wb;
 	
 	
-	public FsmManager(List<MdsState> states, EventParser eParser){
+	public FsmManager(List<MdsState> states, EventParser eParser, Whiteboard wb){
 		this.states = states;
 		try{
 			this.currentState = this.getFirstState();
@@ -27,6 +32,7 @@ public class FsmManager implements FsmInterface{
 			e.printStackTrace();
 		}
 		this.eParser = eParser;
+		this.wb = wb;
 	}
 		
 	public void addLister(FsmInterface toAdd){
@@ -56,6 +62,7 @@ public class FsmManager implements FsmInterface{
 	private MdsState checkEvent(MdsEvent e){
 		
 		//TODO: die transitionen des Currentstate mit dem Eventparser auf erfüllung (.)(.) prüfen dann in den nächsten state wechseln und returnen 
+		MdsTransition trans = eParser.checkEvents(wb.itemList.items, pos, currentState.getTransitions());
 		return null;
 	}
 	
