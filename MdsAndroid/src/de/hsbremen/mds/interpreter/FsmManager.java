@@ -4,28 +4,37 @@ import java.util.List;
 import java.util.Vector;
 
 import de.hsbremen.mds.common.interfaces.FsmInterface;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.interpreter.exceptions.NoStartStateExcetpion;
+
 /**
  * @author JW
  */
-public class FsmManager {
+public class FsmManager implements FsmInterface{
 	private List<MdsState> states;
 	private List<FsmInterface> listeners = new Vector<FsmInterface>();
+	private EventParser = new EventParser();
+	private MdsState currentState;
+	
 	
 	public FsmManager(List<MdsState> states){
 		this.states = states;
-		this.fsm();
+		try{
+			this.currentState = this.getFirstState();
+		} catch (NoStartStateExcetpion e){
+			e.printStackTrace();
+		}
+		
 	}
+
+	
 	/**
-	 * 
-	 * @param toAdd Der hinzuzufügende Listener
+	 * Ersten State raussuchen und zurückgeben / wenn nicht vorhanden: exception
+	 * @return
 	 */
-	public void addFsmListener(FsmInterface toAdd){
-		this.listeners.add(toAdd);
-	}
-	
-	
-	private MdsState getFirstState(){
+	private MdsState getFirstState() throws NoStartStateExcetpion{
 		for(MdsState state: this.states){
 			if(state.isStartState() && state.getParentState() == null){
 				return state;
@@ -35,16 +44,34 @@ public class FsmManager {
 		 * Wenn null returned wird muss noch eine exception geworfen werden
 		 * eg. FsmNoStatestateExcepption
 		 */
-		return null;
+		throw new NoStartStateExcetpion();
 	}
 	
+	/**
+	 * hier läuft die finit state maschine
+	 */
 	private void fsm(){
-		this.getFirstState().getStartAction();
+		
 	}
 	
 	
 	
 	private void changeState(){
 		
+	}
+
+
+	@Override
+	public void onEvent(MdsEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public MdsAction getAction() {
+		// TODO Auto-generated method stub
+		
+		return null;
 	}
 }

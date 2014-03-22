@@ -14,11 +14,12 @@ import de.hsbremen.mds.parser.Parser;
 /**
  * @author JW
  */
-public class Interpreter implements InterpreterInterface, FsmInterface{
+public class Interpreter implements InterpreterInterface{
 	private List<MdsAction> actions;
 	private List<MdsState> states;
 	private List<MdsItem> items;
-
+	
+	private FsmInterface fsmmgr;
 		
 	public Interpreter(File json, MainActivity android){
 		new Parser(this,json);
@@ -36,15 +37,9 @@ public class Interpreter implements InterpreterInterface, FsmInterface{
 	
 	private void onDataSet(){
 		/*
-		 * Erstellen des FsmManagers und der Interpreter wird als Listener hinzugefügt
+		 * Erstellen des FsmManagers
 		 */
-		new FsmManager(states).addFsmListener(this);
-		
-	}
-
-	@Override
-	public void onStateChange(MdsState state) {
-		
+		fsmmgr = new FsmManager(this.states);
 		
 	}
 }
