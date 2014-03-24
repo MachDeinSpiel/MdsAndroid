@@ -36,40 +36,37 @@ public class Parser {
 		try {
 			
 			Object obj = parser.parse(new FileReader("TourismApp_2.0_Client.json"));
-	 
+			 
 			JSONObject jsonObject = (JSONObject) obj;
 			
 			/* ---- aus der JSON datei lesen und in Objekte speichern ---- */
 			
 			JSONArray MdsAction = (JSONArray) jsonObject.get("action"); //lese des MdsAction arrays aus der JSON datei
 			
-			MdsAction[] allMdsActions = new MdsAction[MdsAction.size()];        // array in dem all unsere MdsActions gespeichert werden
-			String ident;											// temp variablen
+			MdsAction[] allMdsActions = new MdsAction[MdsAction.size()];// array in dem all unsere MdsActions gespeichert werden
+			String ident;												// temp variablen
 
 			
 			for (int i = 0; i < MdsAction.size(); i++){	
-				HashMap<String, String> defaults = new HashMap<String, String>();						// temp variablen
 				// aus dem JSONArray wird ein JSONObject an der stelle "i" zwischengespeichert
 				JSONObject element = (JSONObject) MdsAction.get(i);
 				
 				// attribute werden aus dem JSONObject gelesen
 				ident = (String) element.get("ident");
 				// lese des defaults arrays aus der JSON datei
-				JSONObject defaultso = (JSONObject) element.get("defaults");
+				JSONObject defaultsO = (JSONObject) element.get("defaults");
 				// zwischenspeicherung der KeySet
-				Set<String> keySet = defaultso.keySet();
+				Set<String> keySet = defaultsO.keySet();
+				HashMap<String, String> defaults = new HashMap<String, String>();
 				// die param werte aus dem KeySet werden dem params HashMap übergeben
 				for (String key : keySet){
 					
-					Object value = defaultso.get(key);
+					Object value = defaultsO.get(key);
 					defaults.put(key, value.toString());
 					
 				}
 				// gelesene attribute werden in das allMdsActions array gespeichert
-				allMdsActions [i] = new MdsAction(ident, defaults);
-				//Die HashMap wird geleert
-				//params.clear();
-				
+				allMdsActions [i] = new MdsAction(ident, defaults);				
 			}
 			
 			// lesen des MdsPlayer objects
@@ -77,23 +74,20 @@ public class Parser {
 			
 			//Temp variablen
 			String name = MdsPlayer.get("name").toString();
-			
-			
-	
 			double longitude = Double.parseDouble(MdsPlayer.get("longitude").toString());
 			double latitude = Double.parseDouble(MdsPlayer.get("latitude").toString());
 			
 			// erzeugen des MdsPlayers
 			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
 			
-			MdsExhibit[] allMdsExhibits = null;
-			
 			JSONArray MdsState = (JSONArray) jsonObject.get("state");	// lesen des MdsState arrays aus der JSON datei
 			
-			MdsState[] allMdsStates = new MdsState[MdsState.size()];				// array in dem all unsere MdsStates gespeichert werden
-			int id;												// temp variablen
+			MdsState[] allMdsStates = new MdsState[MdsState.size()];	// array in dem all unsere MdsStates gespeichert werden
+			
+			// temp variablen
+			int id;
 			MdsAction doMdsAction = null;
-			boolean startMdsState = true, finalMdsState = true;
+			boolean startMdsState, finalMdsState;
 			String startAction = null, endAction = null;
 			
 			for(int i = 0; i < MdsState.size(); i++) {
@@ -113,8 +107,6 @@ public class Parser {
 				if(element.get("finalState").equals(false)) 
 					finalMdsState = false;
 				else finalMdsState = true;
-				
-				
 				
 				//Verarbeitung fehlt, da diese felder leer sind
 				//JSONObject startMdsActionObject = (JSONObject) element.get("startAction");
@@ -205,48 +197,6 @@ public class Parser {
 				}
 				allMdsStates[i].setTransitions(allTrans); 
 			}
-			
-			
-			 /*---- ausgabe der Objekte ---- 
-			
-			for(int i = 0; i < allMdsActions.length; i++) {
-				System.out.println("-------- Action (" + i + ") --------");
-				//Ausgabe der Items
-				System.out.println("ident: " + allMdsActions[i].getIdent());
-				System.out.println("params: " + allMdsActions[i].getParams().toString());
-			}
-			
-			System.out.println("-------- Player --------");
-			System.out.println("name: " + player.getName());
-			System.out.println("position: x: " + player.getLongtitude() + " y: " + player.getLatitude());
-						
-			for(int i = 0; i < allMdsStates.length; i++) {
-				System.out.println("-------- State (" + i + ") --------");
-				System.out.println("Zustand: " + allMdsStates[i].getName());
-				System.out.println("parentState: " + allMdsStates[i].getParentState());
-				System.out.println("Startzustand: " + allMdsStates[i].isStartState());
-				System.out.println("Endzustand: " + allMdsStates[i].getFinalState());
-				System.out.println("Do-Aktion: " + allMdsStates[i].getDoAction().getIdent() + " - " + allMdsStates[i].getDoAction().getParams());
-				System.out.println("start-Aktion: " + startAction);
-				System.out.println("end-Aktion: " + endAction);
-				
-				
-				if(!allMdsStates[i].getFinalState()) {
-					// zur besseren lesbarkeit wird das transitions array zwischengespeichert
-					MdsTransition[] trans = allMdsStates[i].getTransitions();
-					
-					for(int j = 0; j < trans.length; j++) {
-						System.out.println("Ziel: " + trans[j].getTarget().getName());
-						System.out.println("-------- Event --------");
-						System.out.println("Type: " + trans[j].getEvent().getType());
-						System.out.println("Name: " + trans[j].getEvent().getName());
-						System.out.println("params: " + trans[j].getEvent().getParams().toString());
-
-					}
-					
-				}
-			}
-			*/
 			
 			List<MdsState> states = Arrays.asList(allMdsStates);
 			List<MdsAction> actions = Arrays.asList(allMdsActions);

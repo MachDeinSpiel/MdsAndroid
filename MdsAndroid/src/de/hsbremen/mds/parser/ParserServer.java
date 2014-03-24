@@ -20,7 +20,7 @@ public class ParserServer {
 		try {
 			
 			Object obj = parser.parse(new FileReader("TourismApp_2.0_Server.json"));
-	 
+			 
 			JSONObject jsonObject = (JSONObject) obj;
 		
 			JSONArray groups = (JSONArray) jsonObject.get("groups");
@@ -31,43 +31,32 @@ public class ParserServer {
 				JSONObject groupsElement = (JSONObject) groups.get(i);
 				
 				String name = groupsElement.get("name").toString();
-				System.out.println(name);
 				
-				JSONArray MdsExhibits = (JSONArray) groupsElement.get("members");
-				
-				allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
-				String url, text;
-				boolean movable;
-				
-				for(int j = 0; j < MdsExhibits.size(); j++) {
+				if(name.equals("exhibits")) {
+					JSONArray MdsExhibits = (JSONArray) groupsElement.get("members");
 					
-					JSONObject element = (JSONObject) MdsExhibits.get(j);
+					allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
+					String url, text;
 					
-					name = element.get("name").toString();
-					url = element.get("url").toString();
-					text = element.get("text").toString();
-					
-					double longitude = Double.parseDouble(element.get("longitude").toString());
-					double latitude = Double.parseDouble(element.get("latitude").toString());
-									
-					if(element.get("moveableStatus").equals(false))
-						movable = false;
-					else movable = true;
-					
-					allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
+					for(int j = 0; j < MdsExhibits.size(); j++) {
+						
+						JSONObject element = (JSONObject) MdsExhibits.get(j);
+						
+						name = element.get("name").toString();
+						url = element.get("url").toString();
+						text = element.get("text").toString();
+						
+						double longitude = Double.parseDouble(element.get("longitude").toString());
+						double latitude = Double.parseDouble(element.get("latitude").toString());
+						
+						int movable = Integer.parseInt(element.get("moveableStatus").toString());
+						
+						
+						allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
+					}
 				}
-			}
-				
-			/*for(int i = 0; i < allMdsExhibits.length; i++) {
-				System.out.println("-------- Exhibit (" + i + ") --------");
-				//Ausgabe der Items
-				System.out.println("name: " + allMdsExhibits[i].getName());
-				System.out.println("url: " + allMdsExhibits[i].getUrl());
-				System.out.println("text: " + allMdsExhibits[i].getText());
-				System.out.println("position: x: " + allMdsExhibits[i].getLongitude() + " y: " +allMdsExhibits[i].getLatitude());
-				System.out.println("moveableStatus: " + allMdsExhibits[i].isMovable());
-			}*/
-		
+				//else if(name.equals("items"))  <-- für später
+			}		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
