@@ -113,7 +113,6 @@ public class JsonParser {
 						movable = false;
 					else movable = true;
 					
-					allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
 				}
 			}			
 			

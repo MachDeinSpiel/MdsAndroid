@@ -31,7 +31,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
-import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
@@ -377,22 +376,10 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		actionBar.removeTabAt(site);
 	}
 
-
-
-
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
-		
 	}
 
-
-
-
-	@Override
-	public Whiteboard getData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
