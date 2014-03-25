@@ -8,8 +8,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
 
 
@@ -35,6 +33,7 @@ public class ParserServer {
 				
 				if(name.equals("exhibits")) {
 					JSONArray MdsExhibits = (JSONArray) groupsElement.get("members");
+
 					
 					allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
 					String url, text;
