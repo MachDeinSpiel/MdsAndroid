@@ -30,9 +30,12 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import de.hsbremen.mds.android.listener.AndroidInitiater;
+import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
+import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
@@ -45,7 +48,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	ActionBar actionBar;
 	ViewPager viewPager;
 	Location location;
-	AndroidInitiater initiater;
+	public AndroidInitiater initiater;
 	LocationManager manager;
 	double longitude;
 	double latitude;
@@ -59,6 +62,12 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		ServerClientConnector conn = new ServerClientConnector();
+		
+		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
+		
+		conn.objectToJsonString(item);
+		
 		mfa = new MdsFragmentAdapter(getSupportFragmentManager());
 
 		// Initiater für die Listener registrierung
@@ -375,6 +384,15 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	public void update() {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+
+
+	@Override
+	public Whiteboard getData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

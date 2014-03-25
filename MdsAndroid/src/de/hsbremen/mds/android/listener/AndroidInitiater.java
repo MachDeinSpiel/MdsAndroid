@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.listener;
 
 import de.hsbremen.mds.common.listener.AndroidListener;
 import android.location.Location;

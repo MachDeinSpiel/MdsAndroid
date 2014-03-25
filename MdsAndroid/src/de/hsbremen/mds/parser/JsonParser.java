@@ -174,7 +174,8 @@ public class JsonParser {
 							}
 					}
 				}
-				allMdsStates[i] = new MdsState(id, name, doMdsAction, startMdsState, finalMdsState);
+				// TODO: Parentstate(im Moment null) muss noch eingepflegt werden
+				allMdsStates[i] = new MdsState(id, name, null ,doMdsAction, startMdsState, finalMdsState);
 			}
 			
 			for(int i = 0; i < MdsState.size(); i++) {

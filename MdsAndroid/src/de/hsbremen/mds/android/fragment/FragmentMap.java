@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.fragment;
 
 import android.location.Location;
 import android.location.LocationManager;
@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import de.hsbremen.mds.android.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
 

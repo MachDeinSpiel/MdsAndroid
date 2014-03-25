@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import de.hsbremen.mds.android.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
 /**
