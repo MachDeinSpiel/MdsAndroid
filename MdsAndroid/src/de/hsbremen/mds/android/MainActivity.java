@@ -31,7 +31,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
-import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
@@ -39,6 +38,7 @@ import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
+import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.interpreter.Interpreter;
 import de.hsbremen.mds.mdsandroid.R;
 

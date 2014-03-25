@@ -3,7 +3,6 @@ package de.hsbremen.mds.interpreter;
 import java.io.File;
 
 import android.util.Log;
-import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
@@ -11,6 +10,7 @@ import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.parser.Parser;
 /**
  * @author JW

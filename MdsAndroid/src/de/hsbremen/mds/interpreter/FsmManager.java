@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Vector;
 
 import android.location.Location;
-import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
+import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
 /**
@@ -62,7 +62,7 @@ public class FsmManager implements FsmInterface{
 	private MdsState checkEvent(MdsEvent e){
 		
 		//TODO: die transitionen des Currentstate mit dem Eventparser auf erfüllung (.)(.) prüfen dann in den nächsten state wechseln und returnen 
-		MdsTransition trans = eParser.checkEvents(wb.itemList.items, pos, currentState.getTransitions());
+//		MdsTransition trans = eParser.checkEvents(wb.itemList.items, pos, currentState.getTransitions());
 		return null;
 	}
 	

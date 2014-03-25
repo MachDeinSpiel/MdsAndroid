@@ -202,10 +202,12 @@ public class Parser {
 			
 			List<MdsState> states = Arrays.asList(allMdsStates);
 			List<MdsAction> actions = Arrays.asList(allMdsActions);
+			
+			// TODO: Hier wird allMdsExhibits auf null gesetzt, damit es deklariert existiert, bitte ändern
+			MdsExhibit[] allMdsExhibits = null;
 			List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
 			
 			// TODO: Hier wird noch null für allMdsItems gemacht, ändern!
-			
 			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
 			
 			interpreter.pushParsedObjects(MdsContainer);

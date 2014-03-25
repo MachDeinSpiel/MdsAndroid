@@ -113,7 +113,9 @@ public class JsonParser {
 						movable = false;
 					else movable = true;
 					
-					allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
+					// TODO: movable ist ein integer, kein boolean. bitte ändern, Funktioniert so nicht
+					// deswegen auskommentiert
+//					allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
 				}
 			}			
 			
