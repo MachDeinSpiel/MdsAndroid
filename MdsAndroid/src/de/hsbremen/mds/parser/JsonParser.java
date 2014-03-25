@@ -112,10 +112,7 @@ public class JsonParser {
 					if(element.get("moveable").equals(false))
 						movable = false;
 					else movable = true;
-					
-					// TODO: movable ist ein integer, kein boolean. bitte ändern, Funktioniert so nicht
-					// deswegen auskommentiert
-//					allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
+
 				}
 			}			
 			

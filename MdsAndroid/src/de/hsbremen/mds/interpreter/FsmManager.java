@@ -57,17 +57,6 @@ public class FsmManager implements FsmInterface{
 	}
 	
 	/**
-	 * hier läuft die finit state maschine
-	 */
-	private MdsState checkEvent(MdsEvent e){
-		
-		//TODO: die transitionen des Currentstate mit dem Eventparser auf erfüllung (.)(.) prüfen dann in den nächsten state wechseln und returnen 
-//		MdsTransition trans = eParser.checkEvents(wb.itemList.items, pos, currentState.getTransitions());
-		return null;
-	}
-	
-	
-	/**
 	 * Benachrichtigt alle Listerns 
 	 * 
 	 * @param next der nächste state
