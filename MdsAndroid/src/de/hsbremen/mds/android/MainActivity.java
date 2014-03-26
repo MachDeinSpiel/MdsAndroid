@@ -6,11 +6,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_17;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -68,6 +71,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		
 		conn.objectToJsonString(item);
 		
+//		createSocket();
+		
 		mfa = new MdsFragmentAdapter(getSupportFragmentManager());
 
 		// Initiater für die Listener registrierung
@@ -118,10 +123,29 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		Interpreter interpreter = new Interpreter(jsonDatei, this);
 		
 		initComplete = true;
-		
 	}
 	
-	
+	public void createSocket(){
+		Draft d = new Draft_17();
+		String clientname = "client";
+		String protocol = "ws";
+		String host = "localhost";
+		int port = 8887;
+		String serverlocation = protocol + "://" + host + ":" + port;
+		SocketClient sc;
+		URI uri = null;
+
+		uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
+				+ clientname);
+		sc = new SocketClient(d,uri);
+		
+		try {
+			sc.connect();
+			sc.send("Whaaaaaa");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 
 	public void redrawFragments(int number) {
@@ -380,6 +404,15 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
+	}
+
+
+
+
+	@Override
+	public Whiteboard getData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
