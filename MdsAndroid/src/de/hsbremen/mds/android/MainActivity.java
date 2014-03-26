@@ -6,12 +6,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_17;
 
@@ -33,6 +41,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
@@ -69,7 +78,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 		
-		conn.objectToJsonString(item);
+		String jsonForServer = conn.objectToJsonString(item);
 		
 //		createSocket();
 		
@@ -123,8 +132,33 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		Interpreter interpreter = new Interpreter(jsonDatei, this);
 		
 		initComplete = true;
+		
+//		sendHttpPost(jsonForServer);
 	}
 	
+	private void sendHttpPost(String json) {
+		
+		HttpClient client = new DefaultHttpClient();
+		HttpPost post = new HttpPost("http://172.0.0.1:8887");
+		
+		List<NameValuePair> postlist = new ArrayList<NameValuePair>();
+		postlist.add(new BasicNameValuePair("player", json));
+		
+		try {
+			   post.setEntity(new UrlEncodedFormEntity(postlist));
+			} catch (UnsupportedEncodingException e) {
+			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+			}
+		
+		try {
+			  HttpResponse response = client.execute(post);
+			} catch (ClientProtocolException e) {
+			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+			} catch (IOException e) {
+			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+			}
+	}
+
 	public void createSocket(){
 		Draft d = new Draft_17();
 		String clientname = "client";
@@ -139,9 +173,12 @@ public class MainActivity extends FragmentActivity implements TabListener,
 				+ clientname);
 		sc = new SocketClient(d,uri);
 		
+		Thread t = new Thread(sc);
+		t.start();
 		try {
-			sc.connect();
-			sc.send("Whaaaaaa");
+			t.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -155,6 +192,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+
 	}
 
 	@Override
@@ -334,7 +372,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		InputStream is = null;
 		
 		//InputStream is = getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/2.xml");
-//		InputStream is = getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/3");
+		//InputStream is = getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/3");
 		
 		// Temporäre Datei anlegen
 				File json = null;
