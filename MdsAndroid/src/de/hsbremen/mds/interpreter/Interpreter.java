@@ -15,10 +15,10 @@ import de.hsbremen.mds.parser.Parser;
 /**
  * @author JW
  */
-public class Interpreter implements InterpreterInterface, FsmInterface, AndroidListener{
+public class Interpreter implements InterpreterInterface, AndroidListener{
 	private ActionParser actionParser;
 	private EventParser eventParser;
-	private FsmManager fsmManager;
+	private FsmInterface fsmManager;
 	
 	private Whiteboard whiteboard;
 	
@@ -47,12 +47,6 @@ public class Interpreter implements InterpreterInterface, FsmInterface, AndroidL
 		//Starten
 		Log.d("Interpreter", "Let fsmManager checking Events...");
 		fsmManager.checkEvents();
-		
-	}
-
-	@Override
-	public void onStateChange(MdsState next, MdsState current, MdsEvent e) {
-		// TODO Actions ausführen, dann nach neuen erfüllten Transitions gucken
 		
 	}
 
