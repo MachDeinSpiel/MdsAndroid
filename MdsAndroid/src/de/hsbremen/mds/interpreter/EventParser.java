@@ -5,73 +5,78 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.location.Location;
-import de.hsbremen.mds.common.valueobjects.MdsObject;
-import de.hsbremen.mds.common.valueobjects.MdsValueObject;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 
 public class EventParser {
 	
-	public MdsTransition checkEvents(HashMap<String, MdsItem> items, Location loc, MdsTransition[] mdsTransitions) {
+	public static boolean checkEvent(MdsEvent event, HashMap<String, MdsItem> items, Location loc) {
 		
-		for(MdsTransition t : mdsTransitions) {
-			// alle mit Typ gameEvent
-			if (t.getEvent().getType().equals("gameEvent")) {
-				if(t.getEvent().getName().equals("nearby")) {
-					int radius = Integer.parseInt(t.getEvent().getParams().get("radius"));
-					// alle Items durchgehen und gucken ob genug vorhanden sind
-					int quanti = Integer.parseInt(t.getEvent().getParams().get("quantifier"));
-					if (checkLocationItems(items, loc, radius).size() >= quanti) {
-						return t;
-					}
+		// alle mit Typ gameEvent
+		if (event.getType().equals("gameEvent")) {
+			if(event.getName().equals("nearby")) {
+				int radius = Integer.parseInt(event.getParams().get("radius"));
+				// alle Items durchgehen und gucken ob genug vorhanden sind
+				int quanti = Integer.parseInt(event.getParams().get("quantifier"));
+				if (checkLocationItems(items, loc, radius).size() >= quanti) {
+					return true;
 				}
-			} else if (t.getEvent().getType().equals("condition")) {
-				// get value and compValue
-				double value = -1;
-				double compValue = -2;
-				try {  
-				    value = Double.parseDouble(t.getEvent().getParams().get("value"));  
-				} catch(NumberFormatException nfe) {  
-					// TODO: was wenn da dynamische Werte drin sind? 
-				} 
-				try {  
-				    compValue = Double.parseDouble(t.getEvent().getParams().get("compValue"));  
-				} catch(NumberFormatException nfe) {  
-					// TODO: was wenn da dynamische Werte drin sind? 
-				} 
-				
-				// get checkType
-				if (t.getEvent().getParams().get("checkType").equals("==")) {
-					if (value == compValue) {
-						return t;
-					}
-				} else if (t.getEvent().getParams().get("checkType").equals("<")) {
-					if (value < compValue) {
-						return t;
-					}
-				} else if (t.getEvent().getParams().get("checkType").equals(">")) {
-					if (value > compValue) {
-						return t;
-					}
-				} else if (t.getEvent().getParams().get("checkType").equals("<=")) {
-					if (value <= compValue) {
-						return t;
-					}
-				} else if (t.getEvent().getParams().get("checkType").equals(">=")) {
-					if (value >= compValue) {
-						return t;
-					}
+			}
+		// keine richtigen Events, "nur" Conditions
+		} else if (event.getType().equals("condition")) {
+			// get value and compValue
+			double value = -1;
+			double compValue = -2;
+			try {  
+			    value = Double.parseDouble(event.getParams().get("value"));  
+			} catch(NumberFormatException nfe) {  
+				// TODO: was wenn da dynamische Werte drin sind? 
+			} 
+			try {  
+			    compValue = Double.parseDouble(event.getParams().get("compValue"));  
+			} catch(NumberFormatException nfe) {  
+				// TODO: was wenn da dynamische Werte drin sind? 
+			} 
+			
+			// get checkType
+			if (event.getParams().get("checkType").equals("==")) {
+				if (value == compValue) {
+					return true;
+				}
+			} else if (event.getParams().get("checkType").equals("<")) {
+				if (value < compValue) {
+					return true;
+				}
+			} else if (event.getParams().get("checkType").equals(">")) {
+				if (value > compValue) {
+					return true;
+				}
+			} else if (event.getParams().get("checkType").equals("<=")) {
+				if (value <= compValue) {
+					return true;
+				}
+			} else if (event.getParams().get("checkType").equals(">=")) {
+				if (value >= compValue) {
+					return true;
 				}
 			}
 		}
 		// wenn kein Event gestimmt hat
-		return null;	
+		return false;	
 	}
 	
-	private List<MdsItem> checkLocationItems(HashMap<String, MdsItem> items, Location loc, int radius ) {
+	/**
+	 * Prüft wieviele Items innerhalb eines vordefinierten Radius von einer Position vorhanden sind
+	 * @param items
+	 * @param loc
+	 * @param radius
+	 * @return Liste mit Items innerhalb des Radius
+	 */
+	private static List<MdsItem> checkLocationItems(HashMap<String, MdsItem> items, Location loc, int radius ) {
 		
 		List<MdsItem> result = new ArrayList<MdsItem>();
 		
+		// Alle Items durchgehen
 		for (String key : items.keySet()) {
 			Location itemPos = new Location("ItemPos");
 			itemPos.setLatitude(items.get(key).getLatitude());

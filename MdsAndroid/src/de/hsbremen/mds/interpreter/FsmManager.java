@@ -6,6 +6,7 @@ import java.util.Vector;
 import android.location.Location;
 import de.hsbremen.mds.android.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
+import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
@@ -19,8 +20,8 @@ public class FsmManager implements FsmInterface{
 	private Location pos;
 	// TODO wofür ist denn das?
 	private List<FsmInterface> listeners = new Vector<FsmInterface>();
-	private EventParser eParser = new EventParser();
 	private MdsState currentState;
+	private MdsState lastState;
 	private Whiteboard wb;
 	
 	
@@ -31,7 +32,6 @@ public class FsmManager implements FsmInterface{
 		} catch (NoStartStateException e){
 			e.printStackTrace();
 		}
-		this.eParser = eParser;
 		this.wb = wb;
 	}
 		
@@ -59,10 +59,16 @@ public class FsmManager implements FsmInterface{
 	/**
 	 * hier läuft die finit state maschine
 	 */
-	private MdsState checkEvent(MdsEvent e){
+	public MdsState checkEvents(){
 		
 		//TODO: die transitionen des Currentstate mit dem Eventparser auf erfüllung (.)(.) prüfen dann in den nächsten state wechseln und returnen 
-		MdsTransition trans = eParser.checkEvents(wb.itemList.items, pos, currentState.getTransitions());
+		for(MdsTransition t : currentState.getTransitions()) {
+			if (EventParser.checkEvent(t.getEvent(), wb.itemList.items, pos)) {
+				notifyListeners(t.getTarget(), currentState);
+				return t.getTarget();
+			}
+		}
+		// wenn kein Event zutreffend war
 		return null;
 	}
 	
@@ -74,9 +80,9 @@ public class FsmManager implements FsmInterface{
 	 * @param current der alte state
 	 * @param e das event
 	 */
-	private void notifyListeners(MdsState next, MdsState current, MdsEvent e){
+	private void notifyListeners(MdsState next, MdsState current){
 		for(FsmInterface f:this.listeners){
-			f.onStateChange(next,current,e);
+			f.onStateChange(next,current);
 		}
 	}
 
@@ -88,20 +94,17 @@ public class FsmManager implements FsmInterface{
 	}
 
 	@Override
-	public void onStateChange(MdsState next, MdsState current, MdsEvent e) {
+	public void onStateChange(MdsState next, MdsState current) {
+		this.currentState = next;
+		this.lastState = current;
+		// TODO: Actions ausführen
+	}
+
+
+	@Override
+	public void addStateChangedListener(InterpreterInterface interpreter) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	public void addStateChangedListener(Interpreter interpreter) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void checkEvents() {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 }
