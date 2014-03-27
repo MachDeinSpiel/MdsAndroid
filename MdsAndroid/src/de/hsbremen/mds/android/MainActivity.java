@@ -67,6 +67,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	MdsFragmentAdapter mfa = null;
 	ActionBar.Tab tabMap = null;
 	boolean initComplete = false;
+	ServerClientConnector connector;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +75,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		ServerClientConnector conn = new ServerClientConnector();
-		
-		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
-		
-		String jsonForServer = conn.objectToJsonString(item);
-		
-//		createSocket();
-		
 		mfa = new MdsFragmentAdapter(getSupportFragmentManager());
 
 		// Initiater für die Listener registrierung
@@ -90,7 +83,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		File jsonDatei = jsonEinlesen();
 
 		// Interpreter Instanziert und sich selbst mitgegeben.
-		
+
 		viewPager = (ViewPager) findViewById(R.id.pager);
 
 		viewPager.setAdapter(mfa);
@@ -118,72 +111,34 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		mfa.addFragment("FragmentBackpack");
 		mfa.addFragment("FragmentMap");
 		mfa.addFragment("FragmentText");
-//		mfa.addFragment("FragmentImage");
+		// mfa.addFragment("FragmentImage");
 		mfa.addFragment("FragmentVideo");
-
 
 		addTab("Backpack");
 		addTab("Map");
 		addTab("Text");
-//		addTab("Image");
+		// addTab("Image");
 		addTab("Video");
-		
-		// Hier wird der Interpreter erstellt und wir mitgegeben und als Interface genutzt
+
+		// Hier wird der Interpreter erstellt und wir mitgegeben und als
+		// Interface genutzt
 		Interpreter interpreter = new Interpreter(jsonDatei, this);
-		
+
 		initComplete = true;
-		
-//		sendHttpPost(jsonForServer);
-	}
-	
-	private void sendHttpPost(String json) {
-		
-		HttpClient client = new DefaultHttpClient();
-		HttpPost post = new HttpPost("http://172.0.0.1:8887");
-		
-		List<NameValuePair> postlist = new ArrayList<NameValuePair>();
-		postlist.add(new BasicNameValuePair("player", json));
-		
-		try {
-			post.setEntity(new UrlEncodedFormEntity(postlist));
-		} catch (UnsupportedEncodingException e) {
-			Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-		}
-		
-		try {
-			HttpResponse response = client.execute(post);
-		} catch (ClientProtocolException e) {
-			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-		} catch (IOException e) {
-			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-		}
-	}
 
-	public void createSocket(){
-		Draft d = new Draft_17();
-		String clientname = "client";
-		String protocol = "ws";
-		String host = "localhost";
-		int port = 8887;
-		String serverlocation = protocol + "://" + host + ":" + port;
-		SocketClient sc;
-		URI uri = null;
+		// Serverkommunikation
+		connector = new ServerClientConnector(this);
 
-		uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
-				+ clientname);
-		sc = new SocketClient(d,uri);
+		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
+
+		String jsonForServer = connector.objectToJsonString(item);
 		
-		Thread t = new Thread(sc);
-		t.start();
-		try {
-			t.join();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		connector.httpGetString("http://192.168.2.116:8887/mds/appinfo");
+
+		// createSocket();
+		
+		// sendHttpPost(jsonForServer);
 	}
-	
 
 	public void redrawFragments(int number) {
 		mfa.removeFragment(number);
@@ -345,87 +300,77 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		// TODO Auto-generated method stub
 
 		viewPager.setCurrentItem(0);
-		
-		if(initComplete){
+
+		if (initComplete) {
 			TextView view = (TextView) findViewById(R.id.placeholderText);
 			view.setText("Sie haben noch keine Sehenswürdigkeit erreicht");
 		}
 	}
 
-	public static InputStream getInputStreamFromUrl(String url) {
-		  InputStream content = null;
-		  try {
-		    HttpClient httpclient = new DefaultHttpClient();
-		    HttpResponse response = httpclient.execute(new HttpGet(url));
-		    content = response.getEntity().getContent();
-		  } catch (Exception e) {
-		    Log.e("[GET REQUEST]", "Network exception", e);
-		  }
-		    return content;
-		}
-
 	private File jsonEinlesen() {
 
 		ThreadPolicy tp = ThreadPolicy.LAX;
 		StrictMode.setThreadPolicy(tp);
-		
+
 		InputStream is = null;
-		
-		//InputStream is = getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/2.xml");
-		//InputStream is = getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/3");
-		
+
+		// InputStream is =
+		// getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/2.xml");
+		// InputStream is =
+		// getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/3");
+
 		// TemporŠre Datei anlegen
-				File json = null;
-				try {
-					json = File.createTempFile("TourismApp", ".json");
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+		File json = null;
+		try {
+			json = File.createTempFile("TourismApp", ".json");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
-//				Zum Testen bitte drin lassen!!
-				// Assetmanager um auf den Assetordner zuzugreifen(Json ist da drin)
+		// Zum Testen bitte drin lassen!!
+		// Assetmanager um auf den Assetordner zuzugreifen(Json ist da drin)
 
-				    AssetManager am = getAssets();
+		AssetManager am = getAssets();
 
-				      // Inputstream zum einlesen der Json
-				      try {
-						is = am.open("test.json");
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+		// Inputstream zum einlesen der Json
+		try {
+			is = am.open("test.json");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
-				try {
-					// Inputstream zum einlesen der Json
-					BufferedReader br = new BufferedReader(new InputStreamReader(is));
-					
-					// Json wird zeilenweise eingelesn uns in das File json geschrieben
-					FileWriter writer = new FileWriter(json ,true);
-					
-					String t = "";
-					
-					while((t = br.readLine()) != null){
-						System.out.println(t);
-						writer.write(t);
-					}
-					
-					writer.flush();
-					writer.close();
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-				}       
+		try {
+			// Inputstream zum einlesen der Json
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-				// †berprŸfung, ob es geklappt hat
-				if(json.exists()){
-					System.out.println("Geklappt");
-					System.out.println(json.length());
-				}else{
-					System.out.println("Nicht geklappt");
-				}
-				
-				return json;
-		  
+			// Json wird zeilenweise eingelesn uns in das File json geschrieben
+			FileWriter writer = new FileWriter(json, true);
+
+			String t = "";
+
+			while ((t = br.readLine()) != null) {
+				System.out.println(t);
+				writer.write(t);
+			}
+
+			writer.flush();
+			writer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// †berprŸfung, ob es geklappt hat
+		if (json.exists()) {
+			System.out.println("Geklappt");
+			System.out.println(json.length());
+		} else {
+			System.out.println("Nicht geklappt");
+		}
+
+		return json;
+
 	}
 
 	public void addTab(String name) {
@@ -439,19 +384,22 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		actionBar.removeTabAt(site);
 	}
 
+	/*
+	 * Shows Toast for Debbuging
+	 */
+	public void toastShow(String text, int toastLength) {
+		Toast.makeText(this, text, toastLength).show();
+	}
+
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
 	}
-
-
-
 
 	@Override
 	public Whiteboard getData() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }
