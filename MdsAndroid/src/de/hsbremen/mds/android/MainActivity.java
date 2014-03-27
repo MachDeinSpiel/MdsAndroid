@@ -128,7 +128,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 //		addTab("Image");
 		addTab("Video");
 		
-		// TODO: Hier muss noch ein Möglichkeit gefunden werden den Interpreter oder ein Interface zu erstellen
+		// Hier wird der Interpreter erstellt und wir mitgegeben und als Interface genutzt
 		Interpreter interpreter = new Interpreter(jsonDatei, this);
 		
 		initComplete = true;
@@ -145,18 +145,18 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		postlist.add(new BasicNameValuePair("player", json));
 		
 		try {
-			   post.setEntity(new UrlEncodedFormEntity(postlist));
-			} catch (UnsupportedEncodingException e) {
-			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-			}
+			post.setEntity(new UrlEncodedFormEntity(postlist));
+		} catch (UnsupportedEncodingException e) {
+			Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+		}
 		
 		try {
-			  HttpResponse response = client.execute(post);
-			} catch (ClientProtocolException e) {
+			HttpResponse response = client.execute(post);
+		} catch (ClientProtocolException e) {
 			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-			} catch (IOException e) {
+		} catch (IOException e) {
 			   Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-			}
+		}
 	}
 
 	public void createSocket(){
