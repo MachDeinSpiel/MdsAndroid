@@ -132,8 +132,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
 		String jsonForServer = connector.objectToJsonString(item);
-		
-		connector.httpGetString("http://192.168.2.116:8887/mds/appinfo");
+
+		connector.httpGetString("http://192.168.2.116:8080/mds/appinfo");
 
 		// createSocket();
 		
