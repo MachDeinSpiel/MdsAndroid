@@ -6,20 +6,25 @@ import java.nio.ByteBuffer;
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 
-public class SocketClient extends WebSocketClient {
+import android.widget.Toast;
 
-	public SocketClient(Draft d, URI uri) {
+public class SocketClient extends WebSocketClient {
+	
+	MainActivity main = null;
+	
+	public SocketClient(Draft d, URI uri, MainActivity main) {
 		super(uri, d);
+		this.main = main;
 	}
 
 	@Override
 	public void onMessage(String message) {
 		send(message);
+		main.toastShow(message, Toast.LENGTH_LONG);
 	}
 
 	@Override

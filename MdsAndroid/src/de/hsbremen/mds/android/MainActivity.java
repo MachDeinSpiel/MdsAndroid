@@ -6,22 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_17;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -38,7 +22,6 @@ import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,6 +65,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 		File jsonDatei = jsonEinlesen();
 
+		
 		// Interpreter Instanziert und sich selbst mitgegeben.
 
 		viewPager = (ViewPager) findViewById(R.id.pager);
@@ -102,6 +86,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 			public void onPageSelected(int pos) {
 				actionBar.setSelectedNavigationItem(pos);
 			}
+			
+			
 
 		});
 
@@ -127,15 +113,15 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		initComplete = true;
 
 		// Serverkommunikation
-		connector = new ServerClientConnector(this);
+		connector = new ServerClientConnector(this, "172.38.8.42");
 
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
 		String jsonForServer = connector.objectToJsonString(item);
 
-		connector.httpGetString("http://192.168.2.116:8080/mds/appinfo");
+		connector.httpGetString("/mds/appinfo");
 
-		// createSocket();
+		//connector.createSocket("Android");
 		
 		// sendHttpPost(jsonForServer);
 	}

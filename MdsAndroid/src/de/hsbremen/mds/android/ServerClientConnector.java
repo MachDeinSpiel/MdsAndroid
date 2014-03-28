@@ -33,9 +33,16 @@ import com.google.gson.GsonBuilder;
 public class ServerClientConnector {
 
 	private MainActivity main;
-
-	public ServerClientConnector(MainActivity main) {
+	private String serverIp;
+	private static final String PROTOKOLL_HTTP = "http://";
+	private static final String PORT_HTTP = ":8080";
+	private static final String PROTOKOLL_WS = "ws://";
+	private static final String PORT_WS = ":8887";
+	
+	
+	public ServerClientConnector(MainActivity main, String serverIp) {
 		this.main = main;
+		this.serverIp = serverIp;
 	}
 
 	public String objectToJsonString(Object obj) {
@@ -57,16 +64,17 @@ public class ServerClientConnector {
 		return gson.fromJson(json, getClass());
 	}
 
-	public InputStream httpGet(String url) {
+	private InputStream httpGet(String path) {
 		InputStream content = null;
 		try {
 			HttpClient httpclient = new DefaultHttpClient();
-			HttpGet httpGet = new HttpGet(url);
+			HttpGet httpGet = new HttpGet(PROTOKOLL_HTTP + serverIp + path);
+			
 			HttpResponse response = httpclient.execute(httpGet);
+			
 			// Debugnachricht
 			Log.i("debug_Client", response.getStatusLine().toString());
 			content = response.getEntity().getContent();
-			// vllt abort zu früh?:
 			httpGet.abort();
 		} catch (Exception e) {
 			Log.e("debug_Client", "Network exception", e);
@@ -100,10 +108,10 @@ public class ServerClientConnector {
 		return result;
 	}
 
-	private void httpPost(String json) {
+	private void httpPost(String json, String path) {
 
 		HttpClient client = new DefaultHttpClient();
-		HttpPost post = new HttpPost("http://172.0.0.1:8887");
+		HttpPost post = new HttpPost(PROTOKOLL_HTTP + serverIp + PORT_HTTP + path);
 
 		List<NameValuePair> postlist = new ArrayList<NameValuePair>();
 		postlist.add(new BasicNameValuePair("player", json));
@@ -123,19 +131,15 @@ public class ServerClientConnector {
 		}
 	}
 
-	public void createSocket() {
+	public void createSocket(String clientname) {
 		Draft d = new Draft_17();
-		String clientname = "client";
-		String protocol = "ws";
-		String host = "localhost";
-		int port = 8887;
-		String serverlocation = protocol + "://" + host + ":" + port;
+		
+		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 		SocketClient sc;
-		URI uri = null;
 
-		uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
+		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
 				+ clientname);
-		sc = new SocketClient(d, uri);
+		sc = new SocketClient(d, uri, main);
 
 		Thread t = new Thread(sc);
 		t.start();
