@@ -10,6 +10,7 @@ import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 
+import android.util.Log;
 import android.widget.Toast;
 
 public class SocketClient extends WebSocketClient {
@@ -24,31 +25,33 @@ public class SocketClient extends WebSocketClient {
 	@Override
 	public void onMessage(String message) {
 		send(message);
-		main.toastShow(message, Toast.LENGTH_LONG);
+
+		Log.d("Na", "Message vom Server: " + message);
 	}
 
 	@Override
 	public void onMessage(ByteBuffer blob) {
+		Log.d("Na", "Message ByteBuffer");
 		getConnection().send(blob);
 	}
 
 	@Override
 	public void onError(Exception ex) {
-		System.out.println("Error: ");
-		ex.printStackTrace();
+		Log.d("Na", "Error: " + ex.getMessage());
 	}
 
 	@Override
 	public void onOpen(ServerHandshake handshake) {
-		System.out.println("Serverhandshake hat geklappt");
+		Log.d("Na", "onOpen, Serverhandshake");
 	}
 
 	@Override
 	public void onClose(int code, String reason, boolean remote) {
-		System.out.println("Closed: " + code + " " + reason);
+		Log.d("Na", "Closed: " + code + " " + reason);
 	}
 
 	public void onWebsocketMessageFragment(WebSocket conn, Framedata frame) {
+		Log.d("Na", "onWebsocketMessageFragment");
 		FrameBuilder builder = (FrameBuilder) frame;
 		builder.setTransferemasked(true);
 		getConnection().sendFrame(frame);

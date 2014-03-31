@@ -50,7 +50,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	MdsFragmentAdapter mfa = null;
 	ActionBar.Tab tabMap = null;
 	boolean initComplete = false;
-	ServerClientConnector connector;
+	public ServerClientConnector connector;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +86,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 			public void onPageSelected(int pos) {
 				actionBar.setSelectedNavigationItem(pos);
 			}
-			
-			
-
 		});
 
 		actionBar = getActionBar();
@@ -97,13 +94,11 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		mfa.addFragment("FragmentBackpack");
 		mfa.addFragment("FragmentMap");
 		mfa.addFragment("FragmentText");
-		// mfa.addFragment("FragmentImage");
 		mfa.addFragment("FragmentVideo");
 
 		addTab("Backpack");
 		addTab("Map");
 		addTab("Text");
-		// addTab("Image");
 		addTab("Video");
 
 		// Hier wird der Interpreter erstellt und wir mitgegeben und als
@@ -113,17 +108,21 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		initComplete = true;
 
 		// Serverkommunikation
-		connector = new ServerClientConnector(this, "172.38.8.42");
+		// Wichtig hier: Solange noch kein Server verfügbar ist die IP Adresse vom PC eingeben
+		// auf dem der Server läuft(In der Hochschule wird das irgendwie geblockt, also kann man dort schlecht testen)
+		connector = new ServerClientConnector(this, "192.168.1.5" ); // "172.38.8.42"
 
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
 		String jsonForServer = connector.objectToJsonString(item);
-
-		connector.httpGetString("/mds/appinfo");
-
-		//connector.createSocket("Android");
 		
-		// sendHttpPost(jsonForServer);
+		new Thread(){
+			@Override public void run() {
+				connector.createSocket("Android");
+			}
+		}.start();
+
+//		connector.httpGetString("/mds/appinfo");
 	}
 
 	public void redrawFragments(int number) {

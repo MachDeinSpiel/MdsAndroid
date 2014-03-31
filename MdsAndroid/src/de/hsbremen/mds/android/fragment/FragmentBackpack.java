@@ -19,6 +19,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+import de.hsbremen.mds.android.MainActivity;
+import de.hsbremen.mds.android.ServerClientConnector;
 import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
 
@@ -104,6 +106,12 @@ public class FragmentBackpack extends Fragment {
 			Toast.makeText(getActivity(), itemList.get(info.position).getName()+" benutzt!", Toast.LENGTH_LONG).show();
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);
+			
+
+			String jsonS = "{Name:Julian}";
+			ServerClientConnector c = ((MainActivity)getActivity()).connector;
+			c.httpPost("player",jsonS, "/mds/player");
+			
 		}
 		
 		if(item.getTitle()=="Ablegen"){

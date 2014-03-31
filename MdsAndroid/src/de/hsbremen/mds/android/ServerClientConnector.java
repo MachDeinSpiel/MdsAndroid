@@ -108,13 +108,15 @@ public class ServerClientConnector {
 		return result;
 	}
 
-	private void httpPost(String json, String path) {
+	public void httpPost(String parameter,String json, String path) {
 
 		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost(PROTOKOLL_HTTP + serverIp + PORT_HTTP + path);
-
+		Log.d("Na", PROTOKOLL_HTTP + serverIp + PORT_HTTP + path);
 		List<NameValuePair> postlist = new ArrayList<NameValuePair>();
-		postlist.add(new BasicNameValuePair("player", json));
+		
+		// Paramter ist z.B. player, game usw.
+		postlist.add(new BasicNameValuePair(parameter, json));
 
 		try {
 			post.setEntity(new UrlEncodedFormEntity(postlist));
