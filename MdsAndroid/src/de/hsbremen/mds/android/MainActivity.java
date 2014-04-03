@@ -218,26 +218,22 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void onLocationChanged(Location arg0) {
-		// TODO Auto-generated method stub
 		updateLocationFields();
 		initiater.locationChanged(arg0);
 	}
 
 	@Override
 	public void onProviderDisabled(String arg0) {
-		// TODO Auto-generated method stub
 		showProviderDisable();
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-		// TODO Auto-generated method stub
 		showProviderEnable();
 	}
 
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -248,7 +244,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void nextFragment(MdsImage mds) {
-		// TODO Auto-generated method stub
 		// mfa.addFragment("FragmentImage");
 		// addTab("Image");
 		viewPager.setCurrentItem(2);
@@ -258,7 +253,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void nextFragment(MdsVideo mds) {
-		// TODO Auto-generated method stub
 		// mfa.addFragment("FragmentVideo");
 		// addTab("Video");
 		viewPager.setCurrentItem(3);
@@ -268,7 +262,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void nextFragment(MdsText mds) {
-		// TODO Auto-generated method stub
 		// mfa.addFragment("FragmentText");
 		// addTab("Text");
 		viewPager.setCurrentItem(1);
@@ -282,7 +275,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void nextFragment(MdsMap mds) {
-		// TODO Auto-generated method stub
 
 		viewPager.setCurrentItem(0);
 
@@ -321,7 +313,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		try {
 			is = am.open("test.json");
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -378,13 +369,31 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public Whiteboard getData() {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void getServerData(String type, int id) {
+		String s = connector.httpGetString("/mds/" + type + "/" + id);
+		if(type.equals("item")){
+			addItemtoList(s);
+		}else if(type.equals("player")){
+			addPlayertoList(s);
+		}
+	}
+
+	private void addItemtoList(String s) {
+		// TODO Müssen noch erstellt werden
+		
+	}
+
+	private void addPlayertoList(String s) {
+		// TODO Müssen noch erstellt werden
+		
 	}
 
 }

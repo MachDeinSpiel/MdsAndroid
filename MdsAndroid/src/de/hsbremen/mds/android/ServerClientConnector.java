@@ -68,7 +68,9 @@ public class ServerClientConnector {
 		InputStream content = null;
 		try {
 			HttpClient httpclient = new DefaultHttpClient();
-			HttpGet httpGet = new HttpGet(PROTOKOLL_HTTP + serverIp + path);
+			HttpGet httpGet = new HttpGet(PROTOKOLL_HTTP + serverIp + PORT_HTTP + path);
+			
+			Log.d("Na", "Link zum Getten: " + PROTOKOLL_HTTP + serverIp + PORT_HTTP + path);
 			
 			HttpResponse response = httpclient.execute(httpGet);
 			
@@ -83,9 +85,9 @@ public class ServerClientConnector {
 		return content;
 	}
 
-	public String httpGetString(String url) {
+	public String httpGetString(String path) {
 
-		InputStream instream = this.httpGet(url);
+		InputStream instream = this.httpGet(path);
 
 		// Stream in Json String umwandeln:
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -146,7 +148,9 @@ public class ServerClientConnector {
 		Thread t = new Thread(sc);
 		t.start();
 		try {
+			Log.d("Na", "Starting Socketconnection");
 			t.join();
+			Log.d("Na", "Socketconnection successful");
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {

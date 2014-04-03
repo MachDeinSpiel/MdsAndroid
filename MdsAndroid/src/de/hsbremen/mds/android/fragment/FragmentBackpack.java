@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -107,17 +108,55 @@ public class FragmentBackpack extends Fragment {
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);
 			
-
-			String jsonS = "{Name:Julian}";
+			String jsonItem = "{Name:Apple}";
 			ServerClientConnector c = ((MainActivity)getActivity()).connector;
-			c.httpPost("player",jsonS, "/mds/player");
+			c.httpPost("item",jsonItem, "/mds/item");
 			
+			String jsonPlayer = "{Name:Julian}";
+			c.httpPost("player",jsonPlayer, "/mds/player");
 		}
 		
 		if(item.getTitle()=="Ablegen"){
 			Toast.makeText(getActivity(), "Du hast "+itemList.get(info.position).getName()+" abgelegt!", Toast.LENGTH_LONG).show();
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);
+			
+			ServerClientConnector c = ((MainActivity)getActivity()).connector;
+			String s = c.httpGetString("/mds/item/0");
+			Log.d("Na", s);
+			
+			String s1 = c.httpGetString("/mds/item/1");
+			Log.d("Na", s1);
+			
+			String s2 = c.httpGetString("/mds/item/2");
+			Log.d("Na", s2);
+			
+			String s3 = c.httpGetString("/mds/item/3");
+			Log.d("Na", s3);
+			
+			String s4 = c.httpGetString("/mds/item/4");
+			Log.d("Na", s4);
+			
+			String s5 = c.httpGetString("/mds/item/5");
+			Log.d("Na", s5);
+			
+			String s6 = c.httpGetString("/mds/item/6");
+			Log.d("Na", s6);
+			
+			String s7 = c.httpGetString("/mds/item/7");
+			Log.d("Na", s7);
+			
+			String s8 = c.httpGetString("/mds/player/0");
+			Log.d("Na", s8);
+			
+			String s9 = c.httpGetString("/mds/player/1");
+			Log.d("Na", s9);
+			
+			String s10 = c.httpGetString("/mds/player/2");
+			Log.d("Na", s10);
+			
+			String s11 = c.httpGetString("/mds/player/3");
+			Log.d("Na", s11);
 		}
 
 		if(item.getTitle()=="Essen"){
