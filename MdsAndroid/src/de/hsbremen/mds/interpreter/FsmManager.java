@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 import android.location.Location;
-import de.hsbremen.mds.android.whiteboard.Whiteboard;
+import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
@@ -13,12 +13,12 @@ import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
 /**
- * @author JW
+ * @author JWO
  */
 public class FsmManager implements FsmInterface{
 	private List<MdsState> states;
 	private Location pos;
-	// TODO wofür ist denn das?
+
 	private List<FsmInterface> listeners = new Vector<FsmInterface>();
 	private MdsState currentState;
 	private MdsState lastState;
