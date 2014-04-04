@@ -3,7 +3,7 @@ package de.hsbremen.mds.interpreter;
 import java.io.File;
 
 import android.util.Log;
-import de.hsbremen.mds.android.whiteboard.Whiteboard;
+import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
