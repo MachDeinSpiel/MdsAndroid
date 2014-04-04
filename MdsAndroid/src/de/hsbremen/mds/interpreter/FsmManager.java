@@ -109,4 +109,3 @@ public class FsmManager implements FsmInterface{
 	}
 
 }
->>>>>>> branch 'devInterpreter' of https://github.com/MachDeinSpiel/MdsAndroid.git
