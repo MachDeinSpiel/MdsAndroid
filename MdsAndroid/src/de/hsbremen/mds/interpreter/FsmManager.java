@@ -13,7 +13,7 @@ import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
 /**
- * @author JW
+ * @author JWO
  */
 public class FsmManager implements FsmInterface{
 	private List<MdsState> states;
