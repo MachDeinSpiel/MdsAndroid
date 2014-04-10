@@ -13,7 +13,6 @@ import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.parser.Parser;
@@ -23,7 +22,7 @@ import de.hsbremen.mds.parser.Parser;
  */
 public class Interpreter implements InterpreterInterface, AndroidListener, ClientInterpreterInterface, FsmInterface{
 	private ActionParser actionParser;
-	
+	private FsmManager fsmManager;
 	private Whiteboard whiteboard;
 	private int myId;
 	private GuiInterface gui;
@@ -34,6 +33,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 		//TODO: getData 
 		this.myId = playerId;
 		new Parser(this,json);	
+		
 	}
 
 	
@@ -41,15 +41,10 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 	public void pushParsedObjects(MdsObjectContainer objectContainer) {		
 		Log.d("Interpreter", "Geparste Objekte vo Parser bekommen");
 		this.gui.setAndroidListener(this, 5);
-		
-		this.onDataSet();
+		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard);
 	}
 	
-	private void onDataSet(){
-		//Starten
-		Log.d("Interpreter", "Let fsmManager checking Events...");
-		
-	}
+
 
 	@Override
 	public void onButtonClick(String buttonName) {

@@ -35,6 +35,7 @@ public class FsmManager {
 	private void setState(MdsState current, String setTo){
 		if(setTo.equals("currentState") || setTo.equals("lastState")){
 			wb.setAttributeValue(current, "player",Integer.toString(myID),setTo);
+			this.notifyListeners();
 		} else {
 			/*
 			 * TODO fehler auffangen
@@ -81,7 +82,6 @@ public class FsmManager {
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
 			if(EventParser.checkEvent(t.getEvent(), complied, this.wb, this.myID)){
 				this.setState(t.getTarget(), "currentState");
-				this.notifyListeners();
 			}
 		}
 	}
