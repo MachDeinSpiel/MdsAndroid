@@ -84,8 +84,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
-		// TODO Auto-generated method stub
-		
+		whiteboard.setAttributeValue(value, (String[])keys.toArray());		
 	}
 
 	@Override
