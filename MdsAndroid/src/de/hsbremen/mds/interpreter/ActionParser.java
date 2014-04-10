@@ -8,6 +8,9 @@ import java.util.Vector;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsImageAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMapAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsTextAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsVideoAction;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 
@@ -35,6 +38,13 @@ public class ActionParser {
 		switch(action.getIdent()){
 		case showVideo:
 			return new MdsVideoAction(params.get("title"), params.get("url"), params.get("text"));
+		case showMap:
+			return new MdsMapAction("Map", Double.parseDouble(params.get("longitude")), Double.parseDouble(params.get("latitude")));
+		case showImage:
+			return new MdsImageAction(params.get("title"), params.get("url"), params.get("text"));
+		case showText:
+			return new MdsTextAction(params.get("title"), params.get("text"));
+
 		default:
 			return null;
 		}
