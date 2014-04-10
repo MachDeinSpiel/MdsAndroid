@@ -14,22 +14,40 @@ import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
 /**
- * @author JWO
+ * @author JGWNH
  */
-public class FsmManager implements FsmInterface{
+public class FsmManager {
 	private List<MdsState> states;
-	private Location pos;
-	// TODO wofür ist denn das?
 	private List<FsmInterface> listeners = new Vector<FsmInterface>();
-	private MdsState currentState;
-	private MdsState lastState;
+	private int myID;
 	private Whiteboard wb;
+	/**
+	 * den Aktuellen State aus dem Whiteboard holen
+	 * @return
+	 */
+	private MdsState getCurrentState(){
+		return (MdsState)this.wb.getAttribute("player" ,Integer.toString(myID), "currentState").value;
+	}
+	
+	/**
+	 * Um einen State in das Whiteboard schreiben
+	 * @return
+	 */
+	private void setState(MdsState current, String setTo){
+		if(setTo.equals("currentState") || setTo.equals("lastState")){
+			wb.setAttributeValue(current, "player",Integer.toString(myID),setTo);
+		} else {
+			/*
+			 * TODO fehler auffangen
+			 */
+		}
+	}
 	
 	
-	public FsmManager(List<MdsState> states, EventParser eParser, Whiteboard wb){
+	public FsmManager(List<MdsState> states, Whiteboard wb){
 		this.states = states;
 		try{
-			this.currentState = this.getFirstState();
+			this.setState(this.getFirstState(),"currentState");
 		} catch (NoStartStateException e){
 			e.printStackTrace();
 		}
@@ -52,7 +70,7 @@ public class FsmManager implements FsmInterface{
 		}
 		/*
 		 * Wenn null returned wird muss noch eine exception geworfen werden
-		 * eg. FsmNoStatestateExcepption
+		 * eg. FsmNoStartStateExcepption
 		 */
 		throw new NoStartStateException();
 	}
@@ -60,52 +78,26 @@ public class FsmManager implements FsmInterface{
 	/**
 	 * hier läuft die finit state maschine
 	 */
-	public MdsState checkEvents(){
-		
-		//TODO: die transitionen des Currentstate mit dem Eventparser auf erfüllung (.)(.) prüfen dann in den nächsten state wechseln und returnen 
-		for(MdsTransition t : currentState.getTransitions()) {
-			if (EventParser.checkEvent(t.getEvent(), wb.itemList.items, pos)) {
-				notifyListeners(t.getTarget(), currentState);
-				return t.getTarget();
+	public void checkEvents(MdsEvent complied){
+		for(MdsTransition t : this.getCurrentState().getTransitions()){
+			if(EventParser.checkEvent(t.getEvent(), complied, this.wb, this.myID)){
+				this.setState(t.getTarget(), "currentState");
+				this.notifyListeners();
 			}
 		}
-		// wenn kein Event zutreffend war
-		return null;
 	}
 	
 	
 	/**
-	 * Benachrichtigt alle Listerns 
-	 * 
-	 * @param next der nächste state
-	 * @param current der alte state
-	 * @param e das event
+	 * Benachrichtigt alle Listener
 	 */
-	private void notifyListeners(MdsState next, MdsState current){
+	private void notifyListeners(){
 		for(FsmInterface f:this.listeners){
-			f.onStateChange(next,current);
+			f.onStateChange();
 		}
 	}
 
 
 	
-	public void onEvent(MdsEvent e) {
-		// TODO checkevent aufrufen 
-		
-	}
-
-	@Override
-	public void onStateChange(MdsState next, MdsState current) {
-		this.currentState = next;
-		this.lastState = current;
-		// TODO: Actions ausführen
-	}
-
-
-	@Override
-	public void addStateChangedListener(InterpreterInterface interpreter) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }
