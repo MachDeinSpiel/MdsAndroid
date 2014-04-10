@@ -8,17 +8,17 @@ import java.util.Vector;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
-import de.hsbremen.mds.interpreter.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 
 public class EventParser {
 	
-	public static boolean checkEvent(MdsEvent toCheck, MdsEvent compliedEvent, Whiteboard wb) {
+	public static boolean checkEvent(MdsEvent toCheck, MdsEvent compliedEvent, Whiteboard wb, int playerId) {
 		
 		// alle mit Typ gameEvent
 		if (toCheck.getType().equals("gameEvent")) {
 			if(toCheck.getName().equals("nearby")) {
-				 double longitude = wb.getAttribute("players", Integer.toString(my))
-				 double latitude
+				double longitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "longitude").value;
+				double latitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "latitude").value;
 				int radius = Integer.parseInt(toCheck.getParams().get("radius"));
 				// alle Items durchgehen und gucken ob genug vorhanden sind
 				int quanti = Integer.parseInt(toCheck.getParams().get("quantifier"));
