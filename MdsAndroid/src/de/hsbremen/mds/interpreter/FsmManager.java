@@ -1,3 +1,4 @@
+
 package de.hsbremen.mds.interpreter;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class FsmManager {
 	private MdsState getCurrentState(){
 		return (MdsState)this.wb.getAttribute("player" ,Integer.toString(myID), "currentState").value;
 	}
-	
+
 	/**
 	 * Um einen State in das Whiteboard schreiben
 	 * @return
@@ -42,8 +43,8 @@ public class FsmManager {
 			 */
 		}
 	}
-	
-	
+
+
 	public FsmManager(List<MdsState> states, Whiteboard wb){
 		this.states = states;
 		try{

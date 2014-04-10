@@ -1,9 +1,10 @@
+
 package de.hsbremen.mds.parser;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,7 +34,6 @@ public class ParserServer {
 				
 				if(name.equals("exhibits")) {
 					JSONArray MdsExhibits = (JSONArray) groupsElement.get("members");
-
 					
 					allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
 					String url, text;
@@ -55,7 +55,7 @@ public class ParserServer {
 						allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
 					}
 				}
-				//else if(name.equals("items"))  <-- für später
+				//else if(name.equals("items"))  <-- fÃ¼r spÃ¤ter
 			}		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
