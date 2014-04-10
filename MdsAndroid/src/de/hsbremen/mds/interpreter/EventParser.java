@@ -68,6 +68,10 @@ public class EventParser {
 					return true;
 				}
 			}
+		} else if (toCheck.getType().equals("uiEvent") && compliedEvent != null) {
+			//Wenn ein uiEvent geprüft werden soll, wird es stumpf verglichen
+			return (toCheck.getType().equals(compliedEvent.getType()) && toCheck.getName().equals(compliedEvent.getName()));
+			
 		}
 		// wenn kein Event gestimmt hat
 		return false;	
