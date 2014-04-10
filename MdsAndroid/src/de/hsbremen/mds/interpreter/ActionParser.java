@@ -44,7 +44,8 @@ public class ActionParser {
 			return new MdsImageAction(params.get("title"), params.get("url"), params.get("text"));
 		case showText:
 			return new MdsTextAction(params.get("title"), params.get("text"));
-
+		case addToGroup:
+			//TODO;
 		default:
 			return null;
 		}
