@@ -36,13 +36,6 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 		new Parser(this,json);	
 	}
 
-	private void setPlayerAttributeValue(int playerId, String key, Object value){
-		((Whiteboard)((Whiteboard) whiteboard.get("players").value).get(playerId).value).get(key).value = value;
-	}
-	
-	private WhiteboardEntry getPlayerAttribute(int playerId, String key){
-		return ((Whiteboard)((Whiteboard) whiteboard.get("players").value).get(playerId).value).get(key);
-	}
 	
 	@Override
 	public void pushParsedObjects(MdsObjectContainer objectContainer) {		
@@ -78,17 +71,17 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onPositionChanged(double longitude, double latitude) {
-		setPlayerAttributeValue(myId, "longitude", longitude);
+		whiteboard.setAttributeValue(longitude, "players", Integer.toString(myId), "longitude");
 		List<String> keys = new Vector<String>();
 		keys.add("players");
 		keys.add(""+myId);
 		keys.add("longitude");
-		serverInterpreter.onWhiteboardUpdate(keys, new WhiteboardEntry(longitude, getPlayerAttribute(myId, "longitude").visibility));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute("players", Integer.toString(myId), "longitude"));
 		
-		setPlayerAttributeValue(myId, "latitude", latitude);
+		whiteboard.setAttributeValue(latitude, "players", Integer.toString(myId), "latitude");
 		keys.remove(keys.size()-1);
 		keys.add("latitude");
-		serverInterpreter.onWhiteboardUpdate(keys, new WhiteboardEntry(latitude, getPlayerAttribute(myId, "latitude").visibility));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute("players", Integer.toString(myId), "latitude"));
 		
 		
 	}
