@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -27,7 +28,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
+import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
+import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
 import de.hsbremen.mds.common.valueobjects.MdsItem;
@@ -39,7 +42,7 @@ import de.hsbremen.mds.interpreter.Interpreter;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class MainActivity extends FragmentActivity implements TabListener,
-		LocationListener, GuiInterface {
+		LocationListener, GuiInterface , ServerInterpreterInterface{
 
 	ActionBar actionBar;
 	ViewPager viewPager;
@@ -104,7 +107,9 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 		// Hier wird der Interpreter erstellt und wir mitgegeben und als
 		// Interface genutzt
-		Interpreter interpreter = new Interpreter(jsonDatei, this);
+		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
+		int playerId = 0;
+		Interpreter interpreter = new Interpreter(jsonDatei, this, this, playerId);
 
 		initComplete = true;
 
@@ -369,15 +374,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	}
 
 	@Override
-	public void update() {
-	}
-
-	@Override
-	public Whiteboard getData() {
-		return null;
-	}
-
-	@Override
 	public void getServerData(String type, int id) {
 		String s = connector.httpGetString("/mds/" + type + "/" + id);
 		if(type.equals("item")){
@@ -394,6 +390,18 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	private void addPlayertoList(String s) {
 		// TODO Müssen noch erstellt werden
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
+		// TODO Auto-generated method stub
 		
 	}
 
