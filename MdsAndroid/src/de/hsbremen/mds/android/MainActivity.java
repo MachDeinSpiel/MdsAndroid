@@ -247,7 +247,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		
 		connector.getSocket().send(json.toString());
 		
-		t.notify();
+//		t.notify();
 		
 	}
 

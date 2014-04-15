@@ -157,16 +157,16 @@ public class ServerClientConnector implements Runnable {
 
 		Thread t = new Thread(sc);
 		t.start();
-		try {
-			Log.d("Na", "Starting Socketconnection");
-			t.join();
-			Log.d("Na", "Socketconnection successful");
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+//		try {
+//			Log.d("Na", "Starting Socketconnection");
+//			t.join();
+//			Log.d("Na", "Socketconnection successful");
+//		} catch (InterruptedException e1) {
+//			e1.printStackTrace();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
 		return sc;
 	}
 
