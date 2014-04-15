@@ -38,7 +38,6 @@ import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
-import de.hsbremen.mds.interpreter.Interpreter;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class MainActivity extends FragmentActivity implements TabListener,
@@ -109,7 +108,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		// Interface genutzt
 		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
 		int playerId = 0;
-		Interpreter interpreter = new Interpreter(jsonDatei, this, this, playerId);
 
 		initComplete = true;
 
