@@ -26,7 +26,6 @@ public class SocketClient extends WebSocketClient {
 
 	@Override
 	public void onMessage(String message) {
-		send(message);
 
 		Log.d("Na", "Message vom Server: " + message);
 		

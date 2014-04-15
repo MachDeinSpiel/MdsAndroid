@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
@@ -54,6 +57,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	ActionBar.Tab tabMap = null;
 	boolean initComplete = false;
 	public ServerClientConnector connector;
+	
+	SocketClient socketClient;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +127,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		
 		new Thread(){
 			@Override public void run() {
-				connector.createSocket("Android");
+				socketClient = connector.createSocket("Android");
 			}
 		}.start();
 
@@ -223,7 +228,19 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	@Override
 	public void onLocationChanged(Location arg0) {
 		updateLocationFields();
-		initiater.locationChanged(arg0);
+		//initiater.locationChanged(arg0);
+		JSONObject json = new JSONObject();
+		try {
+			json.put("Latitude", arg0.getLatitude());
+			json.put("Longitude", arg0.getLongitude());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//String json = "{ Longitude: " + arg0.getLongitude() + ", Latitude: " + arg0.getLatitude() + "}";
+		
+		socketClient.getConnection().send(json.toString());
 	}
 
 	@Override

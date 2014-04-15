@@ -135,7 +135,7 @@ public class ServerClientConnector {
 		}
 	}
 
-	public void createSocket(String clientname) {
+	public SocketClient createSocket(String clientname) {
 		Draft d = new Draft_17();
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
@@ -156,6 +156,8 @@ public class ServerClientConnector {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		return sc;
 	}
 
 }
