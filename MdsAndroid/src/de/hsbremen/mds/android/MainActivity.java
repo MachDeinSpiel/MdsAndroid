@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
@@ -27,8 +30,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
-import de.hsbremen.mds.common.whiteboard.Whiteboard;
-import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
@@ -37,7 +38,7 @@ import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
-import de.hsbremen.mds.common.whiteboard.Whiteboard;
+import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.interpreter.Interpreter;
 import de.hsbremen.mds.mdsandroid.R;
 
@@ -55,6 +56,9 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	ActionBar.Tab tabMap = null;
 	boolean initComplete = false;
 	public ServerClientConnector connector;
+	
+	SocketClient socketClient;
+	Thread socketThread;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,17 +120,20 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		// Serverkommunikation
 		// Wichtig hier: Solange noch kein Server verfügbar ist die IP Adresse vom PC eingeben
 		// auf dem der Server läuft(In der Hochschule wird das irgendwie geblockt, also kann man dort schlecht testen)
-		connector = new ServerClientConnector(this, "192.168.1.5" ); // "172.38.8.42"
-
+		connector = new ServerClientConnector(this, "feijnox.no-ip.org" ); // "192.168.1.5"
+		
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
 		String jsonForServer = connector.objectToJsonString(item);
 		
-		new Thread(){
-			@Override public void run() {
-				connector.createSocket("Android");
-			}
-		}.start();
+//		new Thread(){
+//			@Override public void run() {
+//				socketClient = connector.createSocket("Android");
+//			}
+//		}.start();
+		
+		socketThread = new Thread(connector);
+		socketThread.start();
 
 //		connector.httpGetString("/mds/appinfo");
 	}
@@ -225,7 +232,21 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	@Override
 	public void onLocationChanged(Location arg0) {
 		updateLocationFields();
-		initiater.locationChanged(arg0);
+		//initiater.locationChanged(arg0);
+		JSONObject json = new JSONObject();
+		try {
+			json.put("Latitude", arg0.getLatitude());
+			json.put("Longitude", arg0.getLongitude());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//String json = "{ Longitude: " + arg0.getLongitude() + ", Latitude: " + arg0.getLatitude() + "}";
+		
+		connector.getSocket().send(json.toString());
+		
+//		t.notify();
 	}
 
 	@Override

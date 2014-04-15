@@ -30,7 +30,7 @@ import com.google.gson.GsonBuilder;
 /*
  * Stellt notwendige Methoden für die Kommunikation mit dem Server bereit
  */
-public class ServerClientConnector {
+public class ServerClientConnector implements Runnable{
 
 	private MainActivity main;
 	private String serverIp;
@@ -38,6 +38,8 @@ public class ServerClientConnector {
 	private static final String PORT_HTTP = ":8080";
 	private static final String PROTOKOLL_WS = "ws://";
 	private static final String PORT_WS = ":8887";
+	
+	private SocketClient socket;
 	
 	
 	public ServerClientConnector(MainActivity main, String serverIp) {
@@ -135,7 +137,7 @@ public class ServerClientConnector {
 		}
 	}
 
-	public void createSocket(String clientname) {
+	public SocketClient createSocket(String clientname) {
 		Draft d = new Draft_17();
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
@@ -156,6 +158,21 @@ public class ServerClientConnector {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return sc;
+		
+	}
+
+	@Override
+	public void run() {
+		socket = this.createSocket("Android");
+	}
+
+	public SocketClient getSocket() {
+		return socket;
+	}
+
+	public void setSocket(SocketClient socket) {
+		this.socket = socket;
 	}
 
 }
