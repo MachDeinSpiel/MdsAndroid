@@ -59,6 +59,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	public ServerClientConnector connector;
 	
 	SocketClient socketClient;
+	
+	Thread t;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -119,17 +121,20 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		// Serverkommunikation
 		// Wichtig hier: Solange noch kein Server verfügbar ist die IP Adresse vom PC eingeben
 		// auf dem der Server läuft(In der Hochschule wird das irgendwie geblockt, also kann man dort schlecht testen)
-		connector = new ServerClientConnector(this, "192.168.1.5" ); // "172.38.8.42"
-
+		connector = new ServerClientConnector(this, "feijnox.no-ip.org" ); // "192.168.1.5"
+		
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
 		String jsonForServer = connector.objectToJsonString(item);
 		
-		new Thread(){
-			@Override public void run() {
-				socketClient = connector.createSocket("Android");
-			}
-		}.start();
+//		new Thread(){
+//			@Override public void run() {
+//				socketClient = connector.createSocket("Android");
+//			}
+//		}.start();
+		
+		t = new Thread(connector);
+		t.start();
 
 //		connector.httpGetString("/mds/appinfo");
 	}
@@ -240,7 +245,10 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		
 		//String json = "{ Longitude: " + arg0.getLongitude() + ", Latitude: " + arg0.getLatitude() + "}";
 		
-		socketClient.getConnection().send(json.toString());
+		connector.getSocket().send(json.toString());
+		
+		t.notify();
+		
 	}
 
 	@Override

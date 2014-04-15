@@ -10,12 +10,9 @@ import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 
-import de.hsbremen.mds.mdsandroid.R;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.Toast;
 
-public class SocketClient extends WebSocketClient {
+public class SocketClient extends WebSocketClient{
 	
 	MainActivity main = null;
 	
@@ -23,7 +20,7 @@ public class SocketClient extends WebSocketClient {
 		super(uri, d);
 		this.main = main;
 	}
-
+	
 	@Override
 	public void onMessage(String message) {
 
