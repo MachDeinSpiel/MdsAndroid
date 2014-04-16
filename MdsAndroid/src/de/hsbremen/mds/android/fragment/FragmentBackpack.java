@@ -47,6 +47,8 @@ public class FragmentBackpack extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
+		// TODO Hier gecleared
+		itemList.clear();
 		itemList.add(new MdsItem("Rotten-Kiwi","rottenkiwi"));
 		itemList.add(new MdsItem("M4A1","m4a1"));
 		itemList.add(new MdsItem("Burlap-Sack","burlapsack"));
@@ -56,6 +58,8 @@ public class FragmentBackpack extends Fragment {
 		final View view = inflater.inflate(R.layout.fragment_backpack, container,
 				false);
 		
+		// TODO Hier gecleared
+		itemAsStringList.clear();
 		for (MdsItem item : itemList) {
 			itemAsStringList.add(item.getName());
 		}
