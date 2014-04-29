@@ -1,55 +1,64 @@
 package de.hsbremen.mds.interpreter;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
 import android.location.Location;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 
 public class EventParser {
 	
-	// TODO: Exception no Eventtype found
-	public static boolean checkEvent(String btnName, MdsTransition trans, Whiteboard wb, int playerId) {
-		if (trans.getEvent().getName().equals("whiteboardEvent")) {
-			return checkWhiteboardEvent(trans.getCondition(), wb, playerId);
-		} else if (trans.getEvent().getName().equals("locationEvent")) {
-			return checkLocationEvent(trans.getCondition(), wb, playerId);
-		} else if (trans.getEvent().getName().equals("conditionEvent")) {
-			return checkConditionEvent(trans.getCondition(), wb, playerId);
-		} else if (trans.getEvent().getName().equals("uiEvent")) {
-			return checkUiEvent(btnName, trans.getCondition(), wb, playerId);
-		}
-		// wenn keines der Eventtypen stimmt ist wohl was schief gegangen
-		return false;
-	}
+//	// TODO: Exception no Eventtype found
+//	public static boolean checkEvent(String btnName, MdsTransition trans, Whiteboard wb, int playerId) {
+//		if (trans.getEvent().getName().equals("whiteboardEvent")) {
+//			return checkWhiteboardEvent(trans.getCondition(), wb, playerId);
+//		} else if (trans.getEvent().getName().equals("locationEvent")) {
+//			return checkLocationEvent(trans.getCondition(), wb, playerId);
+//		} else if (trans.getEvent().getName().equals("conditionEvent")) {
+//			return checkConditionEvent(trans.getCondition(), wb, playerId);
+//		} else if (trans.getEvent().getName().equals("uiEvent")) {
+//			return checkUiEvent(btnName, trans.getCondition(), wb, playerId);
+//		}
+//		// wenn keines der Eventtypen stimmt ist wohl was schief gegangen
+//		return false;
+//	}
 	
-	private static boolean checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, int playerId) {
+	public static boolean checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, int playerId) {
 		// TODO do sth. here
 		return false;
 	}
 
-	public static boolean checkLocationEvent(MdsCondition cond, Whiteboard wb, int playerId) {
+	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, int playerId) {
 		if(cond.getName().equals("nearby")) {
-			double longitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "longitude").value;
-			double latitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "latitude").value;
-			Location playerLoc = new Location("PlayerLoc");
-			playerLoc.setLatitude(latitude);
-			playerLoc.setLongitude(longitude);
-			int radius = Integer.parseInt(cond.getParams().get("radius"));
-			// alle Items durchgehen und gucken ob genug vorhanden sind
-			int quanti = Integer.parseInt(cond.getParams().get("quantifier"));
-			//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
-			//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
-			Whiteboard target = (Whiteboard)wb.getAttribute(cond.getParams().get("target").split(".")).value;
-			///TODO: Quantifier ist nicht nur eine Zahl, sondern sowas wie all, none, >5, = 3 usw
-			if (getEntriesNearTo(target, playerLoc, radius).size() >= quanti) {
-				return true;
+			if(cond.getParams().get("subject").equals("self")){
+				double longitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "longitude").value;
+				double latitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "latitude").value;
+				Location playerLoc = new Location("PlayerLoc");
+				playerLoc.setLatitude(latitude);
+				playerLoc.setLongitude(longitude);
+				int radius = Integer.parseInt(cond.getParams().get("radius"));
+				// alle Items durchgehen und gucken ob genug vorhanden sind
+				int quanti = Integer.parseInt(cond.getParams().get("quantifier"));
+				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
+				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
+				Whiteboard object = (Whiteboard)wb.getAttribute(cond.getParams().get("object").split(".")).value;
+				///TODO: Quantifier beachten
+				List<WhiteboardEntry> objects = getEntriesNearTo(object, playerLoc, radius);
+				WhiteboardEntry[] playerArray= {(WhiteboardEntry) wb.getAttribute("players",""+playerId).value}; 
+				List<WhiteboardEntry> subject = Arrays.asList(playerArray);
+				if (objects.size() >= quanti) {
+					
+					return new Result(true, subject, objects);
+				}
+			}else{
+				//TODO: subject ist gruppe oder was anderes
 			}
 		}
-		return false;
+		return new Result(false, null, null);
 	}
 	
 	// TODO: ValueNotANumber Exception
@@ -138,6 +147,18 @@ public class EventParser {
 		
 	}
 	
+	
+	static public class Result{
+		public boolean isfullfilled;
+		public List<WhiteboardEntry> subject;
+		public List<WhiteboardEntry> object;
+		
+		public Result(boolean iff, List<WhiteboardEntry> sub, List<WhiteboardEntry> obj){
+			isfullfilled = iff;
+			subject = sub;
+			object = obj;
+		}
+	}
 	
 //	private static double distanceInMeter(double p1long, double p1lat, double p2long, double p2lat){
 //		//Code von https://stackoverflow.com/questions/3715521/how-can-i-calculate-the-distance-between-two-gps-points-in-java
