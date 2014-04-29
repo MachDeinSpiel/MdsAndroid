@@ -26,6 +26,7 @@ import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -230,13 +231,13 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	}
 
 	@Override
-	public void onLocationChanged(Location arg0) {
+	public void onLocationChanged(Location loc) {
 		updateLocationFields();
 		//initiater.locationChanged(arg0);
 		JSONObject json = new JSONObject();
 		try {
-			json.put("Latitude", arg0.getLatitude());
-			json.put("Longitude", arg0.getLongitude());
+			json.put("Latitude", loc.getLatitude());
+			json.put("Longitude", loc.getLongitude());
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -245,6 +246,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		//String json = "{ Longitude: " + arg0.getLongitude() + ", Latitude: " + arg0.getLatitude() + "}";
 		
 		connector.getSocket().send(json.toString());
+		
+		initiater.locationChanged(loc);
 		
 //		t.notify();
 	}
@@ -421,8 +424,29 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	}
 
 	@Override
-	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
-		// TODO Auto-generated method stub
+	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry entry) {
+		
+		JSONObject json = new JSONObject();
+		
+		String result = "";
+		
+		for(int i = 0; i < keys.size(); i++){
+		
+			result += keys.get(i);
+				
+			if(i != keys.size())
+				result += ".";
+		}
+		
+		try {
+			json.put(result, entry.value);
+			json.put("visibility", entry.visibility);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		Log.d("Netzwerk", "Whitboardeintrag wurde geändert");
+		connector.getSocket().send(json.toString());
 		
 	}
 
