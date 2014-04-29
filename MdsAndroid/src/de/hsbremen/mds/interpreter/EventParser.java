@@ -27,9 +27,13 @@ public class EventParser {
 //		return false;
 //	}
 	
-	public static boolean checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, int playerId) {
-		// TODO do sth. here
-		return false;
+	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, int playerId) {
+		Result result = new Result(false, null, null);
+		result = checkLocationEvent(condition, wb, playerId);
+		if (result.isfullfilled)
+			return result;
+		result = checkConditionEvent(condition, wb, playerId);
+		return result;
 	}
 
 	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, int playerId) {
@@ -62,7 +66,7 @@ public class EventParser {
 	}
 	
 	// TODO: ValueNotANumber Exception
-	public static boolean checkConditionEvent(MdsCondition cond, Whiteboard wb, int playerId) {
+	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, int playerId) {
 			// get value and compValue
 			double value = -1;
 			double compValue = -2;
@@ -70,6 +74,7 @@ public class EventParser {
 			    value = Double.parseDouble(cond.getParams().get("value"));  
 			} catch(NumberFormatException nfe) {  
 				try {
+					// TODO: Was ist mit Längen / Größen von Gruppen?
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
 					value = Double.parseDouble((String) wb.getAttribute(cond.getParams().get("value").split(".")).value);
 				} catch (NumberFormatException nfe2) {
@@ -89,17 +94,17 @@ public class EventParser {
 			
 			// get checkType
 			if (cond.getParams().get("checkType").equals("==")) {
-				if (value == compValue) return true;
+				if (value == compValue) return new Result(true, null, null);
 			} else if (cond.getParams().get("checkType").equals("<")) {
-				if (value < compValue) return true;
+				if (value < compValue) return new Result(true, null, null);
 			} else if (cond.getParams().get("checkType").equals(">")) {
-				if (value > compValue) return true;
+				if (value > compValue) return new Result(true, null, null);
 			} else if (cond.getParams().get("checkType").equals("<=")) {
-				if (value <= compValue) return true;
+				if (value <= compValue) return new Result(true, null, null);
 			} else if (cond.getParams().get("checkType").equals(">=")) {
-				if (value >= compValue) return true;
+				if (value >= compValue) return new Result(true, null, null);
 			}
-		return false;
+		return new Result(false, null, null);
 	}
 	
 	/**
@@ -110,9 +115,9 @@ public class EventParser {
 	 * @param playerId
 	 * @return
 	 */
-	public static boolean checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb, int playerId) {
+	public static Result checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb, int playerId) {
 		//Wenn ein uiEvent geprüft werden soll, wird es stumpf verglichen
-		return (cond.getName().equals(btnName));
+		return new Result((cond.getName().equals(btnName)), null, null);
 	}
 	
 	/**
@@ -150,13 +155,13 @@ public class EventParser {
 	
 	static public class Result{
 		public boolean isfullfilled;
-		public List<WhiteboardEntry> subject;
-		public List<WhiteboardEntry> object;
+		public List<WhiteboardEntry> subjects;
+		public List<WhiteboardEntry> objects;
 		
 		public Result(boolean iff, List<WhiteboardEntry> sub, List<WhiteboardEntry> obj){
 			isfullfilled = iff;
-			subject = sub;
-			object = obj;
+			subjects = sub;
+			objects = obj;
 		}
 	}
 	

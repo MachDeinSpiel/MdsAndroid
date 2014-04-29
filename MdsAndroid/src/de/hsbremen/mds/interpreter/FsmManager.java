@@ -1,6 +1,7 @@
 
 package de.hsbremen.mds.interpreter;
 
+import java.util.EventObject;
 import java.util.List;
 import java.util.Vector;
 
@@ -10,6 +11,7 @@ import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsVideoAction;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
@@ -80,11 +82,40 @@ public class FsmManager {
 	 * hier läuft die finit state maschine
 	 */
 	public void checkEvents(MdsEvent complied){
+		
+		
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
-			if(EventParser.checkEvent(t.getEvent(), complied, this.wb, this.myID)){
+			EventParser.Result result;
+			
+			switch(t.getCondition().getIdent()){
+			case locationEvent:
+				result = EventParser.checkLocationEvent(t.getCondition(), wb, myID);
+				break;
+			case uiEvent:
+				result = EventParser.checkUiEvent("btnName", t.getCondition(), wb, myID);
+				break;
+			case whiteboardEvent:
+				result = EventParser.checkWhiteboardEvent(t.getCondition(), wb, myID);
+				break;
+			default:
+				//TODO: Fehler abfangen
+				result = new EventParser.Result(false, null, null);
+				break;
+			}
+				
+			if(result.isfullfilled){
+				
+				this.setState(getCurrentState(), "lastState");
 				this.setState(t.getTarget(), "currentState");
+				if(result.subjects != null)
+					this.getCurrentState().setSubjects(result.subjects);
+				if(result.objects != null)
+					this.getCurrentState().setSubjects(result.objects);
+				return;
 			}
 		}
+			
+		
 	}
 	
 	
