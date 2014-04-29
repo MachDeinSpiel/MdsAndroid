@@ -8,6 +8,7 @@ import java.util.Vector;
 import android.location.Location;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
@@ -81,18 +82,18 @@ public class FsmManager {
 	/**
 	 * hier läuft die finit state maschine
 	 */
-	public void checkEvents(MdsEvent complied){
-		
+	public void checkEvents(String buttonName){
+		//TODO buttonName irgendwo anders herbekommen
 		
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
 			EventParser.Result result;
 			
-			switch(t.getCondition().getIdent()){
+			switch(t.getEventType()){
 			case locationEvent:
 				result = EventParser.checkLocationEvent(t.getCondition(), wb, myID);
 				break;
 			case uiEvent:
-				result = EventParser.checkUiEvent("btnName", t.getCondition(), wb, myID);
+				result = EventParser.checkUiEvent(buttonName, t.getCondition(), wb, myID);
 				break;
 			case whiteboardEvent:
 				result = EventParser.checkWhiteboardEvent(t.getCondition(), wb, myID);
