@@ -1,6 +1,5 @@
 package de.hsbremen.mds.interpreter;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -76,7 +75,18 @@ public class EventParser {
 				try {
 					// TODO: Was ist mit L‰ngen / Grˆﬂen von Gruppen?
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-					value = Double.parseDouble((String) wb.getAttribute(cond.getParams().get("value").split(".")).value);
+					String[] paramsSplitted = cond.getParams().get("value").split(".");
+					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
+						//Wenn die L‰nge abgefragt werden soll
+						//Entferne "length" aus den Parametern
+						List<String> temp = Arrays.asList(paramsSplitted);
+						temp.remove(paramsSplitted.length-1);
+						//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
+						//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
+						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray()).value).entrySet().size();
+					}else{
+						value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+					}
 				} catch (NumberFormatException nfe2) {
 					// something went wrong, Value is not a Number
 				}
@@ -86,24 +96,41 @@ public class EventParser {
 			} catch(NumberFormatException nfe) {  
 				try {
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-					value = Double.parseDouble((String) wb.getAttribute(cond.getParams().get("value").split(".")).value);
+					String[] paramsSplitted = cond.getParams().get("value").split(".");
+					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
+						//Wenn die L‰nge abgefragt werden soll
+						//Entferne "length" aus den Parametern
+						List<String> temp = Arrays.asList(paramsSplitted);
+						temp.remove(paramsSplitted.length-1);
+						//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
+						//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
+						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray()).value).entrySet().size();
+					}else{
+						value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+					}
 				} catch (NumberFormatException nfe2) {
 					// something went wrong, Value is not a Number
 				} 
 			} 
 			
+				
+			
+				//TODO: folgende Dinger noch machen
+				//exists,
+				//all,
 			// get checkType
-			if (cond.getParams().get("checkType").equals("==")) {
+			if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
 				if (value == compValue) return new Result(true, null, null);
-			} else if (cond.getParams().get("checkType").equals("<")) {
+			} else if (cond.getParams().get("checkType").equals(MdsCondition.LOWER)) {
 				if (value < compValue) return new Result(true, null, null);
-			} else if (cond.getParams().get("checkType").equals(">")) {
+			} else if (cond.getParams().get("checkType").equals(MdsCondition.HIGHER)) {
 				if (value > compValue) return new Result(true, null, null);
-			} else if (cond.getParams().get("checkType").equals("<=")) {
+			} else if (cond.getParams().get("checkType").equals(MdsCondition.LOWEQUALS)) {
 				if (value <= compValue) return new Result(true, null, null);
-			} else if (cond.getParams().get("checkType").equals(">=")) {
+			} else if (cond.getParams().get("checkType").equals(MdsCondition.HIGHEQUALS)) {
 				if (value >= compValue) return new Result(true, null, null);
 			}
+			
 		return new Result(false, null, null);
 	}
 	
