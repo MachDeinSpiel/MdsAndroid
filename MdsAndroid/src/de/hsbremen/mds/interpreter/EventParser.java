@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import android.location.Location;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsQuantifier;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
@@ -36,6 +37,7 @@ public class EventParser {
 	}
 
 	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, int playerId) {
+		// Methode nearby
 		if(cond.getName().equals("nearby")) {
 			if(cond.getParams().get("subject").equals("self")){
 				double longitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "longitude").value;
@@ -43,22 +45,45 @@ public class EventParser {
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
-				int radius = Integer.parseInt(cond.getParams().get("radius"));
+				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
+				// TODO: Quanti Object wird aus dem Subject / Object gewonnen
 				// alle Items durchgehen und gucken ob genug vorhanden sind
-				int quanti = Integer.parseInt(cond.getParams().get("quantifier"));
+				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getVALUE());
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
-				Whiteboard object = (Whiteboard)wb.getAttribute(cond.getParams().get("object").split(".")).value;
-				///TODO: Quantifier beachten
+				Whiteboard object = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
 				List<WhiteboardEntry> objects = getEntriesNearTo(object, playerLoc, radius);
+				
+				// CheckType des Quantifiers identifizieren
+				if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.EQUALS)) {
+					if (objects.size() == quanti) return new Result(true, null, null);
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.LOWER)) {
+					if (objects.size() < quanti) return new Result(true, null, null);
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.HIGHER)) {
+					if (objects.size() > quanti) return new Result(true, null, null);
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.LOWEQUALS)) {
+					if (objects.size() <= quanti) return new Result(true, null, null);
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.HIGHEQUALS)) {
+					if (objects.size() >= quanti) return new Result(true, null, null);
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.EXISTS)) {
+					if (objects.size() >= 1) return new Result(true, null, null);
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.ALL)) {
+					if (objects.size() == object.entrySet().size()) return new Result(true, null, null);
+				} 
+			}else{
+				//TODO: subject ist gruppe oder was anderes, so funzt das noch nicht
+				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
+				// alle Items durchgehen und gucken ob genug vorhanden sind
+				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getVALUE());
+				///TODO: Subject wird noch nicht beachtet, da Einzelspieler
 				WhiteboardEntry[] playerArray= {(WhiteboardEntry) wb.getAttribute("players",""+playerId).value}; 
 				List<WhiteboardEntry> subject = Arrays.asList(playerArray);
-				if (objects.size() >= quanti) {
-					
-					return new Result(true, subject, objects);
-				}
-			}else{
-				//TODO: subject ist gruppe oder was anderes
+				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
+				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
+				Whiteboard object = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
+				// Location des Objekts
+				Location someLoc = new Location("somLoc");
+				List<WhiteboardEntry> objects = getEntriesNearTo(object, someLoc, radius);
 			}
 		}
 		return new Result(false, null, null);
@@ -70,12 +95,11 @@ public class EventParser {
 			double value = -1;
 			double compValue = -2;
 			try {  
-			    value = Double.parseDouble(cond.getParams().get("value"));  
+			    value = Double.parseDouble((String) cond.getParams().get("value"));  
 			} catch(NumberFormatException nfe) {  
 				try {
-					// TODO: Was ist mit Längen / Größen von Gruppen?
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-					String[] paramsSplitted = cond.getParams().get("value").split(".");
+					String[] paramsSplitted = ((String)cond.getParams().get("value")).split(".");
 					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 						//Wenn die Länge abgefragt werden soll
 						//Entferne "length" aus den Parametern
@@ -92,11 +116,11 @@ public class EventParser {
 				}
 			} 
 			try {  
-			    compValue = Double.parseDouble(cond.getParams().get("compValue"));  
+			    compValue = Double.parseDouble((String) cond.getParams().get("compValue"));  
 			} catch(NumberFormatException nfe) {  
 				try {
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-					String[] paramsSplitted = cond.getParams().get("value").split(".");
+					String[] paramsSplitted = ((String) cond.getParams().get("value")).split(".");
 					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 						//Wenn die Länge abgefragt werden soll
 						//Entferne "length" aus den Parametern
@@ -115,9 +139,7 @@ public class EventParser {
 			
 				
 			
-				//TODO: folgende Dinger noch machen
-				//exists,
-				//all,
+				// Doch nicht, ist nur bei Location Events wenn ich mich nicht irre
 			// get checkType
 			if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
 				if (value == compValue) return new Result(true, null, null);
@@ -129,7 +151,7 @@ public class EventParser {
 				if (value <= compValue) return new Result(true, null, null);
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.HIGHEQUALS)) {
 				if (value >= compValue) return new Result(true, null, null);
-			}
+			} 
 			
 		return new Result(false, null, null);
 	}
