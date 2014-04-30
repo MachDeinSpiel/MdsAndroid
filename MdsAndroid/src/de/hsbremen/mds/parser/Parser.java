@@ -26,8 +26,6 @@ import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 public class Parser {
 
 	public Parser(InterpreterInterface interpreter, File jsonFile){
-		//TODO: braucht ihr üerbaupt ein File-Object? Wenn nicht einfach Typ ändern, wir
-		//		(Interpretergruppe) ändern dann unseren Aufruf
 		//TODO: Interpreter zwischenspeichern
 		//TODO: Wenn fertig geparst wurde, MdsObjectContainer an Interpreter geben
 		//		(mit interpreter.pushParsedObjects(MdsObjectContainer)
@@ -36,7 +34,7 @@ public class Parser {
 		 
 		try {
 			
-			Object obj = parser.parse(new FileReader("TourismApp_2.0_Client.json"));
+			Object obj = parser.parse(new FileReader(jsonFile));
 			 
 			JSONObject jsonObject = (JSONObject) obj;
 			
@@ -55,16 +53,26 @@ public class Parser {
 				// attribute werden aus dem JSONObject gelesen
 				ident = (String) element.get("ident");
 				// lese des defaults arrays aus der JSON datei
-				JSONObject defaultsO = (JSONObject) element.get("defaults");
-				// zwischenspeicherung der KeySet
-				Set<String> keySet = defaultsO.keySet();
 				HashMap<String, String> defaults = new HashMap<String, String>();
-				// die param werte aus dem KeySet werden dem params HashMap übergeben
-				for (String key : keySet){
-					
-					Object value = defaultsO.get(key);
-					defaults.put(key, value.toString());
-					
+				if(element.get("defaults") != null) {
+					JSONObject defaultsO = (JSONObject) element.get("defaults");
+					// zwischenspeicherung der KeySet
+					Set<String> keySet = defaultsO.keySet();
+					// die param werte aus dem KeySet werden dem params HashMap übergeben
+					for (String key : keySet){
+						Object value = defaultsO.get(key);
+						defaults.put(key, value.toString());
+					}
+				}
+				else if(element.get("params") != null) {
+					JSONObject paramsO = (JSONObject) element.get("params");
+					// zwischenspeicherung der KeySet
+					Set<String> keySet = paramsO.keySet();
+					// die param werte aus dem KeySet werden dem params HashMap übergeben
+					for (String key : keySet){
+						Object value = paramsO.get(key);
+						defaults.put(key, value.toString());
+					}
 				}
 				// gelesene attribute werden in das allMdsActions array gespeichert
 				allMdsActions [i] = new MdsAction(ident, defaults);				
@@ -117,31 +125,32 @@ public class Parser {
 				//JSONObject endMdsActionObject = (JSONObject) element.get("endAction");
 				endAction = element.get("endAction").toString();
 				
-				JSONObject doMdsActionObject = (JSONObject) element.get("doAction");
-				HashMap<String, String> defaults = null;
-				
-				if(doMdsActionObject.get("params") != null) {
-					JSONObject defaultsO = (JSONObject) doMdsActionObject.get("params");
-					defaults = new HashMap<String, String>();
-					Set<String> keySet = defaultsO.keySet();
+				if(element.get("doAction") instanceof JSONObject) {
+					JSONObject doMdsActionObject = (JSONObject) element.get("doAction");
 					
-					// die param werte aus dem KeySet werden dem params HashMap übergeben
-					for (String key : keySet){
-						Object value = defaultsO.get(key);
-						defaults.put(key, value.toString());
+					HashMap<String, String> defaults = null;
+					if(doMdsActionObject.get("params") != null) {
+						JSONObject defaultsO = (JSONObject) doMdsActionObject.get("params");
+						defaults = new HashMap<String, String>();
+						Set<String> keySet = defaultsO.keySet();
+						
+						// die param werte aus dem KeySet werden dem params HashMap übergeben
+						for (String key : keySet){
+							Object value = defaultsO.get(key);
+							defaults.put(key, value.toString());
+						}
+					}
+					
+					for(int j = 0; j < allMdsActions.length;j++) {
+						if (doMdsActionObject.get("name").toString().equals(allMdsActions[j].getIdent())) {
+								doMdsAction = new MdsAction(allMdsActions[j].getIdent(), allMdsActions[j].getParams());
+								if(defaults != null) {
+									doMdsAction.setParams(defaults);
+								}
+						}
 					}
 				}
-				
-				for(int j = 0; j < allMdsActions.length;j++) {
-					if (doMdsActionObject.get("name").toString().equals(allMdsActions[j].getIdent())) {
-							doMdsAction = new MdsAction(allMdsActions[j].getIdent(), allMdsActions[j].getParams());
-							if(defaults != null) {
-								doMdsAction.setParams(defaults);
-							}
-					}
-				}
-				// TODO: Parentstate (im Moment null) muss noch ersetzt werden
-				allMdsStates[i] = new MdsState(id, name, null, doMdsAction, startMdsState, finalMdsState);
+				allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startMdsState, finalMdsState);
 			}
 			
 			for(int i = 0; i < MdsState.size(); i++) {
@@ -173,24 +182,13 @@ public class Parser {
 							
 							JSONObject eventObject = (JSONObject) transElem.get("event");
 							MdsEvent event;
-							HashMap<String, String> paramsEvent = new HashMap<String, String>();	
-							
-							type = eventObject.get("type").toString();
-							nameTransition = eventObject.get("name").toString();
-							
-							// lese des param arrays aus der JSON datei
-							if( eventObject.get("params") != null){
-								JSONObject paramsEventO = (JSONObject) eventObject.get("params");
-								// zwischenspeicherung der KeySet
-								Set<String> keySet = paramsEventO.keySet();
-								for (String key : keySet){
-									
-									Object value = paramsEventO.get(key);
-									paramsEvent.put(key, value.toString());
-									
-								}
+							HashMap<Object, Object> eventHashMap = new HashMap<Object, Object>();
+							Set<Object> keySet = eventObject.keySet();
+							for (Object key : keySet){
+								Object value = eventObject.get(key);
+								eventHashMap.put(key, value);
 							}
-							event = new MdsEvent(type, nameTransition, paramsEvent);						
+							event = new MdsEvent(eventHashMap);						
 							
 							// gelesene attribute werden in das allTrans array gespeichert
 							allTrans[j] = new MdsTransition(target, event);
@@ -204,10 +202,10 @@ public class Parser {
 			List<MdsAction> actions = Arrays.asList(allMdsActions);
 			
 			// TODO: Hier wird allMdsExhibits auf null gesetzt, damit es deklariert existiert, bitte ändern
-			MdsExhibit[] allMdsExhibits = null;
-			List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
+			//MdsExhibit[] allMdsExhibits = null;
+			//List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
 
-			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
+			//MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
 			
 			interpreter.pushParsedObjects(MdsContainer);
 		

@@ -5,12 +5,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import valueobjects.MdsGroup;
+import valueobjects.MdsMembers;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
 
@@ -25,40 +29,38 @@ public class ParserServer {
 			Object obj = parser.parse(new FileReader("TourismApp_2.0_Server.json"));
 			 
 			JSONObject jsonObject = (JSONObject) obj;
-		
+			
 			JSONArray groups = (JSONArray) jsonObject.get("groups");
 			
-			MdsExhibit[] allMdsExhibits = null;
+			MdsGroup[] allMdsGroups = new MdsGroup[groups.size()];
 			
 			for(int i = 0; i < groups.size(); i++) {
 				JSONObject groupsElement = (JSONObject) groups.get(i);
 				
 				String name = groupsElement.get("name").toString();
 				
-				if(name.equals("exhibits")) {
-					JSONArray MdsExhibits = (JSONArray) groupsElement.get("members");
+				JSONArray members = (JSONArray) groupsElement.get("members");
+				
+				MdsMembers[] membersArray = new MdsMembers[members.size()];
+				
+				for(int j = 0; j < members.size(); j++) {
 					
-					allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
-					String url, text;
+					JSONObject element = (JSONObject) members.get(j);
 					
-					for(int j = 0; j < MdsExhibits.size(); j++) {
-						
-						JSONObject element = (JSONObject) MdsExhibits.get(j);
-						
-						name = element.get("name").toString();
-						url = element.get("url").toString();
-						text = element.get("text").toString();
-						
-						double longitude = Double.parseDouble(element.get("longitude").toString());
-						double latitude = Double.parseDouble(element.get("latitude").toString());
-						
-						int movable = Integer.parseInt(element.get("moveableStatus").toString());
-						
-						
-						allMdsExhibits[j] = new MdsExhibit(name,url,text,longitude,latitude,movable);
+					HashMap<Object, Object> membersMap = new HashMap<Object, Object>();
+					
+					Set<Object> keySet = element.keySet();
+					
+					// die param werte aus dem KeySet werden dem params HashMap �bergeben
+					for (Object key : keySet){
+						Object value = element.get(key);
+						membersMap.put(key, value);
 					}
+					
+					membersArray[j] = new MdsMembers(membersMap);
 				}
-				//else if(name.equals("items"))  <-- für später
+				
+				allMdsGroups[i] = new MdsGroup(name, membersArray);
 			}		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
