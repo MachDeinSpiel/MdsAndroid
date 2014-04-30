@@ -7,6 +7,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/MdsCommon"/>
-	<classpathentry kind="lib" path="/MdsCommon/libs/java_websocket.jar"/>
+	<classpathentry kind="lib" path="libs/java_websocket.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

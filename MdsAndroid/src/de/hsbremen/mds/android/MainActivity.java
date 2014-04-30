@@ -26,6 +26,7 @@ import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
@@ -57,6 +58,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	ActionBar.Tab tabMap = null;
 	boolean initComplete = false;
 	public ServerClientConnector connector;
+	String consoleOutput;
 	
 	SocketClient socketClient;
 	Thread socketThread;
@@ -102,11 +104,13 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 		mfa.addFragment("FragmentBackpack");
 		mfa.addFragment("FragmentMap");
+		mfa.addFragment("FragmentMonitoring");
 		mfa.addFragment("FragmentText");
 		mfa.addFragment("FragmentVideo");
 
 		addTab("Backpack");
 		addTab("Map");
+		addTab("Monitoring");
 		addTab("Text");
 		addTab("Video");
 
@@ -122,6 +126,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		// Wichtig hier: Solange noch kein Server verfügbar ist die IP Adresse vom PC eingeben
 		// auf dem der Server läuft(In der Hochschule wird das irgendwie geblockt, also kann man dort schlecht testen)
 		connector = new ServerClientConnector(this, "feijnox.no-ip.org" ); // "192.168.1.5"
+		
 		
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
@@ -146,7 +151,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-
 	}
 
 	@Override
@@ -449,5 +453,22 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		connector.getSocket().send(json.toString());
 		
 	}
+	
+	public void addConsoleEntry(String entry){
+		System.out.println("addConsole");
+		consoleOutput += entry;
+		consoleOutput += "\n";
+		TextView monitoringConsole = (TextView)findViewById(R.id.monitoringConsole);
+		monitoringConsole.setMovementMethod(new ScrollingMovementMethod());
+		monitoringConsole.setText(consoleOutput);
+	}
 
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		
+	}
+	
+	
+	
 }

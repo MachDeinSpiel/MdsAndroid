@@ -37,7 +37,7 @@ public class ServerClientConnector implements Runnable{
 	private static final String PROTOKOLL_HTTP = "http://";
 	private static final String PORT_HTTP = ":8080";
 	private static final String PROTOKOLL_WS = "ws://";
-	private static final String PORT_WS = ":8887";
+	private static final String PORT_WS = ":8000";
 	
 	private SocketClient socket;
 	
@@ -149,15 +149,15 @@ public class ServerClientConnector implements Runnable{
 
 		Thread t = new Thread(sc);
 		t.start();
-		try {
-			Log.d("Na", "Starting Socketconnection");
-			t.join();
-			Log.d("Na", "Socketconnection successful");
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Log.d("Na", "Starting Socketconnection");
+//			t.join();
+//			Log.d("Na", "Socketconnection successful");
+//		} catch (InterruptedException e1) {
+//			e1.printStackTrace();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		return sc;
 		
 	}

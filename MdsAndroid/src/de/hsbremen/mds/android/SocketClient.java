@@ -10,10 +10,7 @@ import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 
-import de.hsbremen.mds.mdsandroid.R;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.Toast;
 
 public class SocketClient extends WebSocketClient {
 	
@@ -30,6 +27,8 @@ public class SocketClient extends WebSocketClient {
 
 		Log.d("Na", "Message vom Server: " + message);
 		
+			main.addConsoleEntry(message);
+		
 		// TODO: Hier muss dem Clientinterpreter bescheid gesagt werden, dass es Änderungen auf dem Server gab
 		// activity.initiater.serverUpdate(message);
 	}
@@ -38,6 +37,7 @@ public class SocketClient extends WebSocketClient {
 	public void onMessage(ByteBuffer blob) {
 		Log.d("Na", "Message ByteBuffer");
 		getConnection().send(blob);
+			main.addConsoleEntry(blob.toString());
 	}
 
 	@Override
@@ -48,6 +48,7 @@ public class SocketClient extends WebSocketClient {
 	@Override
 	public void onOpen(ServerHandshake handshake) {
 		Log.d("Na", "onOpen, Serverhandshake");
+			main.addConsoleEntry("onOpen, Serverhandshake");
 	}
 
 	@Override
