@@ -37,7 +37,6 @@ public class EventParser {
 	}
 
 	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, int playerId) {
-		// Methode nearby
 		if(cond.getName().equals("nearby")) {
 			if(cond.getParams().get("subject").equals("self")){
 				double longitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "longitude").value;
@@ -48,33 +47,33 @@ public class EventParser {
 				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
 				// TODO: Quanti Object wird aus dem Subject / Object gewonnen
 				// alle Items durchgehen und gucken ob genug vorhanden sind
-				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getVALUE());
+				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getValue());
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
 				Whiteboard object = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
 				List<WhiteboardEntry> objects = getEntriesNearTo(object, playerLoc, radius);
 				
 				// CheckType des Quantifiers identifizieren
-				if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.EQUALS)) {
+				if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.EQUALS)) {
 					if (objects.size() == quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.LOWER)) {
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.LOWER)) {
 					if (objects.size() < quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.HIGHER)) {
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.HIGHER)) {
 					if (objects.size() > quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.LOWEQUALS)) {
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.LOWEQUALS)) {
 					if (objects.size() <= quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.HIGHEQUALS)) {
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.HIGHEQUALS)) {
 					if (objects.size() >= quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.EXISTS)) {
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.EXISTS)) {
 					if (objects.size() >= 1) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getCHECKTYPE().equals(MdsCondition.ALL)) {
+				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.ALL)) {
 					if (objects.size() == object.entrySet().size()) return new Result(true, null, null);
 				} 
 			}else{
 				//TODO: subject ist gruppe oder was anderes, so funzt das noch nicht
 				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
 				// alle Items durchgehen und gucken ob genug vorhanden sind
-				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getVALUE());
+				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getValue());
 				///TODO: Subject wird noch nicht beachtet, da Einzelspieler
 				WhiteboardEntry[] playerArray= {(WhiteboardEntry) wb.getAttribute("players",""+playerId).value}; 
 				List<WhiteboardEntry> subject = Arrays.asList(playerArray);
