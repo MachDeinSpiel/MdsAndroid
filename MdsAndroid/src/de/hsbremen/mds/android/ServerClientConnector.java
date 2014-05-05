@@ -24,9 +24,6 @@ import org.java_websocket.drafts.Draft_17;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 /*
  * Stellt notwendige Methoden für die Kommunikation mit dem Server bereit
  */
@@ -45,25 +42,6 @@ public class ServerClientConnector implements Runnable{
 	public ServerClientConnector(MainActivity main, String serverIp) {
 		this.main = main;
 		this.serverIp = serverIp;
-	}
-
-	public String objectToJsonString(Object obj) {
-
-		Gson gson = new GsonBuilder().create();
-
-		System.out.println(gson.toJson(obj));
-
-		return gson.toJson(obj);
-
-	}
-
-	public Object jsonStringToObject(String json) {
-
-		Gson gson = new GsonBuilder().create();
-
-		// TODO: für getClass() muss anscheinend die Klasse
-		// in die das Objekt umgewandelt wird angegeben werden
-		return gson.fromJson(json, getClass());
 	}
 
 	private InputStream httpGet(String path) {

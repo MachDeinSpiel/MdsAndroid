@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
+import de.hsbremen.mds.common.gson.ObjectGsonConverter;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
@@ -128,9 +129,11 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		connector = new ServerClientConnector(this, "feijnox.no-ip.org" ); // "192.168.1.5"
 		
 		
+		// Objekt in Json String Konvertieren für Kommunikation mit Server
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
-		String jsonForServer = connector.objectToJsonString(item);
+		ObjectGsonConverter oGConverter = new ObjectGsonConverter();
+		String jsonForServer = oGConverter.objectToJsonString(item);
 		
 //		new Thread(){
 //			@Override public void run() {
