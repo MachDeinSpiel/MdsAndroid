@@ -36,7 +36,7 @@ public class Parser {
 			
 			Object obj = parser.parse(new FileReader(jsonFile));
 			 
-			JSONObject jsonObject = (JSONObject) obj;
+JSONObject jsonObject = (JSONObject) obj;
 			
 			/* ---- aus der JSON datei lesen und in Objekte speichern ---- */
 			
@@ -83,8 +83,16 @@ public class Parser {
 			
 			//Temp variablen
 			String name = MdsPlayer.get("name").toString();
-			double longitude = Double.parseDouble(MdsPlayer.get("longitude").toString());
-			double latitude = Double.parseDouble(MdsPlayer.get("latitude").toString());
+			double longitude;
+			double latitude;
+			if(MdsPlayer.get("longitude").equals("null") && MdsPlayer.get("latitude").equals("null")) {
+				longitude = 0;
+				latitude = 0;
+			}
+			else {
+				longitude = Double.parseDouble(MdsPlayer.get("longitude").toString());
+				latitude = Double.parseDouble(MdsPlayer.get("latitude").toString());
+			}
 			
 			// erzeugen des MdsPlayers
 			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
@@ -179,8 +187,8 @@ public class Parser {
 									target = allMdsStates[k];
 								}
 							}
-							
-							JSONObject eventObject = (JSONObject) transElem.get("event");
+							String eventName = transElem.get("event").toString();
+							JSONObject eventObject = (JSONObject) transElem.get("condition");
 							MdsEvent event;
 							HashMap<Object, Object> eventHashMap = new HashMap<Object, Object>();
 							Set<Object> keySet = eventObject.keySet();
@@ -191,7 +199,7 @@ public class Parser {
 							event = new MdsEvent(eventHashMap);						
 							
 							// gelesene attribute werden in das allTrans array gespeichert
-							allTrans[j] = new MdsTransition(target, event);
+							allTrans[j] = new MdsTransition(target, event, eventName);
 						}
 					}
 				}
