@@ -68,7 +68,7 @@ public class EventParser {
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
-				
+
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
 				Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split(".")).value;
@@ -90,6 +90,7 @@ public class EventParser {
 				} else if (checkType.equals(MdsQuantifier.ALL)) {
 					if (objects.size() == realObject.entrySet().size()) return new Result(true, null, null);
 				} 
+				//TODO : Error if quantifier is invalid
 			}else{
 				// TODO: Hier muss noch viel überlegt werden bei Multiplayer
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
