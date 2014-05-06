@@ -27,7 +27,7 @@ public class SocketClient extends WebSocketClient {
 
 		Log.d("Na", "Message vom Server: " + message);
 		
-			main.addConsoleEntry(message);
+		main.consoleEntry(message);
 		
 		// TODO: Hier muss dem Clientinterpreter bescheid gesagt werden, dass es Änderungen auf dem Server gab
 		// activity.initiater.serverUpdate(message);
@@ -37,27 +37,30 @@ public class SocketClient extends WebSocketClient {
 	public void onMessage(ByteBuffer blob) {
 		Log.d("Na", "Message ByteBuffer");
 		getConnection().send(blob);
-			main.addConsoleEntry(blob.toString());
+			main.consoleEntry(blob.toString());
 	}
 
 	@Override
 	public void onError(Exception ex) {
 		Log.d("Na", "Error: " + ex.getMessage());
+		main.consoleEntry("Error: " + ex.getMessage());
 	}
 
 	@Override
 	public void onOpen(ServerHandshake handshake) {
 		Log.d("Na", "onOpen, Serverhandshake");
-			main.addConsoleEntry("onOpen, Serverhandshake");
+		main.consoleEntry("onOpen, Serverhandshake");
 	}
 
 	@Override
 	public void onClose(int code, String reason, boolean remote) {
 		Log.d("Na", "Closed: " + code + " " + reason);
+		main.consoleEntry("Closed: " + code + " " + reason);
 	}
 
 	public void onWebsocketMessageFragment(WebSocket conn, Framedata frame) {
 		Log.d("Na", "onWebsocketMessageFragment");
+		main.consoleEntry("onWebsocketMessageFragment");
 		FrameBuilder builder = (FrameBuilder) frame;
 		builder.setTransferemasked(true);
 		getConnection().sendFrame(frame);

@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
@@ -14,7 +15,6 @@ import org.json.JSONObject;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
@@ -24,23 +24,26 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
+import de.hsbremen.mds.android.fragment.FragmentBackpack;
+import de.hsbremen.mds.android.fragment.FragmentMap;
+import de.hsbremen.mds.android.fragment.FragmentMonitoring;
+import de.hsbremen.mds.android.fragment.FragmentStart;
+import de.hsbremen.mds.android.fragment.FragmentText;
+import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
-import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
@@ -58,12 +61,15 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	LocationManager manager;
 	double longitude;
 	double latitude;
-	MdsFragmentAdapter mfa = null;
-	ActionBar.Tab tabMap = null;
 	boolean initComplete = false;
 	public ServerClientConnector connector;
-	String consoleOutput;
 	
+	ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
+	FragmentManager fm;
+
+	int tabCount = 1;
+	
+	Interpreter interpreter;
 	SocketClient socketClient;
 	Thread socketThread;
 
@@ -73,200 +79,97 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		mfa = new MdsFragmentAdapter(getSupportFragmentManager());
-
 		// Initiater für die Listener registrierung
 		initiater = new AndroidInitiater();
 
-		File jsonDatei = jsonEinlesen();
-
+		// Initiallisierung der verfügbaren Fragments
+        initFragments();
 		
-		// Interpreter Instanziert und sich selbst mitgegeben.
-
-		viewPager = (ViewPager) findViewById(R.id.pager);
-
-		viewPager.setAdapter(mfa);
-
-		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-			}
-
-			@Override
-			public void onPageSelected(int pos) {
-				actionBar.setSelectedNavigationItem(pos);
-			}
-		});
-
 		actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-		mfa.addFragment("FragmentBackpack");
-		mfa.addFragment("FragmentMap");
-		mfa.addFragment("FragmentMonitoring");
-		mfa.addFragment("FragmentText");
-		mfa.addFragment("FragmentVideo");
+		addTab("Left");
+		addTab("Right");	
+	}
+	
+	private void initFragments() {
+		fm = getSupportFragmentManager();
+		
+		FragmentTransaction transaction = fm.beginTransaction();
+        FragmentStart startFragment = new FragmentStart();
+        fragmentList.add(startFragment);
+        transaction.add(R.id.content, startFragment);
+        transaction.commit();
+        
+        FragmentBackpack backpackFragment = new FragmentBackpack();
+        fragmentList.add(backpackFragment);
+        
+        FragmentMap mapFragment = new FragmentMap();
+        fragmentList.add(mapFragment);
+        
+        FragmentMonitoring monitoringFragment = new FragmentMonitoring();
+        fragmentList.add(monitoringFragment);
+        
+        FragmentText textFragment = new FragmentText();
+        fragmentList.add(textFragment);
+        
+        FragmentVideo videoFragment = new FragmentVideo();
+        fragmentList.add(videoFragment);
+		
+	}
 
-		addTab("Backpack");
-		addTab("Map");
-		addTab("Monitoring");
-		addTab("Text");
-		addTab("Video");
-
-		// Hier wird der Interpreter erstellt und wir mitgegeben und als
-		// Interface genutzt
-		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
-		int playerId = 0;
-		Interpreter interpreter = new Interpreter(jsonDatei, this, this, playerId);
-
-		initComplete = true;
-
+	public void connectToServer(){
 		// Serverkommunikation
-		// Wichtig hier: Solange noch kein Server verfügbar ist die IP Adresse vom PC eingeben
-		// auf dem der Server läuft(In der Hochschule wird das irgendwie geblockt, also kann man dort schlecht testen)
 		connector = new ServerClientConnector(this, "feijnox.no-ip.org" ); // "192.168.1.5"
-		
-		
-		// Objekt in Json String Konvertieren fŸr Kommunikation mit Server
-		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
-
-		// Gson Builder erzeugen
-		Gson gson = new GsonBuilder().create();
-		
-		// Item zu JSON umwandeln
-		String json = gson.toJson(item);
-		
-		// Aus der JSON ein neues Objekt erstellen 
-		// (item.getClass() muss mitgegeben werden, damit die Funktion die Struktur der zu erstellenden Klasse kennt) 
-		MdsItem newItem = gson.fromJson(json, item.getClass());
-		
-//		new Thread(){
-//			@Override public void run() {
-//				socketClient = connector.createSocket("Android");
-//			}
-//		}.start();
 		
 		socketThread = new Thread(connector);
 		socketThread.start();
-
-//		connector.httpGetString("/mds/appinfo");
-	}
-
-	public void redrawFragments(int number) {
-		mfa.removeFragment(number);
-		mfa.notifyDataSetChanged();
-	}
-
-	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-	}
-
-	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		viewPager.setCurrentItem(tab.getPosition());
-	}
-
-	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-	}
-
-	public void setTabMap() {
-		actionBar.selectTab(tabMap);
-	}
-
-	public void gpsInit() {
-
-		manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
-																			// sec
-				10, this);
-
-		// showText("Hier werden ihre derzeitigen\n Koordinaten angezeigt.");
-
-		boolean isNetworkEnabled = manager
-				.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-		if (isNetworkEnabled) {
-			showProviderEnable();
-		} else {
-			showProviderDisable();
-		}
-
-		updateLocationFields();
-
-		System.out.println("GPS wurde initialisiert");
+		
+		File jsonDatei = jsonEinlesen();
+		
+		// Hier wird der Interpreter erstellt und wir mitgegeben und als Interface genutzt
+		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
+		int playerId = 0;
+		interpreter = new Interpreter(jsonDatei, this, this, playerId);
 	}
 
 	public void showProviderDisable() {
 		TextView view = (TextView) findViewById(R.id.txtGPSVal);
 		view.setText("AUS");
 		view.setBackgroundColor(Color.RED);
-		updateLocationFields();
+		
+		FragmentMap f = (FragmentMap)fragmentList.get(2);
+		f.updateLocationFields();
 	}
 
 	public void showProviderEnable() {
 		TextView view = (TextView) findViewById(R.id.txtGPSVal);
 		view.setText("AN");
 		view.setBackgroundColor(Color.GREEN);
-		updateLocationFields();
+		
+		FragmentMap f = (FragmentMap)fragmentList.get(2);
+		f.updateLocationFields();
+		
 		initiater.locationChanged(location);
-	}
-
-	public void updateLocationFields() {
-
-		String latitude;
-		String longitude;
-
-		location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-		if (location != null) {
-
-			latitude = String.valueOf(location.getLatitude());
-			longitude = String.valueOf(location.getLongitude());
-
-		} else {
-
-			latitude = "Kein Empfang!";
-			longitude = "Kein Empfang!";
-
-		}
-
-		TextView latVal = (TextView) findViewById(R.id.txtLatVal);
-		TextView longVal = (TextView) findViewById(R.id.txtLongVal);
-
-		latVal.setText(latitude);
-		longVal.setText(longitude);
-
-		latVal.invalidate();
-		longVal.invalidate();
 	}
 
 	@Override
 	public void onLocationChanged(Location loc) {
-		updateLocationFields();
-		//initiater.locationChanged(arg0);
+
+			FragmentMap f = (FragmentMap)fragmentList.get(2);
+			f.updateLocationFields();
+			
 		JSONObject json = new JSONObject();
 		try {
 			json.put("Latitude", loc.getLatitude());
 			json.put("Longitude", loc.getLongitude());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//String json = "{ Longitude: " + arg0.getLongitude() + ", Latitude: " + arg0.getLatitude() + "}";
 		
 		connector.getSocket().send(json.toString());
 		
 		initiater.locationChanged(loc);
-		
-//		t.notify();
 	}
 
 	@Override
@@ -291,44 +194,48 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 	@Override
 	public void nextFragment(MdsImage mds) {
-		// mfa.addFragment("FragmentImage");
-		// addTab("Image");
-		viewPager.setCurrentItem(2);
+		FragmentTransaction transaction = fm.beginTransaction();
+	    transaction.replace(R.id.content, fragmentList.get(4));
+	    transaction.addToBackStack(null);
+        transaction.commit();
+        
 		Button btn = (Button) findViewById(R.id.btnReturnImage);
 		btn.setVisibility(1);
 	}
 
 	@Override
 	public void nextFragment(MdsVideo mds) {
-		// mfa.addFragment("FragmentVideo");
-		// addTab("Video");
-		viewPager.setCurrentItem(3);
+		FragmentTransaction transaction = fm.beginTransaction();
+	    transaction.replace(R.id.content, fragmentList.get(5));
+	    transaction.addToBackStack(null);
+        transaction.commit();
+        
+		viewPager.setCurrentItem(4);
 		Button btn = (Button) findViewById(R.id.btnReturnVideo);
 		btn.setVisibility(1);
 	}
 
 	@Override
 	public void nextFragment(MdsText mds) {
-		// mfa.addFragment("FragmentText");
-		// addTab("Text");
-		viewPager.setCurrentItem(1);
-		TextView view = (TextView) findViewById(R.id.placeholderText);
-		view.setText(mds.getText());
-		Button btn = (Button) findViewById(R.id.btnReturnText);
-		btn.setVisibility(1);
-		Button btn2 = (Button) findViewById(R.id.btnShowVideo);
-		btn2.setVisibility(1);
+		FragmentTransaction transaction = fm.beginTransaction();
+	    transaction.replace(R.id.content, fragmentList.get(4));
+	    transaction.addToBackStack(null);
+        transaction.commit();
+	      
+	    TextView view = (TextView) findViewById(R.id.placeholderText);
+	    view.setText(mds.getText());
+	    Button btn = (Button) findViewById(R.id.btnReturnText);
+	    btn.setVisibility(1);
+	    Button btn2 = (Button) findViewById(R.id.btnShowVideo);
+	    btn2.setVisibility(1);
 	}
 
 	@Override
 	public void nextFragment(MdsMap mds) {
-
-		viewPager.setCurrentItem(0);
-
-		if (initComplete) {
-			TextView view = (TextView) findViewById(R.id.placeholderText);
-			view.setText("Sie haben noch keine Sehenswürdigkeit erreicht");
-		}
+		FragmentTransaction transaction = fm.beginTransaction();
+	    transaction.replace(R.id.content, fragmentList.get(2));
+	    transaction.addToBackStack(null);
+        transaction.commit();
 	}
 
 	private File jsonEinlesen() {
@@ -403,10 +310,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		actionBar.addTab(tabImage);
 	}
 
-	public void removeTab(int site) {
-		actionBar.removeTabAt(site);
-	}
-
 	/*
 	 * Shows Toast for Debbuging
 	 */
@@ -466,22 +369,45 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		connector.getSocket().send(json.toString());
 		
 	}
-	
-	public void addConsoleEntry(String entry){
-		System.out.println("addConsole");
-		consoleOutput += entry;
-		consoleOutput += "\n";
-		TextView monitoringConsole = (TextView)findViewById(R.id.monitoringConsole);
-		monitoringConsole.setMovementMethod(new ScrollingMovementMethod());
-		monitoringConsole.setText(consoleOutput);
+
+	@Override
+	public void onTabReselected(Tab tab, android.app.FragmentTransaction arg1) {
+		changeFragment(tab.getPosition());
 	}
 
 	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
+	public void onTabSelected(Tab tab, android.app.FragmentTransaction arg1) {
+		changeFragment(tab.getPosition());
+	}
+
+	@Override
+	public void onTabUnselected(Tab index, android.app.FragmentTransaction arg1) {
 		
 	}
 	
+	private void changeFragment(int index){
+		if((tabCount >= 0 && index == 0) || (tabCount < fragmentList.size()-1 && index == 1)){
+			FragmentTransaction transaction = fm.beginTransaction();
+			
+			int i = (index == 0 )? -1 : 1;
+			
+			tabCount += i;
+		    transaction.replace(R.id.content, fragmentList.get(tabCount));
+		    transaction.addToBackStack(null);
+	        transaction.commit();
+		}
+	}
 	
+	public FragmentManager getFm() {
+		return fm;
+	}
 	
+	public ArrayList<Fragment> getFragmentList(){
+		return fragmentList;
+	}
+
+	public void consoleEntry(String message) {
+		FragmentMonitoring f = (FragmentMonitoring)fragmentList.get(3);
+		f.addConsoleEntry(message);
+	}
 }
