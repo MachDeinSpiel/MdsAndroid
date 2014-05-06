@@ -47,7 +47,7 @@ public class EventParser {
 				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
 				// TODO: Quanti Object wird aus dem Subject / Object gewonnen
 				// alle Items durchgehen und gucken ob genug vorhanden sind
-				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getValue());
+				int quanti = Integer.parseInt(((MdsQuantifier) cond.getParams().get("quantifier")).getValue());
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
 				Whiteboard object = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
@@ -69,6 +69,7 @@ public class EventParser {
 				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.ALL)) {
 					if (objects.size() == object.entrySet().size()) return new Result(true, null, null);
 				} 
+				//TODO : Error if quantifier is invalid
 			}else{
 				//TODO: subject ist gruppe oder was anderes, so funzt das noch nicht
 				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
