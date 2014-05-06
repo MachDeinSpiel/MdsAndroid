@@ -31,7 +31,6 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 		this.gui = guiInterface;
 		this.serverInterpreter = serverInterpreter;
 		
-		//TODO: getData // <- Das heißt was?
 		this.myId = playerId;
 		new Parser(this,json);	
 		

@@ -1,10 +1,12 @@
 package de.hsbremen.mds.interpreter;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
 import android.location.Location;
+import de.hsbremen.mds.common.valueobjects.MdsObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsQuantifier;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
@@ -37,52 +39,70 @@ public class EventParser {
 	}
 
 	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, int playerId) {
+		
+		// ------------------ Werte holen ---------------//
+		// get Params
+		HashMap<String, Object> params = cond.getParams();
+		// get Object
+		MdsObject object = (MdsObject) params.get("object");
+		// get Subject
+		MdsObject subject = (MdsObject) params.get("subject");
+		// get Object Quantifier
+		MdsQuantifier objQuanti = object.getQuantifier();
+		// get Subject Quantifier
+		MdsQuantifier subQuanti = subject.getQuantifier();
+		// get Radius
+		int radius = Integer.parseInt((String) params.get("radius"));
+		// get Quantivalue
+		int quanti = Integer.parseInt(objQuanti.getValue());
+		// get QuanticheckType
+		String checkType = objQuanti.getChecktype();
+		
+		// -------------- alle Verschiedenen Location Events -----------//
 		if(cond.getName().equals("nearby")) {
-			if(cond.getParams().get("subject").equals("self")){
+			// wenn das Subject "self" ist, im Einzelspieler immer
+			if(subject.getName().equals("self")){
+				// Locationobjekt des Spielers erzeuegen
 				double longitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "longitude").value;
 				double latitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "latitude").value;
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
-				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
-				// TODO: Quanti Object wird aus dem Subject / Object gewonnen
-				// alle Items durchgehen und gucken ob genug vorhanden sind
-				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getValue());
+				
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
-				Whiteboard object = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
-				List<WhiteboardEntry> objects = getEntriesNearTo(object, playerLoc, radius);
+				Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split(".")).value;
+				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
 				
 				// CheckType des Quantifiers identifizieren
-				if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.EQUALS)) {
+				if (checkType.equals(MdsCondition.EQUALS)) {
 					if (objects.size() == quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.LOWER)) {
+				} else if (checkType.equals(MdsQuantifier.LOWER)) {
 					if (objects.size() < quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.HIGHER)) {
+				} else if (checkType.equals(MdsQuantifier.HIGHER)) {
 					if (objects.size() > quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.LOWEQUALS)) {
+				} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
 					if (objects.size() <= quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.HIGHEQUALS)) {
+				} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
 					if (objects.size() >= quanti) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.EXISTS)) {
+				} else if (checkType.equals(MdsQuantifier.EXISTS)) {
 					if (objects.size() >= 1) return new Result(true, null, null);
-				} else if (((MdsQuantifier)cond.getParams().get("quantifier")).getChecktype().equals(MdsCondition.ALL)) {
-					if (objects.size() == object.entrySet().size()) return new Result(true, null, null);
+				} else if (checkType.equals(MdsQuantifier.ALL)) {
+					if (objects.size() == realObject.entrySet().size()) return new Result(true, null, null);
 				} 
 			}else{
-				//TODO: subject ist gruppe oder was anderes, so funzt das noch nicht
-				int radius = Integer.parseInt((String) cond.getParams().get("radius"));
-				// alle Items durchgehen und gucken ob genug vorhanden sind
-				int quanti = Integer.parseInt((String) ((MdsQuantifier) cond.getParams().get("quantifier")).getValue());
-				///TODO: Subject wird noch nicht beachtet, da Einzelspieler
-				WhiteboardEntry[] playerArray= {(WhiteboardEntry) wb.getAttribute("players",""+playerId).value}; 
-				List<WhiteboardEntry> subject = Arrays.asList(playerArray);
+				// TODO: Hier muss noch viel überlegt werden bei Multiplayer
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
-				Whiteboard object = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
+				Whiteboard realSubject = (Whiteboard)wb.getAttribute(object.getName().split(".")).value;
+				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
+				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
+				Whiteboard realObject = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
 				// Location des Objekts
 				Location someLoc = new Location("somLoc");
-				List<WhiteboardEntry> objects = getEntriesNearTo(object, someLoc, radius);
+				// FIXME:
+				// Hier evtl eine Liste von Locations?
+				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
 			}
 		}
 		return new Result(false, null, null);
