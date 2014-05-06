@@ -31,8 +31,11 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import de.hsbremen.mds.android.listener.AndroidInitiater;
-import de.hsbremen.mds.common.gson.ObjectGsonConverter;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.listener.AndroidListener;
@@ -132,8 +135,15 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		// Objekt in Json String Konvertieren für Kommunikation mit Server
 		MdsItem item = new MdsItem("ItemNummer1", "paaaaaath...");
 
-		ObjectGsonConverter oGConverter = new ObjectGsonConverter();
-		String jsonForServer = oGConverter.objectToJsonString(item);
+		// Gson Builder erzeugen
+		Gson gson = new GsonBuilder().create();
+		
+		// Item zu JSON umwandeln
+		String json = gson.toJson(item);
+		
+		// Aus der JSON ein neues Objekt erstellen 
+		// (item.getClass() muss mitgegeben werden, damit die Funktion die Struktur der zu erstellenden Klasse kennt) 
+		MdsItem newItem = gson.fromJson(json, item.getClass());
 		
 //		new Thread(){
 //			@Override public void run() {
