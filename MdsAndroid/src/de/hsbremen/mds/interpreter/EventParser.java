@@ -1,14 +1,11 @@
 package de.hsbremen.mds.interpreter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsItem;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 
 public class EventParser {
 	
