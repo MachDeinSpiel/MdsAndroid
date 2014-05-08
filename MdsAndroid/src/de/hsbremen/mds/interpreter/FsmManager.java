@@ -4,10 +4,7 @@ package de.hsbremen.mds.interpreter;
 import java.util.List;
 import java.util.Vector;
 
-import android.location.Location;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
-import de.hsbremen.mds.common.interfaces.InterpreterInterface;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
@@ -79,13 +76,41 @@ public class FsmManager {
 	/**
 	 * hier läuft die finit state maschine
 	 */
-	public void checkEvents(MdsEvent complied){
+	public void checkEvents(String buttonName){
+		//TODO buttonName irgendwo anders herbekommen
+		
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
-			//TODO: Event mit Condition ersetzen
-//			if(EventParser.checkEvent(t.getEvent(), complied, this.wb, this.myID)){
-//				this.setState(t.getTarget(), "currentState");
-//			}
+			EventParser.Result result;
+			
+			switch(t.getEventType()){
+			case locationEvent:
+				result = EventParser.checkLocationEvent(t.getCondition(), wb, myID);
+				break;
+			case uiEvent:
+				result = EventParser.checkUiEvent(buttonName, t.getCondition(), wb, myID);
+				break;
+			case whiteboardEvent:
+				result = EventParser.checkWhiteboardEvent(t.getCondition(), wb, myID);
+				break;
+			default:
+				//TODO: Fehler abfangen
+				result = new EventParser.Result(false, null, null);
+				break;
+			}
+				
+			if(result.isfullfilled){
+				
+				this.setState(getCurrentState(), "lastState");
+				this.setState(t.getTarget(), "currentState");
+				if(result.subjects != null)
+					this.getCurrentState().setSubjects(result.subjects);
+				if(result.objects != null)
+					this.getCurrentState().setSubjects(result.objects);
+				return;
+			}
 		}
+			
+		
 	}
 	
 	
