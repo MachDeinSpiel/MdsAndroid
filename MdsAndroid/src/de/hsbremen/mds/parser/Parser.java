@@ -16,9 +16,6 @@ import org.json.simple.parser.ParseException;
 
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsPlayer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
@@ -75,7 +72,7 @@ JSONObject jsonObject = (JSONObject) obj;
 					}
 				}
 				// gelesene attribute werden in das allMdsActions array gespeichert
-				allMdsActions [i] = new MdsAction(ident, defaults);				
+//				allMdsActions [i] = new MdsAction(ident, defaults);				
 			}
 			
 			// lesen des MdsPlayer objects
@@ -95,7 +92,7 @@ JSONObject jsonObject = (JSONObject) obj;
 			}
 			
 			// erzeugen des MdsPlayers
-			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
+//			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
 			
 			JSONArray MdsState = (JSONArray) jsonObject.get("state");	// lesen des MdsState arrays aus der JSON datei
 			
@@ -158,7 +155,7 @@ JSONObject jsonObject = (JSONObject) obj;
 						}
 					}
 				}
-				allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startMdsState, finalMdsState);
+//				allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startMdsState, finalMdsState);
 			}
 			
 			for(int i = 0; i < MdsState.size(); i++) {
@@ -196,10 +193,10 @@ JSONObject jsonObject = (JSONObject) obj;
 								Object value = eventObject.get(key);
 								eventHashMap.put(key, value);
 							}
-							event = new MdsEvent(eventHashMap);						
-							
-							// gelesene attribute werden in das allTrans array gespeichert
-							allTrans[j] = new MdsTransition(target, event, eventName);
+//							event = new MdsEvent(eventHashMap);						
+//							
+//							// gelesene attribute werden in das allTrans array gespeichert
+//							allTrans[j] = new MdsTransition(target, event, eventName);
 						}
 					}
 				}
@@ -215,7 +212,7 @@ JSONObject jsonObject = (JSONObject) obj;
 
 			//MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
 			
-			interpreter.pushParsedObjects(MdsContainer);
+//			interpreter.pushParsedObjects(MdsContainer);
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

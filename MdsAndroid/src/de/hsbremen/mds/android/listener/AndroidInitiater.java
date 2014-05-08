@@ -1,8 +1,11 @@
 package de.hsbremen.mds.android.listener;
 
-import de.hsbremen.mds.common.listener.AndroidListener;
+import java.util.List;
+
 import android.location.Location;
 import android.util.Log;
+import de.hsbremen.mds.common.interfaces.AndroidListener;
+import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
 public class AndroidInitiater {
 
@@ -39,6 +42,13 @@ public class AndroidInitiater {
     	if(listener != null) {
 	        // Callback mit Event Informationen
 	        listener.onButtonClick(name);
+	    }
+    }
+    
+    public void updateLocalWhiteboard(List<String> keys, WhiteboardEntry entry){
+    	if(listener != null) {
+	        // Callback mit Event Informationen
+	        listener.updateLocalWhiteboard(keys, entry);
 	    }
     }
     

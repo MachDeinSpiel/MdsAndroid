@@ -15,7 +15,6 @@ import org.json.JSONObject;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -40,9 +39,9 @@ import de.hsbremen.mds.android.fragment.FragmentStart;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
+import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
-import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
@@ -359,7 +358,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		}
 		
 		try {
-			json.put(result, entry.value);
+			json.put("path", result);
+			json.put("value", entry.value);
 			json.put("visibility", entry.visibility);
 		} catch (JSONException e) {
 			e.printStackTrace();
