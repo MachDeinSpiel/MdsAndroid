@@ -14,6 +14,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import valueobjects.MdsCondition;
+import valueobjects.MdsObject;
+import valueobjects.MdsQuantifier;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
@@ -36,7 +39,7 @@ public class Parser {
 			
 			Object obj = parser.parse(new FileReader(jsonFile));
 			 
-JSONObject jsonObject = (JSONObject) obj;
+			JSONObject jsonObject = (JSONObject) obj;
 			
 			/* ---- aus der JSON datei lesen und in Objekte speichern ---- */
 			
@@ -97,7 +100,7 @@ JSONObject jsonObject = (JSONObject) obj;
 			// erzeugen des MdsPlayers
 			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
 			
-			JSONArray MdsState = (JSONArray) jsonObject.get("state");	// lesen des MdsState arrays aus der JSON datei
+			JSONArray MdsState = (JSONArray) jsonObject.get("states");	// lesen des MdsState arrays aus der JSON datei
 			
 			MdsState[] allMdsStates = new MdsState[MdsState.size()];	// array in dem all unsere MdsStates gespeichert werden
 			
@@ -115,7 +118,10 @@ JSONObject jsonObject = (JSONObject) obj;
 				id = Integer.parseInt(element.get("ID").toString());
 				name = (String) element.get("name");
 				
-				String parentState = element.get("parentState").toString();
+				MdsState parentState = null;
+				if(!element.get("parentState").equals("null")) {
+					// TODO: was passiert wenns nicht null ist?
+				}
 				
 				if(element.get("startState").equals(false)) 
 					startMdsState = false;
@@ -167,8 +173,7 @@ JSONObject jsonObject = (JSONObject) obj;
 				// aus dem JSONArray wird ein JSONObject an der stelle "i" zwischengespeichert
 				JSONObject element = (JSONObject) MdsState.get(i);
 				
-				if(allMdsStates[i].getFinalState() != true) {							// wenn finalMdsState nicht true --> dann ließ die transitions
-					
+				if(!element.get("transition").equals("null")) {
 					JSONArray transition = (JSONArray) element.get("transition");	// lesen des transition arrays aus der JSON datei
 					allTrans = new MdsTransition[transition.size()];	// die größe des arrays wird festgelegt
 					String type, nameTransition;
@@ -177,30 +182,72 @@ JSONObject jsonObject = (JSONObject) obj;
 					for(int j = 0; j < transition.size(); j++) {
 						// aus dem JSONArray wird ein JSONObject an der stelle "j" zwischengespeichert
 						JSONObject transElem = (JSONObject) transition.get(j);
+						HashMap<String, Object> paramsHM = new HashMap<String, Object>();
 						
-						// attribute werden aus dem JSONObject gelesen
+						JSONObject condition = (JSONObject) transElem.get("condition");
+						JSONObject params = (JSONObject) condition.get("params");
+						
+						if(params.get("object") != null) {
+							JSONObject object = (JSONObject) params.get("object");
+							JSONObject quantifier = (JSONObject) object.get("quantifier");
+							
+							// transition/condition/params/object/quantifier
+							String checkType = quantifier.get("checkType").toString();
+							String value = quantifier.get("value").toString();
+							MdsQuantifier quantifierObj = new MdsQuantifier(checkType, value); // checkType?
+							
+							// transition/condition/params/object
+							name = object.get("name").toString();
+							MdsObject objectObj = new MdsObject(name, quantifierObj);
+							
+							object = (JSONObject) params.get("subject");
+							quantifier = (JSONObject) object.get("quantifier");
+							
+							// transition/condition/params/subject/quantifier
+							checkType = quantifier.get("checkType").toString();
+							value = quantifier.get("value").toString();
+							quantifierObj = new MdsQuantifier(checkType, value); // checkType?
+							
+							// transition/condition/params/subject
+							name = object.get("name").toString();
+							MdsObject subjectObj = new MdsObject(name, quantifierObj);
+							
+							// transition/condition/params
+							int radius = Integer.parseInt(params.get("radius").toString());
+							
+							paramsHM.put("object", objectObj);
+							paramsHM.put("subject", subjectObj);
+							paramsHM.put("radius", radius);
+						}
+						else {
+							Set<String> keySet = params.keySet();
+							for (String key : keySet){
+								Object values = params.get(key);
+								paramsHM.put(key, values);
+							}
+						}
+						
+						// transition/condition
+						name = condition.get("name").toString();
+						MdsCondition conditionObj = new MdsCondition(name, paramsHM);
+						
+						// transition
 						name = transElem.get("target").toString();
-						System.out.println(name);
 						if(name != null) {
 							for(int k = 0; k < allMdsStates.length; k++) {
 								if(allMdsStates[k].getName().equals(name)) {
 									target = allMdsStates[k];
 								}
 							}
-							String eventName = transElem.get("event").toString();
-							JSONObject eventObject = (JSONObject) transElem.get("condition");
-							MdsEvent event;
-							HashMap<Object, Object> eventHashMap = new HashMap<Object, Object>();
-							Set<Object> keySet = eventObject.keySet();
-							for (Object key : keySet){
-								Object value = eventObject.get(key);
-								eventHashMap.put(key, value);
-							}
-							event = new MdsEvent(eventHashMap);						
-							
-							// gelesene attribute werden in das allTrans array gespeichert
-							allTrans[j] = new MdsTransition(target, event, eventName);
 						}
+						String event = transElem.get("event").toString();
+						if(event.equals("locationEvent"))
+							allTrans[j] = new MdsTransition(target, MdsTransition.EventType.locationEvent);
+						else if(event.equals("uiEvent"))
+							allTrans[j] = new MdsTransition(target, MdsTransition.EventType.uiEvent);
+						else if(event.equals("whiteboardEvent"))
+							allTrans[j] = new MdsTransition(target, MdsTransition.EventType.whiteboardEvent);
+						allTrans[j].setCondition(conditionObj);
 					}
 				}
 				allMdsStates[i].setTransitions(allTrans); 
