@@ -80,7 +80,8 @@ public class ActionParser {
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray();
 			//TODO: Trigger mit Object ersetzen
-			return (String) event.getTrigger().getAttributes().getAttribute(keys).value;
+			//return (String) event.getTrigger().getAttributes().getAttribute(keys).value;
+			return null;
 		}
 		
 		//Ansonsten Daten aus dem Whiteboard holen

@@ -82,9 +82,9 @@ public class FsmManager {
 	public void checkEvents(MdsEvent complied){
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
 			//TODO: Event mit Condition ersetzen
-			if(EventParser.checkEvent(t.getEvent(), complied, this.wb, this.myID)){
-				this.setState(t.getTarget(), "currentState");
-			}
+//			if(EventParser.checkEvent(t.getEvent(), complied, this.wb, this.myID)){
+//				this.setState(t.getTarget(), "currentState");
+//			}
 		}
 	}
 	
