@@ -3,9 +3,8 @@ package de.hsbremen.mds.interpreter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsImageAction;
@@ -13,6 +12,7 @@ import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMapAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsTextAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsVideoAction;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
+import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
 public class ActionParser {
 
@@ -24,14 +24,16 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(MdsAction action,MdsEvent triggerEvent, Whiteboard wb, int myId){
+	public MdsActionExecutable parseAction(MdsState state, Whiteboard wb, int myId){
 		
+		// Action des States holen
+		MdsAction action = state.getDoAction();
 		//Parameter der Action
 		HashMap<String, String> params = action.getParams();
 		
 		//Jeden Parameter parsen/interpretieren
 		for(String key : params.keySet()){
-			params.put(key, parseParam(params.remove(key), triggerEvent, wb, myId));
+			params.put(key, parseParam(params.remove(key), state, wb, myId));
 		}
 		
 		//Je nach dem, von welchem Ident die Action ist, werden verschiedene MdsActionExecutables zurückgegeben 
@@ -56,7 +58,7 @@ public class ActionParser {
 		
 	}
 	
-	private String parseParam(String param, MdsEvent event, Whiteboard wb, int playerId){
+	private String parseParam(String param, MdsState state, Whiteboard wb, int playerId){
 		
 		
 		//Ersetzungen gemäß der Spezisprache vorbereiten 
@@ -70,16 +72,19 @@ public class ActionParser {
 		//Einzelne Teile, die Punkten getrennt sind aufsplitten
 		List<String> splitted = Arrays.asList(param.split("."));
 		
-		//Keine weiteren Teile (param enthielt keinen Punkt)? fertig!
-		if(splitted.size() == 1){
-			return splitted.get(0);
-		}
-		
-		//Wenn das Schlüsselwort "Trigger" vorkommt, werden dessen Attribute genutzt
-		if(splitted.get(0).equals("trigger")){
+		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
+		if(splitted.get(0).equals("object")){
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray();
-			return (String) event.getTrigger().getAttributes().getAttribute(keys).value;
+			// TODO: erstmal nur mit einem
+			List<WhiteboardEntry> objects = state.getObjects();
+			return (String) ((Whiteboard)objects.get(0).value).getAttribute(keys).value;
+		} else if (splitted.get(0).equals("subject")) {
+			splitted.remove(0);
+			String[] keys = (String[]) splitted.toArray();
+			// erstmal nur mit einem
+			List<WhiteboardEntry> subjects = state.getSubjects();
+			return (String) ((Whiteboard)subjects.get(0).value).getAttribute(keys).value;
 		}
 		
 		//Ansonsten Daten aus dem Whiteboard holen
