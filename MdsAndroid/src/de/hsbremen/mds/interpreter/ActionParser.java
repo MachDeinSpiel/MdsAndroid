@@ -1,9 +1,12 @@
 package de.hsbremen.mds.interpreter;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
@@ -15,6 +18,10 @@ import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
 public class ActionParser {
+	
+	
+	public static final String ADD = "add";
+	public static final String MULTIPLY = "multiply";
 
 	/**
 	 * Macht aus einer MdsAction eine ausführbare MdsActionExecutable, die man mit .execute() dann ausführen kann.
@@ -24,30 +31,115 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(MdsState state, Whiteboard wb, int myId){
+	public MdsActionExecutable parseAction(final MdsState state, final Whiteboard wb, final int myId){
 		
 		// Action des States holen
 		MdsAction action = state.getDoAction();
 		//Parameter der Action
-		HashMap<String, String> params = action.getParams();
+		final HashMap<String, String> params = action.getParams();
 		
 		//Jeden Parameter parsen/interpretieren
 		for(String key : params.keySet()){
 			params.put(key, parseParam(params.remove(key), state, wb, myId));
 		}
 		
+		/*	showVideo,
+			showMap,
+			showText,
+			showImage,
+			addToGroup,
+			removeFromGroup,
+			changeAttribute,
+			useItem,
+			updateMap
+		 */
+		
 		//Je nach dem, von welchem Ident die Action ist, werden verschiedene MdsActionExecutables zurückgegeben 
 		switch(action.getIdent()){
 		case showVideo:
 			return new MdsVideoAction(params.get("title"), params.get("url"), params.get("text"));
 		case showMap:
+		case updateMap:
 			return new MdsMapAction("Map", Double.parseDouble(params.get("longitude")), Double.parseDouble(params.get("latitude")));
 		case showImage:
 			return new MdsImageAction(params.get("title"), params.get("url"), params.get("text"));
 		case showText:
 			return new MdsTextAction(params.get("title"), params.get("text"));
 		case addToGroup:
-			//TODO;
+			return new MdsActionExecutable() {
+				
+				@Override
+				public void execute(GuiInterface guiInterface) {
+					
+					
+				}
+			};
+		case removeFromGroup:
+			return new MdsActionExecutable() {
+				
+				@Override
+				public void execute(GuiInterface guiInterface) {
+					
+					
+				}
+			};
+		case changeAttribute:
+			//TODO: tick und duration implementieren
+			return new MdsActionExecutable() {
+				
+				@Override
+				public void execute(GuiInterface guiInterface) {
+					//Welches Attribut soll geändert werden?
+					List<String> keysToValue = Arrays.asList(params.get("attribute").split("."));
+					
+					//Whiteboard, in dem das zuändernde Attribut liegt
+					Whiteboard currentWb = wb;
+					
+					if(keysToValue.get(0).equals("self")){
+						currentWb = (Whiteboard) wb.getAttribute("players",myId+"").value;
+						keysToValue.remove(0);
+					}else if (keysToValue.get(0).equals("trigger")){ 
+						if(keysToValue.get(0).equals("subject")){
+							currentWb = (Whiteboard) state.getSubjects().get(0).value;
+							keysToValue.remove(0);
+							keysToValue.remove(0);
+						}else if(keysToValue.get(0).equals("object")){
+							currentWb = (Whiteboard) state.getObjects().get(0).value;
+							keysToValue.remove(0);
+							keysToValue.remove(0);
+						}
+					}
+					
+					String attributeToChange = (String)currentWb.getAttribute(keysToValue.toArray(new String[0])).value;
+					
+					if(params.get("valueType").equals(ADD)){
+						try{
+							attributeToChange = Double.toString(Double.parseDouble(attributeToChange)+Double.parseDouble(params.get("value")));
+						}catch(NumberFormatException nfe){
+							nfe.printStackTrace();
+						}
+					}else if(params.get("valueType").equals(MULTIPLY)){
+						try{
+							attributeToChange = Double.toString(Double.parseDouble(attributeToChange)*Double.parseDouble(params.get("value")));
+						}catch(NumberFormatException nfe){
+							nfe.printStackTrace();
+						}
+					}
+					
+					currentWb.setAttributeValue(attributeToChange, keysToValue.toArray(new String[0]));
+					
+					
+				}
+			};
+		case useItem:
+			return new MdsActionExecutable() {
+				
+				@Override
+				public void execute(GuiInterface guiInterface) {
+					
+					
+				}
+			};
 		default:
 			return null;
 		}
