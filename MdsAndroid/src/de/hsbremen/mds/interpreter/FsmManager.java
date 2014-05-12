@@ -42,7 +42,7 @@ public class FsmManager {
 
 	private void onstateChanged(MdsState state) {
 		
-		aParser.parseAction(state, wb, myID);
+		aParser.parseAction(state.getDoAction(), state, wb, myID);
 	}
 
 	public FsmManager(List<MdsState> states, Whiteboard wb){

@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsImageAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMapAction;
@@ -31,10 +33,9 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(final MdsState state, final Whiteboard wb, final int myId){
+	public MdsActionExecutable parseAction(MdsAction action, final MdsState state, final Whiteboard wb, final int myId){
 		
-		// Action des States holen
-		MdsAction action = state.getDoAction();
+	
 		//Parameter der Action
 		final HashMap<String, String> params = action.getParams();
 		
@@ -132,11 +133,73 @@ public class ActionParser {
 				}
 			};
 		case useItem:
+			
+			//Vorbereitung: Item finden
+			List<String> keysToItem = Arrays.asList(params.get("attribute").split("."));
+			 Whiteboard currentWb = wb;
+			
+			//Bekannte Konstanten ersetzen, bzw. root-Whiteboard ändern
+			if(keysToItem.get(0).equals("self")){
+				currentWb = (Whiteboard) wb.getAttribute("players",myId+"").value;
+				keysToItem.remove(0);
+			}else if (keysToItem.get(0).equals("trigger")){ 
+				if(keysToItem.get(0).equals("subject")){
+					currentWb = (Whiteboard) state.getSubjects().get(0).value;
+					keysToItem.remove(0);
+					keysToItem.remove(0);
+				}else if(keysToItem.get(0).equals("object")){
+					currentWb = (Whiteboard) state.getObjects().get(0).value;
+					keysToItem.remove(0);
+					keysToItem.remove(0);
+				}
+			}
+			//Item, dessen useAction(s) ausgeführt werden sollen
+			final Whiteboard item = (Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
+			
+			
 			return new MdsActionExecutable() {
-				
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					
+					Set<String> actions = ((Whiteboard)item.getAttribute("useAction").value).keySet();
+					//Alle useActions ausführen, dabei steht in action der aktuelle Name
+					//TODO: so wie es jetzt ist (auch wie es geparst wird) kann von jedem Typ immer nur
+					//eine Action da sein. Es können also zb. keine zwei "changeAttribute" aufrufe vorkommen
+					for(String action : actions){
+						MdsActionIdent actionIdent = null;
+						
+						//entsprechenden Enum suchen
+						if(action.equals("showVideo")){
+							actionIdent = MdsActionIdent.showVideo;
+						}else if(action.equals("showMap")){
+							actionIdent = MdsActionIdent.showMap;
+						}else if(action.equals("showText")){
+							actionIdent = MdsActionIdent.showText;
+						}else if(action.equals("showImage")){
+							actionIdent = MdsActionIdent.showImage;
+						}else if(action.equals("addToGroup")){
+							actionIdent = MdsActionIdent.addToGroup;
+						}else if(action.equals("removeFromGroup")){
+							actionIdent = MdsActionIdent.removeFromGroup;
+						}else if(action.equals("changeAttribute")){
+							actionIdent = MdsActionIdent.changeAttribute;
+						}else if(action.equals("useItem")){
+							actionIdent = MdsActionIdent.useItem;
+						}else if(action.equals("updateMap")){
+							actionIdent = MdsActionIdent.updateMap;
+						}
+						
+						//Params auslesen und in action Params kopieren
+						Set<String> allParamKeys = ((Whiteboard)item.getAttribute("useAction", action).value).keySet();
+						HashMap<String,String> actionParams = new HashMap<String, String>();
+						for(String paramName : allParamKeys){
+							actionParams.put(paramName, (String) item.getAttribute("useAction", action, paramName).value);
+						}
+						
+						//Ausführbare Action erzeugen und sie danach ausführen
+						MdsActionExecutable realAction = parseAction(new MdsAction(actionIdent, actionParams), state, wb, myId);
+						realAction.execute(guiInterface);
+					}
 					
 				}
 			};
