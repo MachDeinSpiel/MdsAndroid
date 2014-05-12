@@ -13,17 +13,20 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
 
 public class ParserServer {
+	
+	private Whiteboard wb = new Whiteboard();
 
-	public ParserServer(InterpreterInterface interpreter, File jsonFile){
+	public ParserServer(File jsonFile){
 		JSONParser parser = new JSONParser();
 		 
 		try {
 			
-			Object obj = parser.parse(new FileReader("TourismApp_2.0_Server.json"));
+			Object obj = parser.parse(new FileReader(jsonFile));
 			 
 			JSONObject jsonObject = (JSONObject) obj;
 			
@@ -66,7 +69,6 @@ public class ParserServer {
 				}
 			}
 			*/
-			strings.clear();
 			
 			
 			/*
