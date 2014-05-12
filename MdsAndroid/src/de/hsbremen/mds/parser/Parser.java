@@ -47,7 +47,7 @@ public class Parser {
 			String ident;												// temp variablen
 
 			
-			for (int i = 0; i < MdsAction.size(); i++){	
+			for (int i = 0; i < MdsAction.size(); i++) {	
 				// aus dem JSONArray wird ein JSONObject an der stelle "i" zwischengespeichert
 				JSONObject element = (JSONObject) MdsAction.get(i);
 				
@@ -76,9 +76,28 @@ public class Parser {
 					}
 				}
 				// gelesene attribute werden in das allMdsActions array gespeichert
-				allMdsActions [i] = new MdsAction(ident, defaults);				
+				if(ident.equals("showVideo"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.showVideo, defaults);
+				else if(ident.equals("showMap"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.showMap, defaults);
+				else if(ident.equals("showText"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.showText, defaults);
+				else if(ident.equals("showImage"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.showImage, defaults);
+				else if(ident.equals("addToGroup"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.addToGroup, defaults);
+				else if(ident.equals("removeFromGroup"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.removeFromGroup, defaults);
+				else if(ident.equals("changeAttribute"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.changeAttribute, defaults);
+				else if(ident.equals("useItem"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.useItem, defaults);
+				else if(ident.equals("updateMap"))
+					allMdsActions[i] = new MdsAction(MdsActionIdent.updateMap, defaults);
+				
 			}
 			
+			/*
 			// lesen des MdsPlayer objects
 			JSONObject MdsPlayer = (JSONObject) jsonObject.get("player");
 			
@@ -97,6 +116,7 @@ public class Parser {
 			
 			// erzeugen des MdsPlayers
 			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
+			*/
 			
 			JSONArray MdsState = (JSONArray) jsonObject.get("states");	// lesen des MdsState arrays aus der JSON datei
 			
@@ -106,7 +126,8 @@ public class Parser {
 			int id;
 			MdsAction doMdsAction = null;
 			boolean startMdsState, finalMdsState;
-			String startAction = null, endAction = null;
+			MdsAction startAction = null, endAction = null;
+			String name;
 			
 			for(int i = 0; i < MdsState.size(); i++) {
 				// aus dem JSONArray wird ein JSONObject an der stelle "i" zwischengespeichert
@@ -131,12 +152,7 @@ public class Parser {
 				
 				//Verarbeitung fehlt, da diese felder leer sind
 				//JSONObject startMdsActionObject = (JSONObject) element.get("startAction");
-				startAction = element.get("startAction").toString();
-				
-				//Verarbeitung fehlt, da diese felder leer sind
-				//JSONObject endMdsActionObject = (JSONObject) element.get("endAction");
-				endAction = element.get("endAction").toString();
-				
+								
 				if(element.get("doAction") instanceof JSONObject) {
 					JSONObject doMdsActionObject = (JSONObject) element.get("doAction");
 					
@@ -154,7 +170,8 @@ public class Parser {
 					}
 					
 					for(int j = 0; j < allMdsActions.length;j++) {
-						if (doMdsActionObject.get("name").toString().equals(allMdsActions[j].getIdent())) {
+						System.out.println(allMdsActions[j].getIdent().toString());
+						if (doMdsActionObject.get("name").toString().equals(allMdsActions[j].getIdent().toString())) {
 								doMdsAction = new MdsAction(allMdsActions[j].getIdent(), allMdsActions[j].getParams());
 								if(defaults != null) {
 									doMdsAction.setParams(defaults);
@@ -162,7 +179,52 @@ public class Parser {
 						}
 					}
 				}
+				
+				ident = element.get("startAction").toString();
+				if(!ident.equals("null")) {
+					JSONObject sAction = (JSONObject) element.get("startAction");
+					ident = sAction.get("name").toString();
+					
+					HashMap<String, String> paramsHM = new HashMap<String, String>();
+					if(sAction.get("params") != null) {
+						JSONObject paramsO = (JSONObject) sAction.get("params");
+						Set<String> keySet = paramsO.keySet();
+						for (String key : keySet){
+							Object value = paramsO.get(key);
+							paramsHM.put(key, value.toString());
+						}
+					}
+					for(int a = 0; a < allMdsActions.length; a++) {
+						if(allMdsActions[a].getIdent().toString().equals(ident)) {
+							startAction = new MdsAction(allMdsActions[a].getIdent(), paramsHM);
+						}
+					}
+				}
+				
+				ident = element.get("endAction").toString();
+				if(!ident.equals("null")) {
+					JSONObject eAction = (JSONObject) element.get("endAction");
+					ident = eAction.get("name").toString();
+
+					HashMap<String, String> paramsHM = new HashMap<String, String>();
+					if(eAction.get("params") != null) {
+						JSONObject paramsO = (JSONObject) eAction.get("params");
+						Set<String> keySet = paramsO.keySet();
+						for (String key : keySet){
+							Object value = paramsO.get(key);
+							paramsHM.put(key, value.toString());
+						}
+					}
+					for(int a = 0; a < allMdsActions.length; a++) {
+						if(allMdsActions[a].getIdent().toString().equals(ident)) {
+							endAction = new MdsAction(allMdsActions[a].getIdent(), paramsHM);
+						}
+					}
+				}
+				
 				allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startMdsState, finalMdsState);
+				allMdsStates[i].setStartAction(startAction);
+				allMdsStates[i].setEndAction(endAction);
 			}
 			
 			for(int i = 0; i < MdsState.size(); i++) {
@@ -174,7 +236,7 @@ public class Parser {
 				if(!element.get("transition").equals("null")) {
 					JSONArray transition = (JSONArray) element.get("transition");	// lesen des transition arrays aus der JSON datei
 					allTrans = new MdsTransition[transition.size()];	// die größe des arrays wird festgelegt
-					String type, nameTransition;
+					String event, nameTransition;
 					MdsState target = null;			// temp variablen
 					
 					for(int j = 0; j < transition.size(); j++) {
@@ -211,11 +273,16 @@ public class Parser {
 							MdsObject subjectObj = new MdsObject(name, quantifierObj);
 							
 							// transition/condition/params
-							int radius = Integer.parseInt(params.get("radius").toString());
-							
 							paramsHM.put("object", objectObj);
 							paramsHM.put("subject", subjectObj);
-							paramsHM.put("radius", radius);
+							
+							Set<String> keySet = params.keySet();
+							for (String key : keySet){
+								if(!key.equals("object") || !key.equals("subject")) {
+									Object values = params.get(key);
+									paramsHM.put(key, values);
+								}
+							}
 						}
 						else {
 							Set<String> keySet = params.keySet();
@@ -238,7 +305,7 @@ public class Parser {
 								}
 							}
 						}
-						String event = transElem.get("event").toString();
+						event = transElem.get("event").toString();
 						if(event.equals("locationEvent"))
 							allTrans[j] = new MdsTransition(target, MdsTransition.EventType.locationEvent);
 						else if(event.equals("uiEvent"))
@@ -246,6 +313,32 @@ public class Parser {
 						else if(event.equals("whiteboardEvent"))
 							allTrans[j] = new MdsTransition(target, MdsTransition.EventType.whiteboardEvent);
 						allTrans[j].setCondition(conditionObj);
+						
+						
+						/*
+						// attribute werden aus dem JSONObject gelesen
+						name = transElem.get("target").toString();
+						System.out.println(name);
+						if(name != null) {
+							for(int k = 0; k < allMdsStates.length; k++) {
+								if(allMdsStates[k].getName().equals(name)) {
+									target = allMdsStates[k];
+								}
+							}
+							String eventName = transElem.get("event").toString();
+							JSONObject eventObject = (JSONObject) transElem.get("condition");
+							MdsEvent event;
+							HashMap<Object, Object> eventHashMap = new HashMap<Object, Object>();
+							Set<Object> keySet = eventObject.keySet();
+							for (Object key : keySet){
+								Object values = eventObject.get(key);
+								eventHashMap.put(key, values);
+							}
+							event = new MdsEvent(eventHashMap);						
+							
+							// gelesene attribute werden in das allTrans array gespeichert
+							allTrans[j] = new MdsTransition(target, event);
+							*/
 					}
 				}
 				allMdsStates[i].setTransitions(allTrans); 
@@ -254,11 +347,7 @@ public class Parser {
 			List<MdsState> states = Arrays.asList(allMdsStates);
 			List<MdsAction> actions = Arrays.asList(allMdsActions);
 			
-			// TODO: Hier wird allMdsExhibits auf null gesetzt, damit es deklariert existiert, bitte ändern
-			//MdsExhibit[] allMdsExhibits = null;
-			//List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
-
-			//MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
+			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, states);
 			
 			interpreter.pushParsedObjects(MdsContainer);
 		
