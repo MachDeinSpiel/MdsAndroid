@@ -120,6 +120,8 @@ public class ServerClientConnector implements Runnable{
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 		SocketClient sc;
+		
+		// TODO: ServerClientBla ist überflüssig. Thread mit SocketClient kann auch in der MainActivity erstellt werden
 
 		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
 				+ clientname);

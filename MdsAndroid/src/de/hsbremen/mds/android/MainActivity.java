@@ -14,6 +14,7 @@ import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.java_websocket.WebSocket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,26 +98,6 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		addTab("Left");
 		addTab("Right");	
 		
-		
-		
-		WhiteboardEntry entry = new WhiteboardEntry(new MdsImage("ImageName", "http:www.dings.de", "ImageText"), "all");
-		
-		String serializedObject = "";
-
-		 // serialize the object
-		 try {
-		     ByteArrayOutputStream bo = new ByteArrayOutputStream();
-		     ObjectOutputStream so = new ObjectOutputStream(bo);
-		     so.writeObject(entry);
-		     so.flush();
-		     serializedObject = bo.toString();
-		 } catch (Exception e) {
-		     e.printStackTrace();
-		 }
-		 
-		 System.out.println("JSON Entry: " + serializedObject);
-
-		 WhiteboardEntry obj = null;
 	}
 	
 	private void initFragments() {
