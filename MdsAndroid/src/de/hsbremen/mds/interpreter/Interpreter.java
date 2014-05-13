@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Vector;
 
 import android.util.Log;
+import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.ClientInterpreterInterface;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
-import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
@@ -90,12 +90,18 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 	@Override
 	public void onFullWhiteboardUpdate(Whiteboard newWhiteboard) {
 		this.whiteboard = newWhiteboard;
-		
 	}
 
 	@Override
 	public void onStateChange() {
 		// TODO FsmManager bescheid sagen.
+		
+	}
+
+
+	@Override
+	public void updateLocalWhiteboard(List<String> keys, WhiteboardEntry entry) {
+		// TODO Auto-generated method stub
 		
 	}
 
