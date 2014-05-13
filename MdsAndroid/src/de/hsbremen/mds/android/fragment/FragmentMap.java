@@ -1,10 +1,10 @@
 package de.hsbremen.mds.android.fragment;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +29,6 @@ public class FragmentMap extends Fragment {
     double latitude;
 
 	public FragmentMap() {
-		// Required empty public constructor
 	}
 	
 	@Override
@@ -63,7 +62,7 @@ public class FragmentMap extends Fragment {
 		
 		MainActivity activity = (MainActivity) getActivity();
 
-		manager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+		manager = activity.getLocationManager();
 
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
 																			// sec
@@ -81,8 +80,6 @@ public class FragmentMap extends Fragment {
 		}
 
 		updateLocationFields();
-
-		System.out.println("GPS wurde initialisiert");
 	}
 	
 	public void updateLocationFields() {
@@ -90,28 +87,32 @@ public class FragmentMap extends Fragment {
 		String latitude;
 		String longitude;
 
-		location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-		if (location != null) {
-
-			latitude = String.valueOf(location.getLatitude());
-			longitude = String.valueOf(location.getLongitude());
-
-		} else {
-
-			latitude = "Kein Empfang!";
-			longitude = "Kein Empfang!";
-
+		if(manager != null){
+			location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+	
+			System.out.println("Location gesetzt");
+			
+			if (location != null) {
+	
+				latitude = String.valueOf(location.getLatitude());
+				longitude = String.valueOf(location.getLongitude());
+	
+			} else {
+	
+				latitude = "Kein Empfang!";
+				longitude = "Kein Empfang!";
+	
+			}
+	
+			TextView latVal = (TextView) mapView.findViewById(R.id.txtLatVal);
+			TextView longVal = (TextView) mapView.findViewById(R.id.txtLongVal);
+	
+			latVal.setText(latitude);
+			longVal.setText(longitude);
+	
+			latVal.invalidate();
+			longVal.invalidate();
 		}
-
-		TextView latVal = (TextView) mapView.findViewById(R.id.txtLatVal);
-		TextView longVal = (TextView) mapView.findViewById(R.id.txtLongVal);
-
-		latVal.setText(latitude);
-		longVal.setText(longitude);
-
-		latVal.invalidate();
-		longVal.invalidate();
 	}
 	
 	public View getMapView(){

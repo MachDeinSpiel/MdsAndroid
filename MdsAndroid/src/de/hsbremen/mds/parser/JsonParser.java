@@ -14,9 +14,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsPlayer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
@@ -63,7 +61,7 @@ public class JsonParser {
 					
 				}
 				// gelesene attribute werden in das allMdsActions array gespeichert
-				allMdsActions [i] = new MdsAction(ident, defaults);
+//				allMdsActions [i] = new MdsAction(ident, defaults);
 				//Die HashMap wird geleert
 				//params.clear();
 				
@@ -81,9 +79,9 @@ public class JsonParser {
 			double latitude = Double.parseDouble(MdsPlayer.get("latitute").toString());
 			
 			// erzeugen des MdsPlayers
-			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
+//			MdsPlayer player = new MdsPlayer(name, longitude, latitude);
 			
-			MdsExhibit[] allMdsExhibits = null;
+//			MdsExhibit[] allMdsExhibits = null;
 			JSONArray groups = (JSONArray) jsonObject.get("groups");
 			
 			for(int i = 0; i < groups.size(); i++) {
@@ -94,7 +92,7 @@ public class JsonParser {
 				
 				JSONArray MdsExhibits = (JSONArray) groupsElement.get("members");
 				
-				allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
+//				allMdsExhibits = new MdsExhibit[MdsExhibits.size()];
 				String url, text;
 				boolean movable;
 				
@@ -226,7 +224,7 @@ public class JsonParser {
 							event = new MdsEvent(type, nameTransition, paramsEvent);						
 							
 							// gelesene attribute werden in das allTrans array gespeichert
-							allTrans[j] = new MdsTransition(target, event);
+//							allTrans[j] = new MdsTransition(target, event);
 						}
 					}
 				}
@@ -243,19 +241,19 @@ public class JsonParser {
 				System.out.println("params: " + allMdsActions[i].getParams().toString());
 			}
 			
-			System.out.println("-------- Player --------");
-			System.out.println("name: " + player.getName());
-			System.out.println("position: x: " + player.getLongtitude() + " y: " + player.getLatitude());
-			
-			for(int i = 0; i < allMdsExhibits.length; i++) {
-				System.out.println("-------- Exhibit (" + i + ") --------");
-				//Ausgabe der Items
-				System.out.println("name: " + allMdsExhibits[i].getName());
-				System.out.println("url: " + allMdsExhibits[i].getUrl());
-				System.out.println("text: " + allMdsExhibits[i].getText());
-				System.out.println("position: x: " + allMdsExhibits[i].getLongitude() + " y: " +allMdsExhibits[i].getLatitude());
-				System.out.println("movable: " + allMdsExhibits[i].isMovable());
-			}
+//			System.out.println("-------- Player --------");
+//			System.out.println("name: " + player.getName());
+//			System.out.println("position: x: " + player.getLongtitude() + " y: " + player.getLatitude());
+//			
+//			for(int i = 0; i < allMdsExhibits.length; i++) {
+//				System.out.println("-------- Exhibit (" + i + ") --------");
+//				//Ausgabe der Items
+//				System.out.println("name: " + allMdsExhibits[i].getName());
+//				System.out.println("url: " + allMdsExhibits[i].getUrl());
+//				System.out.println("text: " + allMdsExhibits[i].getText());
+//				System.out.println("position: x: " + allMdsExhibits[i].getLongitude() + " y: " +allMdsExhibits[i].getLatitude());
+//				System.out.println("movable: " + allMdsExhibits[i].isMovable());
+//			}
 			
 			for(int i = 0; i < allMdsStates.length; i++) {
 				System.out.println("-------- State (" + i + ") --------");
@@ -274,9 +272,9 @@ public class JsonParser {
 					for(int j = 0; j < trans.length; j++) {
 						System.out.println("Ziel: " + trans[j].getTarget().getName());
 						System.out.println("-------- Event --------");
-						System.out.println("Type: " + trans[j].getEvent().getType());
-						System.out.println("Name: " + trans[j].getEvent().getName());
-						System.out.println("params: " + trans[j].getEvent().getParams().toString());
+//						System.out.println("Type: " + trans[j].getEvent().getType());
+//						System.out.println("Name: " + trans[j].getEvent().getName());
+//						System.out.println("params: " + trans[j].getEvent().getParams().toString());
 
 					}
 					
@@ -286,10 +284,10 @@ public class JsonParser {
 			
 			List<MdsState> states = Arrays.asList(allMdsStates);
 			List<MdsAction> actions = Arrays.asList(allMdsActions);
-			List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
+//			List<MdsExhibit> exhibits = Arrays.asList(allMdsExhibits);
 			//List<MdsItem> item = Arrays.asList(allMdsItems);
 			
-			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
+//			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, player, exhibits, null, states);
 			
 			//interpreter.pushParsedObjects(MdsContainer);
 		

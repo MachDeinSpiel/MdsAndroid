@@ -1,26 +1,27 @@
 package de.hsbremen.mds.android;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.java_websocket.WebSocket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -29,15 +30,16 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentMap;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
@@ -51,6 +53,7 @@ import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
+import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
@@ -58,11 +61,10 @@ import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.interpreter.Interpreter;
 import de.hsbremen.mds.mdsandroid.R;
 
-public class MainActivity extends FragmentActivity implements TabListener,
+public class MainActivity extends Activity implements TabListener,
 		LocationListener, GuiInterface , ServerInterpreterInterface{
 
 	ActionBar actionBar;
-	ViewPager viewPager;
 	Location location;
 	public AndroidInitiater initiater;
 	LocationManager manager;
@@ -79,7 +81,10 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	Interpreter interpreter;
 	SocketClient socketClient;
 	Thread socketThread;
-
+	
+	LocationManager lm;
+	GoogleMap map;
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -88,6 +93,9 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 		// Initiater für die Listener registrierung
 		initiater = new AndroidInitiater();
+		
+		// Initialisiern von GoogleMaps
+		initGMaps();
 
 		// Initiallisierung der verfügbaren Fragments
         initFragments();
@@ -100,30 +108,49 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		
 	}
 	
+	private void initGMaps(){
+		
+		  lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		  lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+		  
+		  map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
+		    .getMap();
+		  // map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+		  // map.setMapType(GoogleMap.MAP_TYPE_NONE);
+		  map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+		  // map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+		  // map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+	}
+	
 	private void initFragments() {
-		fm = getSupportFragmentManager();
+		fm = getFragmentManager();
 		
 		FragmentTransaction transaction = fm.beginTransaction();
         FragmentStart startFragment = new FragmentStart();
         fragmentList.add(startFragment);
+        
         transaction.add(R.id.content, startFragment);
         transaction.commit();
-        
-        FragmentBackpack backpackFragment = new FragmentBackpack();
-        fragmentList.add(backpackFragment);
         
         FragmentMap mapFragment = new FragmentMap();
         fragmentList.add(mapFragment);
         
-        FragmentMonitoring monitoringFragment = new FragmentMonitoring();
-        fragmentList.add(monitoringFragment);
-        
         FragmentText textFragment = new FragmentText();
         fragmentList.add(textFragment);
         
+        FragmentBackpack backpackFragment = new FragmentBackpack();
+        backpackFragment.addItem(new MdsItem("Bomb","bomb"));
+        backpackFragment.addItem(new MdsItem("Bomb","bomb"));
+        backpackFragment.addItem(new MdsItem("Bomb","bomb"));
+        backpackFragment.addItem(new MdsItem("Bomb","bomb"));
+        fragmentList.add(backpackFragment);
+        
+        FragmentMonitoring monitoringFragment = new FragmentMonitoring();
+        fragmentList.add(monitoringFragment);
+        
         FragmentVideo videoFragment = new FragmentVideo();
         fragmentList.add(videoFragment);
-		
 	}
 
 	public void connectToServer(){
@@ -146,7 +173,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		view.setText("AUS");
 		view.setBackgroundColor(Color.RED);
 		
-		FragmentMap f = (FragmentMap)fragmentList.get(2);
+		FragmentMap f = (FragmentMap)fragmentList.get(1);
 		f.updateLocationFields();
 	}
 
@@ -155,7 +182,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 		view.setText("AN");
 		view.setBackgroundColor(Color.GREEN);
 		
-		FragmentMap f = (FragmentMap)fragmentList.get(2);
+		FragmentMap f = (FragmentMap)fragmentList.get(1);
 		f.updateLocationFields();
 		
 		initiater.locationChanged(location);
@@ -164,20 +191,38 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	@Override
 	public void onLocationChanged(Location loc) {
 
-			FragmentMap f = (FragmentMap)fragmentList.get(2);
-			f.updateLocationFields();
-			
-		JSONObject json = new JSONObject();
-		try {
-			json.put("Latitude", loc.getLatitude());
-			json.put("Longitude", loc.getLongitude());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		gmapsUpdate(loc);
 		
-		connector.getSocket().send(json.toString());
+		FragmentMap f = (FragmentMap)fragmentList.get(1);
+		f.updateLocationFields();
+		
+		// TODO: Zum testen von GMaps auskommentiert
+//		JSONObject json = new JSONObject();
+//		try {
+//			json.put("Latitude", loc.getLatitude());
+//			json.put("Longitude", loc.getLongitude());
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+//			
+//		connector.getSocket().send(json.toString());
 		
 		initiater.locationChanged(loc);
+	}
+	
+	private void gmapsUpdate(Location loc){
+		map.clear();
+
+		MarkerOptions mp = new MarkerOptions();
+
+		mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
+
+		mp.title("Player Position");
+
+		map.addMarker(mp);
+
+		map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+		new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
 	}
 
 	@Override
@@ -218,7 +263,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	    transaction.addToBackStack(null);
         transaction.commit();
         
-		viewPager.setCurrentItem(4);
+		// TODO: Hier muss noch eine Transaction hin
 		Button btn = (Button) findViewById(R.id.btnReturnVideo);
 		btn.setVisibility(1);
 	}
@@ -234,8 +279,8 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	    view.setText(mds.getText());
 	    Button btn = (Button) findViewById(R.id.btnReturnText);
 	    btn.setVisibility(1);
-	    Button btn2 = (Button) findViewById(R.id.btnShowVideo);
-	    btn2.setVisibility(1);
+//	    Button btn2 = (Button) findViewById(R.id.btnShowVideo);
+//	    btn2.setVisibility(1);
 	}
 
 	@Override
@@ -384,7 +429,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	}
 	
 	private void changeFragment(int index){
-		if((tabCount >= 0 && index == 0) || (tabCount < fragmentList.size()-1 && index == 1)){
+		if((tabCount > 0 && index == 0) || (tabCount < fragmentList.size()-1 && index == 1)){
 			FragmentTransaction transaction = fm.beginTransaction();
 			
 			int i = (index == 0 )? -1 : 1;
@@ -405,7 +450,11 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	}
 
 	public void consoleEntry(String message) {
-		FragmentMonitoring f = (FragmentMonitoring)fragmentList.get(3);
+		FragmentMonitoring f = (FragmentMonitoring)fragmentList.get(4);
 		f.addConsoleEntry(message);
+	}
+	
+	public LocationManager getLocationManager() {
+		return this.lm;
 	}
 }

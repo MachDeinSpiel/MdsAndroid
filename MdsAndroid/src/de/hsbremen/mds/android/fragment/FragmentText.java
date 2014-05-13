@@ -1,8 +1,8 @@
 package de.hsbremen.mds.android.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +22,7 @@ public class FragmentText extends Fragment {
 	
 	public FragmentText() {
 		// Required empty public constructor
-		this.text = "Sie haben noch keine Sehenswürdikeit erreicht";
+		this.text = "Sie haben noch kein Ziel erreicht";
 	}
 	
 	public FragmentText(String txtString) {
@@ -45,7 +45,7 @@ public class FragmentText extends Fragment {
 				MainActivity activity = (MainActivity) getActivity();
 				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnText);
 				returnBtn.setVisibility(Button.GONE);
-				activity.initiater.buttonClicked("proceedWalk");
+				activity.initiater.buttonClicked("useItem");
 			}
 		});
 		

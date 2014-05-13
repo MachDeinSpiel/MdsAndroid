@@ -13,26 +13,27 @@
             android:layout_height="fill_parent">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:orientation="horizontal" >
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Latitude:"
                     android:id="@+id/txtLat"
-                    android:layout_column="0" />
-
-                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/txtLatVal"
-                    android:layout_column="4" />
+                    android:layout_column="0"
+                    android:layout_weight="12.18"
+                    android:text="Latitude:"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
 
+                <TextView
+                    android:id="@+id/txtLatVal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </LinearLayout>
+
         </TableRow>
 
         <TableRow
@@ -100,13 +101,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:id="@+id/placeholder">
-
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="318dp"
-                    android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:background="@drawable/map" />
 
             </LinearLayout>
         </TableRow>

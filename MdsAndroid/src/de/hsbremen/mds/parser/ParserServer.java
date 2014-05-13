@@ -13,10 +13,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import valueobjects.MdsGroup;
-import valueobjects.MdsMembers;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsExhibit;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsGroup;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsMembers;
 
 
 public class ParserServer {
