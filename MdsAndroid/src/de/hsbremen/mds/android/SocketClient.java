@@ -9,12 +9,15 @@ import org.java_websocket.drafts.Draft;
 import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONException;
 
 import android.util.Log;
+import de.hsbremen.mds.common.communication.EntryHandler;
+import de.hsbremen.mds.common.whiteboard.WhiterboardUpdateObject;
 
 public class SocketClient extends WebSocketClient {
 	
-	MainActivity main = null;
+	MainActivity main = null;	
 	
 	public SocketClient(Draft d, URI uri, MainActivity main) {
 		super(uri, d);
@@ -23,14 +26,13 @@ public class SocketClient extends WebSocketClient {
 
 	@Override
 	public void onMessage(String message) {
-		send(message);
+		
+		WhiterboardUpdateObject wObj = EntryHandler.toObject(message);
+		
+		main.initiater.updateLocalWhiteboard(wObj.getKeys(), wObj.getValue());
 
 		Log.d("Na", "Message vom Server: " + message);
-		
 		main.consoleEntry(message);
-		
-		// TODO: Hier muss dem Clientinterpreter bescheid gesagt werden, dass es Änderungen auf dem Server gab
-		// activity.initiater.serverUpdate(message);
 	}
 
 	@Override

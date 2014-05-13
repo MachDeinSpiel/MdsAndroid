@@ -1,21 +1,26 @@
 package de.hsbremen.mds.android;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.java_websocket.WebSocket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -40,9 +45,11 @@ import de.hsbremen.mds.android.fragment.FragmentStart;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
+import de.hsbremen.mds.common.communication.EntryHandler;
+import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
+import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
-import de.hsbremen.mds.common.listener.AndroidListener;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
@@ -90,6 +97,7 @@ public class MainActivity extends FragmentActivity implements TabListener,
 
 		addTab("Left");
 		addTab("Right");	
+		
 	}
 	
 	private void initFragments() {
@@ -346,27 +354,17 @@ public class MainActivity extends FragmentActivity implements TabListener,
 	@Override
 	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry entry) {
 		
-		JSONObject json = new JSONObject();
-		
-		String result = "";
-		
-		for(int i = 0; i < keys.size(); i++){
-		
-			result += keys.get(i);
-				
-			if(i != keys.size())
-				result += ".";
-		}
-		
+		//TODO: Entry Handler wandelt keys und entry in JSON um
+
 		try {
-			json.put(result, entry.value);
-			json.put("visibility", entry.visibility);
-		} catch (JSONException e) {
+			connector.getSocket().send(EntryHandler.toJson(keys, entry));
+		} catch (NotYetConnectedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownWhiteboardTypeException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		Log.d("Netzwerk", "Whitboardeintrag wurde geändert");
-		connector.getSocket().send(json.toString());
 		
 	}
 
