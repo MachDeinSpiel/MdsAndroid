@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Vector;
 
 import android.util.Log;
-import de.hsbremen.mds.common.listener.AndroidListener;
+import de.hsbremen.mds.common.guiobjects.MdsItem;
+import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.ClientInterpreterInterface;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
@@ -103,6 +104,13 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void updateLocalWhiteboard(List<String> keys, WhiteboardEntry entry) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void useItem(MdsItem item) {
 		// TODO Auto-generated method stub
 		
 	}
