@@ -13,6 +13,8 @@ import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.parser.Parser;
@@ -27,11 +29,12 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 	private int myId;
 	private GuiInterface gui;
 	private ServerInterpreterInterface serverInterpreter;
+
 		
 	public Interpreter(File json, GuiInterface guiInterface, ServerInterpreterInterface serverInterpreter, int playerId){
 		this.gui = guiInterface;
 		this.serverInterpreter = serverInterpreter;
-		
+
 		this.myId = playerId;
 		new Parser(this,json);	
 		
@@ -42,7 +45,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 	public void pushParsedObjects(MdsObjectContainer objectContainer) {		
 		Log.d("Interpreter", "Geparste Objekte vo Parser bekommen");
 		this.gui.setAndroidListener(this, 5);
-		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard);
+		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard, this);
 	}
 	
 
@@ -97,14 +100,20 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onStateChange() {
-		// TODO FsmManager bescheid sagen.
+		MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","lastState").value)), whiteboard, myId);
+		MdsActionExecutable startAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)), whiteboard, myId);
+		MdsActionExecutable doAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)), whiteboard, myId);
 		
+		endAction.execute(gui);
+		startAction.execute(gui);
+		doAction.execute(gui);
 	}
 
 
 	@Override
 	public void updateLocalWhiteboard(List<String> keys, WhiteboardEntry entry) {
-		// TODO Auto-generated method stub
+		whiteboard.setAttributeValue(entry, (String[])keys.toArray());
+		
 		
 	}
 

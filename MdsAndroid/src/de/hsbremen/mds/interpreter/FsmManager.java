@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
@@ -14,9 +15,21 @@ import de.hsbremen.mds.exceptions.NoStartStateException;
  */
 public class FsmManager {
 	private List<MdsState> states;
-	private ActionParser aParser = new ActionParser();
 	private int myID;
 	private Whiteboard wb;
+	private Interpreter interpreter; //TODO: interface
+	
+	public FsmManager(List<MdsState> states, Whiteboard wb, Interpreter interpreter){
+		this.states = states;
+		this.interpreter = interpreter;
+		try{
+			this.setState(this.getFirstState(),"currentState");
+		} catch (NoStartStateException e){
+			e.printStackTrace();
+		}
+		this.wb = wb;
+	}
+	
 	/**
 	 * den Aktuellen State aus dem Whiteboard holen
 	 * @return
@@ -31,7 +44,7 @@ public class FsmManager {
 	 */
 	private void setState(MdsState current, String setTo){
 		if(setTo.equals("currentState") || setTo.equals("lastState")){
-			wb.setAttributeValue(current, "player",Integer.toString(myID),setTo);
+			wb.setAttributeValue(current, "players",Integer.toString(myID),setTo);
 			this.onstateChanged(current);
 		} else {
 			/*
@@ -43,18 +56,12 @@ public class FsmManager {
 
 	private void onstateChanged(MdsState state) {
 		
-		aParser.parseAction(state.getDoAction(), state, wb, myID);
+	
+		interpreter.onStateChange();
+		
 	}
 
-	public FsmManager(List<MdsState> states, Whiteboard wb){
-		this.states = states;
-		try{
-			this.setState(this.getFirstState(),"currentState");
-		} catch (NoStartStateException e){
-			e.printStackTrace();
-		}
-		this.wb = wb;
-	}
+	
 	
 	/**
 	 * Ersten State raussuchen und zurückgeben / wenn nicht vorhanden: exception
