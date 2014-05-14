@@ -135,23 +135,19 @@ public class ActionParser {
 		case useItem:
 			
 			//Vorbereitung: Item finden
-			List<String> keysToItem = Arrays.asList(params.get("attribute").split("."));
+			List<String> keysToItem = Arrays.asList(params.get("target").split("."));
 			 Whiteboard currentWb = wb;
 			
 			//Bekannte Konstanten ersetzen, bzw. root-Whiteboard ändern
 			if(keysToItem.get(0).equals("self")){
 				currentWb = (Whiteboard) wb.getAttribute("players",myId+"").value;
 				keysToItem.remove(0);
-			}else if (keysToItem.get(0).equals("trigger")){ 
-				if(keysToItem.get(0).equals("subject")){
-					currentWb = (Whiteboard) state.getSubjects().get(0).value;
-					keysToItem.remove(0);
-					keysToItem.remove(0);
-				}else if(keysToItem.get(0).equals("object")){
-					currentWb = (Whiteboard) state.getObjects().get(0).value;
-					keysToItem.remove(0);
-					keysToItem.remove(0);
-				}
+			}else if(keysToItem.get(0).equals("subject")){
+				currentWb = (Whiteboard) state.getSubjects().get(0).value;
+				keysToItem.remove(0);
+			}else if(keysToItem.get(0).equals("object")){
+				currentWb = (Whiteboard) state.getObjects().get(0).value;
+				keysToItem.remove(0);
 			}
 			//Item, dessen useAction(s) ausgeführt werden sollen
 			final Whiteboard item = (Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
