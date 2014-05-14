@@ -31,7 +31,6 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 		this.gui = guiInterface;
 		this.serverInterpreter = serverInterpreter;
 		
-		//TODO: getData // <- Das heißt was?
 		this.myId = playerId;
 		new Parser(this,json);	
 		
@@ -49,7 +48,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onButtonClick(String buttonName) {
-		// TODO Auto-generated method stub
+		fsmManager.checkEvents(buttonName);
 		
 	}
 
@@ -79,12 +78,15 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 		keys.add("latitude");
 		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute("players", Integer.toString(myId), "latitude"));
 		
+		fsmManager.checkEvents(null);
 		
 	}
 
 	@Override
 	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
-		whiteboard.setAttributeValue(value, (String[])keys.toArray());		
+		whiteboard.setAttributeValue(value, (String[])keys.toArray());
+		
+		fsmManager.checkEvents(null);
 	}
 
 	@Override
