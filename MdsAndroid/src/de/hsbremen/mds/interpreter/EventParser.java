@@ -71,7 +71,7 @@ public class EventParser {
 
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
-				Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split(".")).value;
+				Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
 				
 				// CheckType des Quantifiers identifizieren
@@ -95,10 +95,10 @@ public class EventParser {
 				// TODO: Hier muss noch viel überlegt werden bei Multiplayer
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
-				Whiteboard realSubject = (Whiteboard)wb.getAttribute(object.getName().split(".")).value;
+				Whiteboard realSubject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
-				Whiteboard realObject = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split(".")).value;
+				Whiteboard realObject = (Whiteboard)wb.getAttribute(((String)cond.getParams().get("object")).split("\\.")).value;
 				// Location des Objekts
 				Location someLoc = new Location("somLoc");
 				// FIXME:
@@ -119,7 +119,7 @@ public class EventParser {
 			} catch(NumberFormatException nfe) {  
 				try {
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-					String[] paramsSplitted = ((String)cond.getParams().get("value")).split(".");
+					String[] paramsSplitted = ((String)cond.getParams().get("value")).split("\\.");
 					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 						//Wenn die Länge abgefragt werden soll
 						//Entferne "length" aus den Parametern
@@ -140,7 +140,7 @@ public class EventParser {
 			} catch(NumberFormatException nfe) {  
 				try {
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-					String[] paramsSplitted = ((String) cond.getParams().get("value")).split(".");
+					String[] paramsSplitted = ((String) cond.getParams().get("value")).split("\\.");
 					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 						//Wenn die Länge abgefragt werden soll
 						//Entferne "length" aus den Parametern

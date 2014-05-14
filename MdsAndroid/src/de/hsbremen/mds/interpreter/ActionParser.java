@@ -81,6 +81,9 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					
+					List<String> keysToValue = Arrays.asList(params.get("group").split("\\."));
+					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
+					currentWb.remove(params.get("target"));
 					
 				}
 			};
@@ -91,21 +94,9 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					//Welches Attribut soll geändert werden?
-					List<String> keysToValue = Arrays.asList(params.get("attribute").split("."));
+					List<String> keysToValue = Arrays.asList(params.get("attribute").split("\\."));
+					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
 					
-					//Whiteboard, in dem das zuändernde Attribut liegt
-					Whiteboard currentWb = wb;
-					
-					if(keysToValue.get(0).equals("self")){
-						currentWb = (Whiteboard) wb.getAttribute("players",myId+"").value;
-						keysToValue.remove(0);
-					}else if(keysToValue.get(0).equals("subject")){
-						currentWb = (Whiteboard) state.getSubjects().get(0).value;
-						keysToValue.remove(0);
-					}else if(keysToValue.get(0).equals("object")){
-						currentWb = (Whiteboard) state.getObjects().get(0).value;
-						keysToValue.remove(0);
-					}
 					
 					String attributeToChange = (String)currentWb.getAttribute(keysToValue.toArray(new String[0])).value;
 					
@@ -131,20 +122,8 @@ public class ActionParser {
 		case useItem:
 			
 			//Vorbereitung: Item finden
-			List<String> keysToItem = Arrays.asList(params.get("target").split("."));
-			 Whiteboard currentWb = wb;
-			
-			//Bekannte Konstanten ersetzen, bzw. root-Whiteboard ändern
-			if(keysToItem.get(0).equals("self")){
-				currentWb = (Whiteboard) wb.getAttribute("players",myId+"").value;
-				keysToItem.remove(0);
-			}else if(keysToItem.get(0).equals("subject")){
-				currentWb = (Whiteboard) state.getSubjects().get(0).value;
-				keysToItem.remove(0);
-			}else if(keysToItem.get(0).equals("object")){
-				currentWb = (Whiteboard) state.getObjects().get(0).value;
-				keysToItem.remove(0);
-			}
+			List<String> keysToItem = Arrays.asList(params.get("target").split("\\."));
+			 Whiteboard currentWb = parseActionString(wb, keysToItem, state, myId);
 			//Item, dessen useAction(s) ausgeführt werden sollen
 			final Whiteboard item = (Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
 			
@@ -217,7 +196,7 @@ public class ActionParser {
 		}
 		
 		//Einzelne Teile, die Punkten getrennt sind aufsplitten
-		List<String> splitted = Arrays.asList(param.split("."));
+		List<String> splitted = Arrays.asList(param.split("\\."));
 		
 		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
 		if(splitted.get(0).equals("object")){
@@ -238,6 +217,25 @@ public class ActionParser {
 		return (String) wb.getAttribute((String[]) splitted.toArray()).value;
 		
 				
+	}
+	
+	
+	private Whiteboard parseActionString(Whiteboard root, List<String> keysToValue, MdsState state, int myId){
+		//Whiteboard, in dem das zuändernde Attribut liegt
+		Whiteboard currentWb = root;
+		
+		if(keysToValue.get(0).equals("self")){
+			currentWb = (Whiteboard) root.getAttribute("players",myId+"").value;
+			keysToValue.remove(0);
+		}else if(keysToValue.get(0).equals("subject")){
+			currentWb = (Whiteboard) state.getSubjects().get(0).value;
+			keysToValue.remove(0);
+		}else if(keysToValue.get(0).equals("object")){
+			currentWb = (Whiteboard) state.getObjects().get(0).value;
+			keysToValue.remove(0);
+		}
+		
+		return currentWb;
 	}
 	
 }
