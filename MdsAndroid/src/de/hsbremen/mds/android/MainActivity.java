@@ -49,6 +49,7 @@ import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
 import de.hsbremen.mds.common.communication.EntryHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
+import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
@@ -456,5 +457,17 @@ public class MainActivity extends Activity implements TabListener,
 	
 	public LocationManager getLocationManager() {
 		return this.lm;
+    }
+
+	@Override
+	public void showMap(ArrayList<MdsItem> items2display) {
+		// TODO Anzeigen von MdsItems auf der GMaps Karte
+		
+	}
+
+	@Override
+	public void addToBackpack(MdsItem item) {
+		// TODO Auto-generated method stub
+		
 	}
 }

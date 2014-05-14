@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.location.Location;
 import android.util.Log;
+import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
@@ -50,6 +51,15 @@ public class AndroidInitiater {
 	        // Callback mit Event Informationen
 	        listener.updateLocalWhiteboard(keys, entry);
 	    }
+    }
+    
+    public void useItem(MdsItem item){
+    	this.listener.useItem(item);
+    }
+    
+    public void dropItem(MdsItem item){
+    	// TODO: Dropitem noch einfügen
+//    	this.listener.dropItem(item);
     }
     
     
