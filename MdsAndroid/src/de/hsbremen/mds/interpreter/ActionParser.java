@@ -99,29 +99,25 @@ public class ActionParser {
 					if(keysToValue.get(0).equals("self")){
 						currentWb = (Whiteboard) wb.getAttribute("players",myId+"").value;
 						keysToValue.remove(0);
-					}else if (keysToValue.get(0).equals("trigger")){ 
-						if(keysToValue.get(0).equals("subject")){
-							currentWb = (Whiteboard) state.getSubjects().get(0).value;
-							keysToValue.remove(0);
-							keysToValue.remove(0);
-						}else if(keysToValue.get(0).equals("object")){
-							currentWb = (Whiteboard) state.getObjects().get(0).value;
-							keysToValue.remove(0);
-							keysToValue.remove(0);
-						}
+					}else if(keysToValue.get(0).equals("subject")){
+						currentWb = (Whiteboard) state.getSubjects().get(0).value;
+						keysToValue.remove(0);
+					}else if(keysToValue.get(0).equals("object")){
+						currentWb = (Whiteboard) state.getObjects().get(0).value;
+						keysToValue.remove(0);
 					}
 					
 					String attributeToChange = (String)currentWb.getAttribute(keysToValue.toArray(new String[0])).value;
 					
 					if(params.get("valueType").equals(ADD)){
 						try{
-							attributeToChange = Double.toString(Double.parseDouble(attributeToChange)+Double.parseDouble(params.get("value")));
+							attributeToChange = Double.toString(Double.parseDouble(attributeToChange) + Double.parseDouble(params.get("value")));
 						}catch(NumberFormatException nfe){
 							nfe.printStackTrace();
 						}
 					}else if(params.get("valueType").equals(MULTIPLY)){
 						try{
-							attributeToChange = Double.toString(Double.parseDouble(attributeToChange)*Double.parseDouble(params.get("value")));
+							attributeToChange = Double.toString(Double.parseDouble(attributeToChange) * Double.parseDouble(params.get("value")));
 						}catch(NumberFormatException nfe){
 							nfe.printStackTrace();
 						}
