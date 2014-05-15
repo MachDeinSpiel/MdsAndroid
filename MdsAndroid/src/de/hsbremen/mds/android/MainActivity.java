@@ -6,12 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_17;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -54,7 +55,6 @@ import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
-import de.hsbremen.mds.common.valueobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.MdsVideo;
@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements TabListener,
 	double longitude;
 	double latitude;
 	boolean initComplete = false;
-	public ServerClientConnector connector;
+//	public ServerClientConnector connector;
 	
 	ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
 	FragmentManager fm;
@@ -155,11 +155,25 @@ public class MainActivity extends Activity implements TabListener,
 	}
 
 	public void connectToServer(){
-		// Serverkommunikation
-		connector = new ServerClientConnector(this, "feijnox.no-ip.org" ); // "192.168.1.5"
 		
-		socketThread = new Thread(connector);
-		socketThread.start();
+		// Serverkommunikation
+		Draft d = new Draft_17();
+
+		String clientname = "AndroidClient";
+		String serverIp = "feijnox.no-ip.org";
+		String PROTOKOLL_HTTP = "http://";
+		String PORT_HTTP = ":8080";
+		String PROTOKOLL_WS = "ws://";
+		String PORT_WS = ":8000";
+		
+		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
+		
+		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
+				+ clientname);
+		socketClient = new SocketClient(d, uri, this);
+
+		Thread t = new Thread(socketClient);
+		t.start();
 		
 		File jsonDatei = jsonEinlesen();
 		
@@ -196,17 +210,6 @@ public class MainActivity extends Activity implements TabListener,
 		
 		FragmentMap f = (FragmentMap)fragmentList.get(1);
 		f.updateLocationFields();
-		
-		// TODO: Zum testen von GMaps auskommentiert
-//		JSONObject json = new JSONObject();
-//		try {
-//			json.put("Latitude", loc.getLatitude());
-//			json.put("Longitude", loc.getLongitude());
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//			
-//		connector.getSocket().send(json.toString());
 		
 		initiater.locationChanged(loc);
 	}
@@ -371,16 +374,6 @@ public class MainActivity extends Activity implements TabListener,
 		Toast.makeText(this, text, toastLength).show();
 	}
 
-	@Override
-	public void getServerData(String type, int id) {
-		String s = connector.httpGetString("/mds/" + type + "/" + id);
-		if(type.equals("item")){
-			addItemtoList(s);
-		}else if(type.equals("player")){
-			addPlayertoList(s);
-		}
-	}
-
 	private void addItemtoList(String s) {
 		// TODO Müssen noch erstellt werden
 		
@@ -403,7 +396,7 @@ public class MainActivity extends Activity implements TabListener,
 		//TODO: Entry Handler wandelt keys und entry in JSON um
 
 		try {
-			connector.getSocket().send(EntryHandler.toJson(keys, entry));
+			socketClient.send(EntryHandler.toJson(keys, entry));
 		} catch (NotYetConnectedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

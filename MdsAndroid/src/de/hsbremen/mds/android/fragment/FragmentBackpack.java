@@ -19,7 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
-import de.hsbremen.mds.common.valueobjects.MdsItem;
+import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
 
 /**
