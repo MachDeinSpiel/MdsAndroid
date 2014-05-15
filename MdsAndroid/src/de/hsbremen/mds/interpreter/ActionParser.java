@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
+import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
@@ -35,7 +36,7 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(MdsAction action, final MdsState state, final Whiteboard wb, final int myId){
+	public MdsActionExecutable parseAction(MdsAction action, final MdsState state, final Whiteboard wb, final int myId, final ServerInterpreterInterface sii){
 		
 	
 		//Parameter der Action
@@ -109,6 +110,11 @@ public class ActionParser {
 					List<String> keysToValue = Arrays.asList(params.get("group").split("\\."));
 					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
 					currentWb.remove(params.get("target"));
+					try {
+						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+					} catch (InvalidWhiteboardEntryException e) {
+						e.printStackTrace();
+					}
 					
 				}
 			};
@@ -141,6 +147,7 @@ public class ActionParser {
 					
 					try {
 						currentWb.setAttributeValue(attributeToChange, keysToValue.toArray(new String[0]));
+						sii.onWhiteboardUpdate(keysToValue, currentWb.getAttribute(keysToValue.toArray(new String[0])));
 					} catch (InvalidWhiteboardEntryException e) {
 						e.printStackTrace();
 					}
@@ -197,7 +204,7 @@ public class ActionParser {
 						}
 						
 						//Ausführbare Action erzeugen und sie danach ausführen
-						MdsActionExecutable realAction = parseAction(new MdsAction(actionIdent, actionParams), state, wb, myId);
+						MdsActionExecutable realAction = parseAction(new MdsAction(actionIdent, actionParams), state, wb, myId, sii);
 						realAction.execute(guiInterface);
 					}
 					
