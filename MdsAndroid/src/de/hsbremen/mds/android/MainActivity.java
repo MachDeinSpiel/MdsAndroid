@@ -275,22 +275,19 @@ public class MainActivity extends Activity implements TabListener,
 	@Override
 	public void nextFragment(MdsText mds) {
 		FragmentTransaction transaction = fm.beginTransaction();
-	    transaction.replace(R.id.content, fragmentList.get(4));
+	    transaction.replace(R.id.content, fragmentList.get(2));
 	    transaction.addToBackStack(null);
         transaction.commit();
 	      
-	    TextView view = (TextView) findViewById(R.id.placeholderText);
-	    view.setText(mds.getText());
-	    Button btn = (Button) findViewById(R.id.btnReturnText);
-	    btn.setVisibility(1);
-//	    Button btn2 = (Button) findViewById(R.id.btnShowVideo);
-//	    btn2.setVisibility(1);
+        FragmentText t = (FragmentText)fragmentList.get(2);
+        t.setMessage(mds.getText());
+        t.setActionbutton(true);
 	}
 
 	@Override
 	public void nextFragment(MdsMap mds) {
 		FragmentTransaction transaction = fm.beginTransaction();
-	    transaction.replace(R.id.content, fragmentList.get(2));
+	    transaction.replace(R.id.content, fragmentList.get(1));
 	    transaction.addToBackStack(null);
         transaction.commit();
 	}
@@ -462,5 +459,10 @@ public class MainActivity extends Activity implements TabListener,
 	public void addToBackpack(MdsItem item) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void getServerData(String type, int id) {
+		// TODO Auto-generated method stub
 	}
 }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import de.hsbremen.mds.android.MainActivity;
+import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.mdsandroid.R;
 
 

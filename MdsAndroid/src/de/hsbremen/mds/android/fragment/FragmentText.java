@@ -18,7 +18,8 @@ import de.hsbremen.mds.mdsandroid.R;
 @SuppressLint("ValidFragment")
 public class FragmentText extends Fragment {
 
-	String text;
+	String text = "";
+	boolean actionButton;
 	
 	public FragmentText() {
 		// Required empty public constructor
@@ -37,6 +38,10 @@ public class FragmentText extends Fragment {
 				false), this.text);
 		
 		Button btn = (Button) view.findViewById(R.id.btnReturnText);
+		
+		if(actionButton){
+			btn.setVisibility(1);
+		}
 		
 		btn.setOnClickListener(new View.OnClickListener() {
 			
@@ -84,6 +89,14 @@ public class FragmentText extends Fragment {
 		TextView txtView = (TextView) view.findViewById(R.id.placeholderText);
 		txtView.setText(text);
 		return view;
+	}
+	
+	public void setMessage(String message){
+		this.text = message;
+	}
+
+	public void setActionbutton(boolean b) {
+		actionButton = b;
 	}
 	
 }
