@@ -7,6 +7,7 @@ import java.util.List;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
+import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
@@ -44,7 +45,11 @@ public class FsmManager {
 	 */
 	private void setState(MdsState current, String setTo){
 		if(setTo.equals("currentState") || setTo.equals("lastState")){
-			wb.setAttributeValue(current, "players",Integer.toString(myID),setTo);
+			
+			wb.getAttribute("players",Integer.toString(myID),setTo).value = current;
+			//TODO: Sneaky methode zum setzen des States enternen, WhiteboardEntry akzeptiert ja eigentlich
+			//nur Strings und Whiteboards (muhahahah *evil face*)
+		
 			this.onstateChanged(current);
 		} else {
 			/*

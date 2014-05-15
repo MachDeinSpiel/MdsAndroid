@@ -15,6 +15,7 @@ import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
+import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.parser.Parser;
@@ -70,14 +71,22 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onPositionChanged(double longitude, double latitude) {
-		whiteboard.setAttributeValue(longitude, "players", Integer.toString(myId), "longitude");
+		try {
+			whiteboard.setAttributeValue(Double.toString(longitude), "players", Integer.toString(myId), "longitude");
+		} catch (InvalidWhiteboardEntryException e) {
+			e.printStackTrace();
+		}
 		List<String> keys = new Vector<String>();
 		keys.add("players");
 		keys.add(""+myId);
 		keys.add("longitude");
 		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute("players", Integer.toString(myId), "longitude"));
 		
-		whiteboard.setAttributeValue(latitude, "players", Integer.toString(myId), "latitude");
+		try {
+			whiteboard.setAttributeValue(Double.toString(latitude), "players", Integer.toString(myId), "latitude");
+		} catch (InvalidWhiteboardEntryException e) {
+			e.printStackTrace();
+		}
 		keys.remove(keys.size()-1);
 		keys.add("latitude");
 		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute("players", Integer.toString(myId), "latitude"));
@@ -88,7 +97,11 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
-		whiteboard.setAttributeValue(value, (String[])keys.toArray());
+		try {
+			whiteboard.setAttributeValue(value, (String[])keys.toArray());
+		} catch (InvalidWhiteboardEntryException e) {
+			e.printStackTrace();
+		}
 		
 		fsmManager.checkEvents(null);
 	}
@@ -112,7 +125,11 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void updateLocalWhiteboard(List<String> keys, WhiteboardEntry entry) {
-		whiteboard.setAttributeValue(entry, (String[])keys.toArray());
+		try {
+			whiteboard.setAttributeValue(entry, (String[])keys.toArray());
+		} catch (InvalidWhiteboardEntryException e) {
+			e.printStackTrace();
+		}
 		
 		
 	}
