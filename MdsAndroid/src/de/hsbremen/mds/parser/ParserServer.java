@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
@@ -158,8 +159,15 @@ public class ParserServer {
 			Object value = jo.get(key);
 			paramsHM.put(key, value);
 		}
-		WhiteboardEntry wbe = new WhiteboardEntry(paramsHM, "none");
-		wb.setAttribute(wbe, name); 
+		WhiteboardEntry wbe;
+		try {
+			wbe = new WhiteboardEntry(paramsHM, "none");
+			wb.setAttribute(wbe, name); 
+		} catch (InvalidWhiteboardEntryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public Whiteboard getWhiteboard() {
