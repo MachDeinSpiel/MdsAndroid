@@ -131,6 +131,8 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 			e.printStackTrace();
 		}
 		
+		fsmManager.checkEvents(null);
+		
 		
 	}
 
