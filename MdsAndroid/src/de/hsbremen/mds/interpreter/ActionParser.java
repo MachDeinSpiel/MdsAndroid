@@ -1,12 +1,13 @@
 package de.hsbremen.mds.interpreter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
+import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
@@ -16,6 +17,7 @@ import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsImageAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMapAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsTextAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsVideoAction;
+import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
@@ -61,7 +63,30 @@ public class ActionParser {
 			return new MdsVideoAction(params.get("title"), params.get("url"), params.get("text"));
 		case showMap:
 		case updateMap:
-			return new MdsMapAction("Map", Double.parseDouble(params.get("longitude")), Double.parseDouble(params.get("latitude")));
+			return new MdsActionExecutable() {
+				
+				@Override
+				public void execute(GuiInterface guiInterface) {
+					//Map anzeigen
+					MdsMapAction mma = new MdsMapAction("Map", Double.parseDouble(params.get("longitude")), Double.parseDouble(params.get("latitude")));
+					
+					ArrayList<MdsItem> mapEntities = new ArrayList<MdsItem>();
+					
+					for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
+						Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
+						mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+					}
+					for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
+						Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
+						mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+					}
+					//Map anzeigen
+					mma.execute(guiInterface);
+					//Und Bomben und Medipacks anzeigen
+					//TODO: Wenn die Visibillity klar definiert wird, entsprechende Items anzeigen
+					guiInterface.showMap(mapEntities);
+				}
+			}; 
 		case showImage:
 			return new MdsImageAction(params.get("title"), params.get("url"), params.get("text"));
 		case showText:
@@ -114,7 +139,11 @@ public class ActionParser {
 						}
 					}
 					
-					currentWb.setAttributeValue(attributeToChange, keysToValue.toArray(new String[0]));
+					try {
+						currentWb.setAttributeValue(attributeToChange, keysToValue.toArray(new String[0]));
+					} catch (InvalidWhiteboardEntryException e) {
+						e.printStackTrace();
+					}
 					
 					
 				}
