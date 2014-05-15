@@ -142,9 +142,6 @@ public class MainActivity extends Activity implements TabListener,
         
         FragmentBackpack backpackFragment = new FragmentBackpack();
         backpackFragment.addItem(new MdsItem("Bomb","bomb"));
-        backpackFragment.addItem(new MdsItem("Bomb","bomb"));
-        backpackFragment.addItem(new MdsItem("Bomb","bomb"));
-        backpackFragment.addItem(new MdsItem("Bomb","bomb"));
         fragmentList.add(backpackFragment);
         
         FragmentMonitoring monitoringFragment = new FragmentMonitoring();
@@ -457,12 +454,10 @@ public class MainActivity extends Activity implements TabListener,
 
 	@Override
 	public void addToBackpack(MdsItem item) {
-		// TODO Auto-generated method stub
-		
+		FragmentBackpack f = (FragmentBackpack)fragmentList.get(3);
+        f.addItem(item);
 	}
 
-	@Override
 	public void getServerData(String type, int id) {
-		// TODO Auto-generated method stub
 	}
 }

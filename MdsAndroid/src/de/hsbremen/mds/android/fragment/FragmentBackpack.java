@@ -19,6 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+import de.hsbremen.mds.android.MainActivity;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
 
@@ -95,6 +96,11 @@ public class FragmentBackpack extends Fragment {
 		
 		if(item.getTitle()=="Benutzen"){
 			Toast.makeText(getActivity(), itemList.get(info.position).getName()+" used!", Toast.LENGTH_LONG).show();
+			
+			// Item benutzen an Interpreter schicken
+			MainActivity activity = (MainActivity) getActivity();
+			activity.initiater.useItem(itemList.get(info.position));
+			
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);
 		}
