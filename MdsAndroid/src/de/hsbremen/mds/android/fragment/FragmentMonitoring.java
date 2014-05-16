@@ -19,8 +19,9 @@ public class FragmentMonitoring extends Fragment {
 	String consoleOutput;
 	View view;
 	
-	public FragmentMonitoring() {
-	}
+//	public FragmentMonitoring() {
+//		super();
+//	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -47,6 +47,7 @@ import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.FragmentStart;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
+import de.hsbremen.mds.android.fragment.MdsMapFragment;
 import de.hsbremen.mds.android.listener.AndroidInitiater;
 import de.hsbremen.mds.common.communication.EntryHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
@@ -84,7 +85,9 @@ public class MainActivity extends Activity implements TabListener,
 	Thread socketThread;
 	
 	LocationManager lm;
-	GoogleMap map;
+//	GoogleMap map;
+	private MdsMapFragment mapFragment;
+	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +99,7 @@ public class MainActivity extends Activity implements TabListener,
 		initiater = new AndroidInitiater();
 		
 		// Initialisiern von GoogleMaps
-		initGMaps();
+		// initGMaps();
 
 		// Initiallisierung der verfügbaren Fragments
         initFragments();
@@ -107,22 +110,24 @@ public class MainActivity extends Activity implements TabListener,
 		addTab("Left");
 		addTab("Right");	
 		
+		FragmentManager fm = getFragmentManager();
+		mapFragment = (MdsMapFragment) fm.findFragmentById(R.id.map);
 	}
 	
-	private void initGMaps(){
-		
-		  lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-		  lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-		  
-		  map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-		    .getMap();
-		  // map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-		  // map.setMapType(GoogleMap.MAP_TYPE_NONE);
-		  map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-		  // map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-		  // map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-	}
+//	private void initGMaps(){
+//		
+//		  lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//
+//		  lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+//		  
+//		  map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
+//		    .getMap();
+//		  // map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//		  // map.setMapType(GoogleMap.MAP_TYPE_NONE);
+//		  map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+//		  // map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+//		  // map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+//	}
 	
 	private void initFragments() {
 		fm = getFragmentManager();
@@ -205,7 +210,7 @@ public class MainActivity extends Activity implements TabListener,
 	@Override
 	public void onLocationChanged(Location loc) {
 
-		gmapsUpdate(loc);
+		mapFragment.gmapsUpdate(loc);
 		
 		FragmentMap f = (FragmentMap)fragmentList.get(1);
 		f.updateLocationFields();
@@ -213,20 +218,6 @@ public class MainActivity extends Activity implements TabListener,
 		initiater.locationChanged(loc);
 	}
 	
-	private void gmapsUpdate(Location loc){
-		map.clear();
-
-		MarkerOptions mp = new MarkerOptions();
-
-		mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
-
-		mp.title("Player Position");
-
-		map.addMarker(mp);
-
-		map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-		new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
-	}
 
 	@Override
 	public void onProviderDisabled(String arg0) {
@@ -291,6 +282,15 @@ public class MainActivity extends Activity implements TabListener,
         transaction.commit();
 	}
 
+/*	
+	@Override
+	public void nextFragment(MdsInfoObject mdsInfo) {
+		// Transaction
+		int index = 0; //???
+		Fragment f = fragmentList.get(index);
+		// f.setInfo(mdsInfo);
+	}
+*/
 	private File jsonEinlesen() {
 
 		ThreadPolicy tp = ThreadPolicy.LAX;
