@@ -178,6 +178,8 @@ public class MainActivity extends Activity implements TabListener,
 		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
 		int playerId = 0;
 		interpreter = new Interpreter(jsonDatei, this, this, playerId);
+		// TODO Listener wird vorrübergehend hier erstellt
+		initiater.setListener(interpreter, 5);
 	}
 
 	public void showProviderDisable() {

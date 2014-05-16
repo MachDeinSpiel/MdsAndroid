@@ -14,6 +14,7 @@ public class AndroidInitiater {
 	Location oldLocation;
     AndroidListener listener;
     
+    // TODO Listener ersetzen durch AndroidInterpreterVermittler
     public AndroidInitiater(){
     	positionIntervall = 0;
     	oldLocation = null;
