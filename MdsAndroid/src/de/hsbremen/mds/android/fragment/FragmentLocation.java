@@ -1,11 +1,11 @@
 package de.hsbremen.mds.android.fragment;
 
-import android.app.Fragment;
+
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,29 +14,18 @@ import android.widget.TextView;
 import de.hsbremen.mds.android.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
-
-/**
- * A simple {@link android.support.v4.app.Fragment} subclass.
- * 
- */
-public class FragmentMap extends Fragment {
+public class FragmentLocation extends Fragment{
 	
-    Location location;
-    LocationManager manager;
-    FragmentActivity fragAct;
-    View mapView;
-    double longitude;
-    double latitude;
-
-	public FragmentMap() {
-	}
+	private LocationManager manager; 
+    private Location location;
+    private View mapView;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		
-		mapView = inflater.inflate(R.layout.fragment_map, container,false);
+		mapView = inflater.inflate(R.layout.fragment_location, container,false);
 		
 		Button btn1 = (Button) mapView.findViewById(R.id.btnCloseAppMap);
 		
@@ -62,13 +51,11 @@ public class FragmentMap extends Fragment {
 		
 		MainActivity activity = (MainActivity) getActivity();
 
-		manager = activity.getLocationManager();
+		manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
 																			// sec
 				10, activity);
-
-		// showText("Hier werden ihre derzeitigen\n Koordinaten angezeigt.");
 
 		boolean isNetworkEnabled = manager
 				.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -113,9 +100,5 @@ public class FragmentMap extends Fragment {
 			latVal.invalidate();
 			longVal.invalidate();
 		}
-	}
-	
-	public View getMapView(){
-		return this.mapView;
 	}
 }

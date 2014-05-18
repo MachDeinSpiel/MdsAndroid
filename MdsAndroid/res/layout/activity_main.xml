@@ -12,19 +12,20 @@
         android:layout_gravity="center"
         android:orientation="vertical" >
 
-        <LinearLayout
-            android:id="@+id/content"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.01"
-            android:orientation="horizontal" >
-        </LinearLayout>
+        <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/pager"
+            tools:context=".MainActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="3"/>
 
         <fragment
             android:id="@+id/map"
-            android:name="com.google.android.gms.maps.MapFragment"
-            android:layout_width="fill_parent"
-            android:layout_height="220dp" />
+            android:name="de.hsbremen.mds.android.fragment.GoogleMapFragment"
+			android:layout_width="wrap_content"
+			android:layout_height="0dp"
+			android:layout_weight="2"/>
 
     </LinearLayout>
 
