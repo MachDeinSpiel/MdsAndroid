@@ -15,7 +15,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MdsMapFragment extends MapFragment {
+public class GoogleMapFragment extends MapFragment {
 
 	private GoogleMap map;
 	private Location lastLocation;
@@ -23,22 +23,21 @@ public class MdsMapFragment extends MapFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-	
 		initGMaps();
 	}
 
-@Override
-public View onCreateView(LayoutInflater inflater, ViewGroup container,
-		Bundle savedInstanceState) {
-	// TODO Auto-generated method stub
-	return super.onCreateView(inflater, container, savedInstanceState);
-}
-@Override
-public void onSaveInstanceState(Bundle outState) {
-	outState.putParcelable("LAST_LOCATION", lastLocation);
-	// TODO Auto-generated method stub
-	super.onSaveInstanceState(outState);
-}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putParcelable("LAST_LOCATION", lastLocation);
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+	}
 	
 	private void initGMaps(){
   

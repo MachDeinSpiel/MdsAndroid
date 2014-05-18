@@ -3,8 +3,8 @@ package de.hsbremen.mds.android.fragment;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -29,24 +29,16 @@ import de.hsbremen.mds.mdsandroid.R;
 @SuppressLint("ValidFragment")
 public class FragmentBackpack extends Fragment {
 
-	ArrayList<MdsItem> itemList = new ArrayList<MdsItem>();
-	ArrayList<String> itemAsStringList = new ArrayList<String>();
-	BaseAdapter adapter;
-	ListView lv;
-	
-	public FragmentBackpack() {
-	}
-	
-	public FragmentBackpack(ArrayList<MdsItem> itemList) {
-		this.itemList=itemList;
-	}
+	private ArrayList<MdsItem> itemList = new ArrayList<MdsItem>();
+	private ArrayList<String> itemAsStringList = new ArrayList<String>();
+	private BaseAdapter adapter;
+	private ListView lv;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		final View view = inflater.inflate(R.layout.fragment_backpack, container,
-				false);
+		View view = inflater.inflate(R.layout.fragment_backpack, container, false);
 		
 		itemAsStringList.clear();
 		for (MdsItem item : itemList) {

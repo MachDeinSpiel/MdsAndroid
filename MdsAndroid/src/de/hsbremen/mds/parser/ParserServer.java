@@ -159,7 +159,7 @@ public class ParserServer {
 			Object value = jo.get(key);
 			paramsHM.put(key, value);
 		}
-<<<<<<< Updated upstream
+		
 		WhiteboardEntry wbe;
 		try {
 			wbe = new WhiteboardEntry(paramsHM, "none");
@@ -168,11 +168,6 @@ public class ParserServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-=======
-//		WhiteboardEntry wbe = new WhiteboardEntry(paramsHM, "none");
-//		wb.setAttribute(wbe, name); 
->>>>>>> Stashed changes
 	}
 	
 	public Whiteboard getWhiteboard() {

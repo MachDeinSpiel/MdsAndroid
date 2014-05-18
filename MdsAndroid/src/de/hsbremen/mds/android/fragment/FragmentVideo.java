@@ -1,10 +1,10 @@
 package de.hsbremen.mds.android.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.Fragment;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,23 +13,10 @@ import android.widget.VideoView;
 import de.hsbremen.mds.android.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
-/**
- * A simple {@link android.support.v4.app.Fragment} subclass.
- * 
- */
 @SuppressLint("ValidFragment")
 public class FragmentVideo extends Fragment {
 
-	String url;
-	
-	public FragmentVideo() {
-		// Required empty public constructor
-		this.url="http://bdmobi.in/videos/load/Hindi%203GP%20Music%20Videos/Ram%20Leela%20-%20Laal%20Ishq.3gp";
-	}
-	
-	public FragmentVideo(String url) {
-		this.url=url;
-	}
+	private String url = "http://bdmobi.in/videos/load/Hindi%203GP%20Music%20Videos/Ram%20Leela%20-%20Laal%20Ishq.3gp";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
