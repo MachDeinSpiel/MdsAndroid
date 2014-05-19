@@ -1,6 +1,8 @@
 package de.hsbremen.mds.android;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,8 +18,10 @@ import de.hsbremen.mds.common.guiobjects.MdsItem;
 
 public class SwipeAdapter extends FragmentPagerAdapter{
 
-	private ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
-	
+
+	private HashMap<String, Fragment> fragmentList = new HashMap<String, Fragment>();
+	private List<String> fragmentNumber = new ArrayList<String>();
+
 	public SwipeAdapter(FragmentManager fm) {
 		super(fm);
 		initFragments();
@@ -25,32 +29,39 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 
 	private void initFragments() {	
         FragmentStart startFragment = new FragmentStart();
-        fragmentList.add(startFragment);
+        fragmentList.put("start", startFragment);
+        fragmentNumber.add("start");
         
-        FragmentLocation mapFragment = new FragmentLocation();
-        fragmentList.add(mapFragment);
+        FragmentLocation locationFragment = new FragmentLocation();
+        fragmentList.put("location", locationFragment);
+        fragmentNumber.add("location");
         
         FragmentBackpack backpackFragment = new FragmentBackpack();
         backpackFragment.addItem(new MdsItem("bomb", "bomb"));
-        fragmentList.add(backpackFragment);
+        fragmentList.put("backpack", backpackFragment);
+        fragmentNumber.add("backpack");
         
         FragmentText textFragment = new FragmentText();
-        fragmentList.add(textFragment);
+        textFragment.setMessage("Es wurde noch kein Ziel erreicht");
+        fragmentList.put("text", textFragment);
+        fragmentNumber.add("text");
         
         FragmentMonitoring monitoringFragment = new FragmentMonitoring();
-        fragmentList.add(monitoringFragment);
+        fragmentList.put("monitoring", monitoringFragment);
+        fragmentNumber.add("monitoring");
         
         FragmentImage imageFragment = new FragmentImage();
-        fragmentList.add(imageFragment);
+        fragmentList.put("image", imageFragment);
+        fragmentNumber.add("image");
         
         FragmentVideo videoFragment = new FragmentVideo();
-        fragmentList.add(videoFragment);		
+        fragmentList.put("video", videoFragment);	
+        fragmentNumber.add("video");
 	}
 	
-
 	@Override
-	public Fragment getItem(int index) {		
-		return fragmentList.get(index);
+	public Fragment getItem(int index) {
+		return fragmentList.get(fragmentNumber.get(index));
 	}
 
 	@Override
@@ -58,7 +69,18 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 		return fragmentList.size();
 	}
 
-	public Fragment getFragment(int index){
-		return fragmentList.get(index);
+	public Fragment getFragment(String name){
+		return fragmentList.get(name);
+	}
+	
+	public int getFragmentName(String name){
+		int index = 0;
+		for(String s : fragmentNumber){
+			if(s.equals(name)){
+				return index;
+			}
+			index++;
+		}
+		return index;
 	}
 }

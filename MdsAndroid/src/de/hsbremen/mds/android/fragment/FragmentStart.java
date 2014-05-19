@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import de.hsbremen.mds.android.MainActivity;
-import de.hsbremen.mds.common.valueobjects.MdsText;
+import de.hsbremen.mds.common.valueobjects.MdsMap;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentStart extends Fragment {
@@ -28,7 +28,7 @@ public class FragmentStart extends Fragment {
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity)getActivity();
 				activity.connectToServer();
-				activity.nextFragment(new MdsText("Test", "Testtext bla bla"));
+				activity.nextFragment(new MdsMap("Map", "URL", "Text"));
 			}
 		});
 	
