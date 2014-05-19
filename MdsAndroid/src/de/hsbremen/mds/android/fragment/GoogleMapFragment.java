@@ -58,17 +58,20 @@ public class GoogleMapFragment extends MapFragment {
 	
 
 	public void gmapsUpdate(Location loc){
-		map.clear();
-
-		MarkerOptions mp = new MarkerOptions();
-
-		mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
-
-		mp.title("Player Position");
-
-		map.addMarker(mp);
-
-		map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-		new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
+		
+		if(loc != null){
+			map.clear();
+	
+			MarkerOptions mp = new MarkerOptions();
+	
+			mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
+	
+			mp.title("Player Position");
+	
+			map.addMarker(mp);
+	
+			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+			new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
+		}
 	}
 }

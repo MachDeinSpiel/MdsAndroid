@@ -15,6 +15,7 @@ import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_17;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.content.res.AssetManager;
 import android.graphics.Color;
@@ -25,7 +26,15 @@ import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
@@ -67,6 +76,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		ActionBar actionbar = getActionBar();
+		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
 		viewPager=(ViewPager) findViewById(R.id.pager);
 		swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
@@ -79,6 +91,35 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+		
+		LinearLayout l = (LinearLayout)findViewById(R.id.containerMap);
+		LinearLayout l2 = (LinearLayout)findViewById(R.id.containerPager);
+		
+		
+		if(item.getItemId() == R.id.toggleMap){
+			
+			if(l.getHeight() > l2.getHeight()){
+				l.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1.5f));
+				l2.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 3.5f));
+			}else{
+				l.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 3.5f));
+				l2.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1.5f));
+			}
+		}
+		return true;
+	}
+	
 	public void connectToServer(){
 		
 		// Serverkommunikation
@@ -113,7 +154,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		mapFragment.gmapsUpdate(loc);
 		
-		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment(1);
+		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
 		f.updateLocationFields();
 		
 		initiater.locationChanged(loc);
@@ -124,7 +165,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		view.setText("AUS");
 		view.setBackgroundColor(Color.RED);
 		
-		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment(1);
+		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
 		f.updateLocationFields();
 	}
 	
@@ -133,7 +174,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		view.setText("AN");
 		view.setBackgroundColor(Color.GREEN);
 		
-		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment(1);
+		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
 		f.updateLocationFields();
 		
 		initiater.locationChanged(location);
@@ -161,7 +202,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsImage mds) {
-		viewPager.setCurrentItem(5, true);
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("image"), true);
 		
 		Button btn = (Button) findViewById(R.id.btnReturnImage);
 		btn.setVisibility(1);
@@ -170,7 +211,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void nextFragment(MdsVideo mds) {
 		
-		viewPager.setCurrentItem(6, true);
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("video"), true);
        
 		Button btn = (Button) findViewById(R.id.btnReturnVideo);
 		btn.setVisibility(1);
@@ -178,16 +219,16 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsText mds) {	      
-		FragmentText f = (FragmentText)swipeAdapter.getFragment(3);
+		FragmentText f = (FragmentText)swipeAdapter.getFragment("text");
         f.setMessage(mds.getText());
         f.setActionbutton(true);
         
-		viewPager.setCurrentItem(3, true);
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("text"), true);
 	}
 
 	@Override
 	public void nextFragment(MdsMap mds) {
-		viewPager.setCurrentItem(1, true);
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("location"), true);
 	}
 
 /*	
@@ -287,7 +328,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	public void consoleEntry(String message) {
-		FragmentMonitoring f = (FragmentMonitoring)swipeAdapter.getFragment(4);
+		FragmentMonitoring f = (FragmentMonitoring)swipeAdapter.getFragment("monitoring");
 		f.addConsoleEntry(message);
 	}
 
@@ -298,7 +339,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void addToBackpack(MdsItem item) {
-		FragmentBackpack f = (FragmentBackpack)swipeAdapter.getFragment(2);
+		FragmentBackpack f = (FragmentBackpack)swipeAdapter.getFragment("backpack");
         f.addItem(item);
 	}
 
