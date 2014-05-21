@@ -24,6 +24,9 @@ import de.hsbremen.mds.parser.Parser;
  * @author JW
  */
 public class Interpreter implements InterpreterInterface, AndroidListener, ClientInterpreterInterface, FsmInterface{
+	
+	public static final String LOGTAG = "InterpreterClient";
+	
 	private ActionParser actionParser;
 	private FsmManager fsmManager;
 	private Whiteboard whiteboard;
@@ -33,6 +36,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 		
 	public Interpreter(File json, GuiInterface guiInterface, ServerInterpreterInterface serverInterpreter, int playerId){
+		Log.i(LOGTAG, "Interpreter erzeugt");
 		this.gui = guiInterface;
 		this.serverInterpreter = serverInterpreter;
 
@@ -44,7 +48,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 	
 	@Override
 	public void pushParsedObjects(MdsObjectContainer objectContainer) {		
-		Log.d("Interpreter", "Geparste Objekte vo Parser bekommen");
+		Log.i(LOGTAG, "Geparste Objekte vom Parser bekommen");
 		this.gui.setAndroidListener(this, 5);
 		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard, this);
 	}
@@ -53,6 +57,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onButtonClick(String buttonName) {
+		Log.i(LOGTAG, "onButtonClick ausgeführt");
 		fsmManager.checkEvents(buttonName);
 		
 	}
@@ -71,6 +76,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onPositionChanged(double longitude, double latitude) {
+		Log.i(LOGTAG, "Neue Position von Android bekommen : [long:"+longitude+" ,|lat:"+latitude+"]");
 		try {
 			whiteboard.setAttributeValue(Double.toString(longitude), "players", Integer.toString(myId), "longitude");
 		} catch (InvalidWhiteboardEntryException e) {
@@ -97,6 +103,11 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
+		String logKeys = "";
+		for(String s : keys){
+			logKeys += ","+s;
+		}
+		Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+value+"]");
 		try {
 			whiteboard.setAttributeValue(value, (String[])keys.toArray());
 		} catch (InvalidWhiteboardEntryException e) {
@@ -113,6 +124,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void onStateChange() {
+		Log.i(LOGTAG, "Zustand geändert");
 		MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
 		MdsActionExecutable startAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
 		MdsActionExecutable doAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
@@ -125,6 +137,11 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void updateLocalWhiteboard(List<String> keys, WhiteboardEntry entry) {
+		String logKeys = "";
+		for(String s : keys){
+			logKeys += ","+s;
+		}
+		Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+entry.value.toString()+"]");
 		try {
 			whiteboard.setAttributeValue(entry, (String[])keys.toArray());
 		} catch (InvalidWhiteboardEntryException e) {

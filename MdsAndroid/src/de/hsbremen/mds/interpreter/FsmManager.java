@@ -4,6 +4,8 @@ package de.hsbremen.mds.interpreter;
 import java.util.List;
 
 
+
+import android.util.Log;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
@@ -15,6 +17,10 @@ import de.hsbremen.mds.exceptions.NoStartStateException;
  * @author JGWNH
  */
 public class FsmManager {
+	
+	public static final String CURRENT_STATE = "currentState";
+	public static final String LAST_STATE = "lastState";
+	
 	private List<MdsState> states;
 	private int myID;
 	private Whiteboard wb;
@@ -24,9 +30,9 @@ public class FsmManager {
 		this.states = states;
 		this.interpreter = interpreter;
 		try{
-			this.setState(this.getFirstState(),"currentState");
+			this.setState(this.getFirstState(),CURRENT_STATE);
 		} catch (NoStartStateException e){
-			e.printStackTrace();
+			Log.e(Interpreter.LOGTAG, "Error: No start-state found!");
 		}
 		this.wb = wb;
 	}
@@ -36,7 +42,7 @@ public class FsmManager {
 	 * @return
 	 */
 	private MdsState getCurrentState(){
-		return (MdsState)this.wb.getAttribute("player" ,Integer.toString(myID), "currentState").value;
+		return (MdsState)this.wb.getAttribute("player" ,Integer.toString(myID), CURRENT_STATE).value;
 	}
 
 	/**
@@ -44,7 +50,8 @@ public class FsmManager {
 	 * @return
 	 */
 	private void setState(MdsState current, String setTo){
-		if(setTo.equals("currentState") || setTo.equals("lastState")){
+		Log.i(Interpreter.LOGTAG, "FsmManager: setState("+current.getName()+", "+setTo+")");
+		if(setTo.equals(CURRENT_STATE) || setTo.equals(LAST_STATE)){
 			
 			wb.getAttribute("players",Integer.toString(myID),setTo).value = current;
 			//TODO: Sneaky methode zum setzen des States enternen, WhiteboardEntry akzeptiert ja eigentlich
@@ -55,13 +62,14 @@ public class FsmManager {
 			/*
 			 * TODO fehler auffangen
 			 */
+			Log.e(Interpreter.LOGTAG, "Error: setTo doesn't equal 'currentState' or 'lastState'");
 		}
 	}
 
 
 	private void onstateChanged(MdsState state) {
 		
-	
+		Log.i(Interpreter.LOGTAG, "onstateChanged im FsmManager ausgeführt");
 		interpreter.onStateChange();
 		
 	}
@@ -73,8 +81,10 @@ public class FsmManager {
 	 * @return
 	 */
 	private MdsState getFirstState() throws NoStartStateException{
+		Log.i(Interpreter.LOGTAG, "Suche nach StartZustand...");
 		for(MdsState state: this.states){
 			if(state.isStartState() && state.getParentState() == null){
+				Log.i(Interpreter.LOGTAG, "StartZustand gefunden:"+state.getName());
 				return state;
 			}
 		}
@@ -118,8 +128,8 @@ public class FsmManager {
 					this.getCurrentState().setSubjects(result.subjects);
 				if(result.objects != null)
 					this.getCurrentState().setObjects(result.objects);
-				this.setState(getCurrentState(), "lastState");
-				this.setState(t.getTarget(), "currentState");
+				this.setState(getCurrentState(), LAST_STATE);
+				this.setState(t.getTarget(), CURRENT_STATE);
 
 				return;
 			}

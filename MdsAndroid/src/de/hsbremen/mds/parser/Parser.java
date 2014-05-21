@@ -304,7 +304,7 @@ public class Parser {
 			
 			MdsObjectContainer MdsContainer = new MdsObjectContainer(actions, states);
 			
-//			interpreter.pushParsedObjects(MdsContainer);
+			interpreter.pushParsedObjects(MdsContainer);
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
