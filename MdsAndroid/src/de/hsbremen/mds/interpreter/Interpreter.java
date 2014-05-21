@@ -120,6 +120,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 	@Override
 	public void onFullWhiteboardUpdate(Whiteboard newWhiteboard) {
 		this.whiteboard = newWhiteboard;
+		fsmManager.initiate();
 	}
 
 	@Override

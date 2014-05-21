@@ -25,16 +25,26 @@ public class FsmManager {
 	private int myID;
 	private Whiteboard wb;
 	private Interpreter interpreter; //TODO: interface
+	private boolean isRunning = false;
 	
 	public FsmManager(List<MdsState> states, Whiteboard wb, Interpreter interpreter){
 		this.states = states;
 		this.interpreter = interpreter;
-		try{
-			this.setState(this.getFirstState(),CURRENT_STATE);
-		} catch (NoStartStateException e){
-			Log.e(Interpreter.LOGTAG, "Error: No start-state found!");
-		}
 		this.wb = wb;
+	}
+	
+	/**
+	 * Legt den Startzustand fest und startet den Automaten
+	 */
+	public void initiate(){
+		if(!isRunning){
+			try{
+				this.setState(this.getFirstState(),CURRENT_STATE);
+			} catch (NoStartStateException e){
+				Log.e(Interpreter.LOGTAG, "Error: No start-state found!");
+			}
+			isRunning = true;
+		}
 	}
 	
 	/**
