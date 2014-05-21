@@ -33,7 +33,7 @@ public class FragmentImage extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.initiater.buttonClicked("proceedWalk");
+				activity.interpreterCom.buttonClicked("proceedWalk");
 			}
 		});
 		
@@ -44,7 +44,7 @@ public class FragmentImage extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.initiater.buttonClicked("endGame");
+				activity.interpreterCom.buttonClicked("endGame");
 			}
 		});
 		

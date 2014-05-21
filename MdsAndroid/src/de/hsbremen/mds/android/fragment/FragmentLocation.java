@@ -34,7 +34,7 @@ public class FragmentLocation extends Fragment{
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.initiater.buttonClicked("endGame");
+				activity.interpreterCom.buttonClicked("endGame");
 			}
 		});
 		

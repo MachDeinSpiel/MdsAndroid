@@ -37,7 +37,7 @@ public class FragmentText extends Fragment {
 				MainActivity activity = (MainActivity) getActivity();
 				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnText);
 				returnBtn.setVisibility(Button.GONE);
-				activity.initiater.buttonClicked("useItem");
+				activity.interpreterCom.buttonClicked("useItem");
 			}
 		});
 		
@@ -48,7 +48,7 @@ public class FragmentText extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.initiater.buttonClicked("endGame");
+				activity.interpreterCom.buttonClicked("endGame");
 			}
 		});
 		

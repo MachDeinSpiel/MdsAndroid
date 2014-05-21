@@ -29,11 +29,9 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
@@ -41,11 +39,10 @@ import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
-import de.hsbremen.mds.android.listener.AndroidInitiater;
 import de.hsbremen.mds.common.communication.EntryHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
-import de.hsbremen.mds.common.interfaces.AndroidListener;
+import de.hsbremen.mds.common.interfaces.ClientInterpreterInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
@@ -60,9 +57,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 					GuiInterface , ServerInterpreterInterface{
 
 	private Location location;
-	public AndroidInitiater initiater;
+	public InterpreterCommunicator interpreterCom;
 	
-	private Interpreter interpreter;
 	private SocketClient socketClient;
 	
 	private GoogleMapFragment mapFragment;
@@ -83,9 +79,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		viewPager=(ViewPager) findViewById(R.id.pager);
 		swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
 		viewPager.setAdapter(swipeAdapter);
-		
-		// Initiater für die Listener registrierung
-		initiater = new AndroidInitiater();
 			
 		FragmentManager fm = getFragmentManager();
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
@@ -144,9 +137,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		// Hier wird der Interpreter erstellt und wir mitgegeben und als Interface genutzt
 		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
 		int playerId = 0;
-		interpreter = new Interpreter(jsonDatei, this, this, playerId);
-		// TODO Listener wird vorrŸbergehend hier erstellt
-		initiater.setListener(interpreter, 5);
+		Interpreter interpreter = new Interpreter(jsonDatei, this, this, playerId);
+
+		// Initiater für die Listener registrierung
+		interpreterCom = new InterpreterCommunicator(interpreter, 5);
+		
 	}
 
 	@Override
@@ -157,7 +152,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
 		f.updateLocationFields();
 		
-		initiater.locationChanged(loc);
+		interpreterCom.locationChanged(loc);
 	}
 	
 	public void showProviderDisable() {
@@ -177,7 +172,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
 		f.updateLocationFields();
 		
-		initiater.locationChanged(location);
+		interpreterCom.locationChanged(location);
 	}
 	
 	@Override
@@ -192,12 +187,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-	}
-
-	@Override
-	public void setAndroidListener(AndroidListener listener,
-			double positionsIntervall) {
-		initiater.setListener(listener, positionsIntervall);
 	}
 
 	@Override

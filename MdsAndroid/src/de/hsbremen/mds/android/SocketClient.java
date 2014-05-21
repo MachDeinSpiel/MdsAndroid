@@ -2,6 +2,7 @@ package de.hsbremen.mds.android;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -9,11 +10,10 @@ import org.java_websocket.drafts.Draft;
 import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
-import org.json.JSONException;
 
 import android.util.Log;
 import de.hsbremen.mds.common.communication.EntryHandler;
-import de.hsbremen.mds.common.whiteboard.WhiterboardUpdateObject;
+import de.hsbremen.mds.common.whiteboard.WhiteboardUpdateObject;
 
 public class SocketClient extends WebSocketClient {
 	
@@ -27,12 +27,15 @@ public class SocketClient extends WebSocketClient {
 	@Override
 	public void onMessage(String message) {
 		
-		WhiterboardUpdateObject wObj = EntryHandler.toObject(message);
-		
-		main.initiater.updateLocalWhiteboard(wObj.getKeys(), wObj.getValue());
+		List<WhiteboardUpdateObject> wObj = EntryHandler.toObject(message);
 
-		Log.d("Na", "Message vom Server: " + message);
 		main.consoleEntry(message);
+		
+		if(wObj.size() == 1)
+			main.interpreterCom.updateLocalWhiteboard(wObj.get(0).getKeys(), wObj.get(0).getValue());
+		else
+			main.interpreterCom.fullUpdateLocalWhiteboard(wObj);
+		
 	}
 
 	@Override
