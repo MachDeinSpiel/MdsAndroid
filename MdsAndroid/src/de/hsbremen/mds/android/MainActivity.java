@@ -136,8 +136,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 
-//		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent=" + clientname);
-		URI uri = URI.create(serverlocation + clientname);
+		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent=" + clientname);
+//		URI uri = URI.create(serverlocation + clientname);
 		
 		socketClient = new SocketClient(d, uri, this);
 
