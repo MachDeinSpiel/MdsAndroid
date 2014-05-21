@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
-import de.hsbremen.mds.common.interfaces.AndroidListener;
 import de.hsbremen.mds.common.interfaces.ClientInterpreterInterface;
 import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
@@ -18,12 +17,13 @@ import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecuta
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
+import de.hsbremen.mds.common.whiteboard.WhiteboardUpdateObject;
 import de.hsbremen.mds.parser.Parser;
 
 /**
  * @author JW
  */
-public class Interpreter implements InterpreterInterface, AndroidListener, ClientInterpreterInterface, FsmInterface{
+public class Interpreter implements InterpreterInterface, ClientInterpreterInterface, FsmInterface{
 	
 	public static final String LOGTAG = "InterpreterClient";
 	
@@ -49,7 +49,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 	@Override
 	public void pushParsedObjects(MdsObjectContainer objectContainer) {		
 		Log.i(LOGTAG, "Geparste Objekte vom Parser bekommen");
-		this.gui.setAndroidListener(this, 5);
+		//this.gui.setAndroidListener(this, 5);
 		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard, this);
 	}
 	
@@ -101,27 +101,27 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 		
 	}
 
-	@Override
-	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
-		String logKeys = "";
-		for(String s : keys){
-			logKeys += ","+s;
-		}
-		Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+value+"]");
-		try {
-			whiteboard.setAttributeValue(value, (String[])keys.toArray());
-		} catch (InvalidWhiteboardEntryException e) {
-			e.printStackTrace();
-		}
-		
-		fsmManager.checkEvents(null);
-	}
+//	@Override
+//	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry value) {
+//		String logKeys = "";
+//		for(String s : keys){
+//			logKeys += ","+s;
+//		}
+//		Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+value+"]");
+//		try {
+//			whiteboard.setAttributeValue(value, (String[])keys.toArray());
+//		} catch (InvalidWhiteboardEntryException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		fsmManager.checkEvents(null);
+//	}
 
-	@Override
-	public void onFullWhiteboardUpdate(Whiteboard newWhiteboard) {
-		this.whiteboard = newWhiteboard;
-		fsmManager.initiate();
-	}
+//	@Override
+//	public void onFullWhiteboardUpdate(Whiteboard newWhiteboard) {
+//		this.whiteboard = newWhiteboard;
+//		fsmManager.initiate();
+//	}
 
 	@Override
 	public void onStateChange() {
@@ -137,7 +137,7 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 
 	@Override
-	public void updateLocalWhiteboard(List<String> keys, WhiteboardEntry entry) {
+	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry entry) {
 		String logKeys = "";
 		for(String s : keys){
 			logKeys += ","+s;
@@ -157,6 +157,33 @@ public class Interpreter implements InterpreterInterface, AndroidListener, Clien
 
 	@Override
 	public void useItem(MdsItem item) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void onFullWhiteboardUpdate(List<WhiteboardUpdateObject> wb) {
+		for(WhiteboardUpdateObject wuo: wb){
+			String logKeys = "";
+			for(String s : wuo.getKeys()){
+				logKeys += ","+s;
+			}
+			Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+wuo.getValue().value.toString()+"]");
+			try {
+				whiteboard.setAttributeValue(wuo.getValue(), (String[])wuo.getKeys().toArray());
+			} catch (InvalidWhiteboardEntryException e) {
+				e.printStackTrace();
+			}
+		}
+			
+		fsmManager.initiate();
+		
+	}
+
+
+	@Override
+	public void dropItem(MdsItem item) {
 		// TODO Auto-generated method stub
 		
 	}
