@@ -23,7 +23,7 @@ public class InterpreterCommunicator {
     }
 
     public void locationChanged(Location loc) {
-    	if(interpreter != null) {
+    	if(interpreter != null && loc != null) {
 	    	if(oldLocation == null || loc.distanceTo(oldLocation)>= positionIntervall) {
 	            Log.d("Android", "Neue Position");
 	    		// Callback mit aktueller Location
