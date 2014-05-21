@@ -82,6 +82,17 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			
 		FragmentManager fm = getFragmentManager();
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
+		
+		// Interpreter Erstellung
+		File jsonDatei = jsonEinlesen();
+		
+		// Hier wird der Interpreter erstellt und wir mitgegeben und als Interface genutzt
+		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
+		int playerId = 0;
+		Interpreter interpreter = new Interpreter(jsonDatei, this, this, playerId);
+
+		// Initiater für die Listener registrierung
+		interpreterCom = new InterpreterCommunicator(interpreter, 5);
 	}
 
 	@Override
@@ -124,23 +135,14 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		String PORT_WS = ":8000";
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
+
+//		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent=" + clientname);
+		URI uri = URI.create(serverlocation + clientname);
 		
-		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
-				+ clientname);
 		socketClient = new SocketClient(d, uri, this);
 
 		Thread t = new Thread(socketClient);
 		t.start();
-		
-		File jsonDatei = jsonEinlesen();
-		
-		// Hier wird der Interpreter erstellt und wir mitgegeben und als Interface genutzt
-		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
-		int playerId = 0;
-		Interpreter interpreter = new Interpreter(jsonDatei, this, this, playerId);
-
-		// Initiater für die Listener registrierung
-		interpreterCom = new InterpreterCommunicator(interpreter, 5);
 		
 	}
 
