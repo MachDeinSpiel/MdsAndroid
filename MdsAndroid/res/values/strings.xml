@@ -4,5 +4,13 @@
     <string name="app_name">MdsAndroidMds</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="usernameRes">Username:</string>
+    <string name="usernameHint">Username</string>
+    <string name="passwordRes">Password:</string>
+    <string name="passwordHint">Password</string>
+    <string name="loginBtnRes">Login</string>
+    <string name="helpRes">Help</string>
+    <string name="gamecenter">Gamecenter</string>
+
 
 </resources>
