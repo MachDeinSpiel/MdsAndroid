@@ -52,7 +52,17 @@ public class EventParser {
 		// get Subject Quantifier
 		MdsQuantifier subQuanti = subject.getQuantifier();
 		// get Radius
-		int radius = Integer.parseInt((String) params.get("radius"));
+		int radius;
+		try{
+			radius = (Integer)params.get("radius");
+		}catch(ClassCastException cce){
+			try{
+				radius = Integer.parseInt(params.get("radius").toString());
+			}catch(Exception e){
+				//TODO: bessere alternative
+				radius = 20;
+			}
+		}
 		// get Quantivalue
 		int quanti = Integer.parseInt(objQuanti.getValue());
 		// get QuanticheckType
@@ -63,8 +73,8 @@ public class EventParser {
 			// wenn das Subject "self" ist, im Einzelspieler immer
 			if(subject.getName().equals("self")){
 				// Locationobjekt des Spielers erzeuegen
-				double longitude = (Double) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "longitude").value;
-				double latitude = (Double) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "latitude").value;
+				double longitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "longitude").value);
+				double latitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "latitude").value);
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
