@@ -98,7 +98,7 @@
                         "name": "condition",
                         "params": {
                             "checkType": "equals",
-                            "value": "Player.health",
+                            "value": "self.health",
                             "compValue": 0
                         }
                     }

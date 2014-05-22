@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Vector;
 
 import android.location.Location;
+import android.util.Log;
 import de.hsbremen.mds.common.valueobjects.MdsObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsQuantifier;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
@@ -31,9 +33,10 @@ public class EventParser {
 	
 	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, int playerId) {
 		Result result = new Result(false, null, null);
-		result = checkLocationEvent(condition, wb, playerId);
-		if (result.isfullfilled)
-			return result;
+		//TODO: vorerst rausgenommen da kein Multiplayer und wirft exception (ist whiteboardevent, es wird nach locationkram gesucht -> NullPointer)
+		//result = checkLocationEvent(condition, wb, playerId);
+		//if (result.isfullfilled)
+		//	return result;
 		result = checkConditionEvent(condition, wb, playerId);
 		return result;
 	}
@@ -118,6 +121,10 @@ public class EventParser {
 				// FIXME:
 				// Hier evtl eine Liste von Locations?
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
+				
+				
+				MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
+				currentState.setObjects(objects);
 			}
 		}
 		return new Result(false, null, null);
@@ -128,52 +135,63 @@ public class EventParser {
 			// get value and compValue
 			double value = -1;
 			double compValue = -2;
-			try {  
-			    value = Double.parseDouble((String) cond.getParams().get("value"));  
-			} catch(NumberFormatException nfe) {  
-				try {
-					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-
-					String[] paramsSplitted = ((String)cond.getParams().get("value")).split("\\.");
-
-					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
-						//Wenn die L‰nge abgefragt werden soll
-						//Entferne "length" aus den Parametern
-						List<String> temp = Arrays.asList(paramsSplitted);
-						temp.remove(paramsSplitted.length-1);
-						//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
-						//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
-						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray()).value).entrySet().size();
-					}else{
-						value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+		
+		    try {  
+			    value = (Double)cond.getParams().get("value");  
+			} catch(ClassCastException cce){
+				try{
+					value = Double.parseDouble(cond.getParams().get("value").toString());
+				}catch(NumberFormatException nfe) {  
+					try {
+						//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
+						Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
+						String[] paramsSplitted = ((String)cond.getParams().get("value")).split("\\.");
+	
+						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
+							//Wenn die L‰nge abgefragt werden soll
+							//Entferne "length" aus den Parametern
+							List<String> temp = new Vector<String>(Arrays.asList(paramsSplitted));
+							temp.remove(paramsSplitted.length-1);
+							//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
+							//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
+							value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
+						}else{
+							//TODO: hier (und im if-block ?) object, subject, self usw auflˆsen (parseParams? oder wie's im actionaprser gemacht wird)
+							value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+						}
+					} catch (NumberFormatException nfe2) {
+						// something went wrong, Value is not a Number
 					}
-				} catch (NumberFormatException nfe2) {
-					// something went wrong, Value is not a Number
 				}
 			} 
+			
 			try {  
-			    compValue = Double.parseDouble((String) cond.getParams().get("compValue"));  
-			} catch(NumberFormatException nfe) {  
-				try {
-					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-
-					String[] paramsSplitted = ((String) cond.getParams().get("value")).split("\\.");
-
-					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
-						//Wenn die L‰nge abgefragt werden soll
-						//Entferne "length" aus den Parametern
-						List<String> temp = Arrays.asList(paramsSplitted);
-						temp.remove(paramsSplitted.length-1);
-						//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
-						//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
-						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray()).value).entrySet().size();
-					}else{
-						value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
-					}
-				} catch (NumberFormatException nfe2) {
-					// something went wrong, Value is not a Number
+			    compValue = (Double)cond.getParams().get("compValue");  
+			} catch(ClassCastException cce){
+				try{
+					compValue = Double.parseDouble(cond.getParams().get("compValue").toString());
+				}catch(NumberFormatException nfe) {  
+					try {
+						//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
+	
+						String[] paramsSplitted = ((String) cond.getParams().get("value")).split("\\.");
+	
+						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
+							//Wenn die L‰nge abgefragt werden soll
+							//Entferne "length" aus den Parametern
+							List<String> temp = new Vector<String>(Arrays.asList(paramsSplitted));
+							temp.remove(paramsSplitted.length-1);
+							//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
+							//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
+							value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
+						}else{
+							value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+						}
+					} catch (NumberFormatException nfe2) {
+						// something went wrong, Value is not a Number
+					} 
 				} 
-			} 
+			}
 			
 				
 			

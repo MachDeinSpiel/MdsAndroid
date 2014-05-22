@@ -43,6 +43,9 @@ public class FsmManager {
 			try{
 				wb.setAttribute(new WhiteboardEntry("currentSt","all"), Interpreter.WB_PLAYERS,""+myID,CURRENT_STATE);
 				wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
+				//TODO: fix my shit up
+				wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
+				
 			}catch(InvalidWhiteboardEntryException e){
 				e.printStackTrace();
 			}

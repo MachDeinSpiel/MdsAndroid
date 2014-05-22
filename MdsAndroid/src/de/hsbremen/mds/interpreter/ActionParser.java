@@ -123,7 +123,7 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					
-					List<String> keysToValue = Arrays.asList(params.get("group").split("\\."));
+					List<String> keysToValue = new Vector<String>(Arrays.asList(params.get("group").split("\\.")));
 					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
 					currentWb.remove(params.get("target"));
 					try {
@@ -141,7 +141,7 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					//Welches Attribut soll geändert werden?
-					List<String> keysToValue = Arrays.asList(params.get("attribute").split("\\."));
+					List<String> keysToValue = new Vector<String>(Arrays.asList(params.get("attribute").split("\\.")));
 					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
 					
 					
@@ -174,7 +174,7 @@ public class ActionParser {
 		case useItem:
 			
 			//Vorbereitung: Item finden
-			List<String> keysToItem = Arrays.asList(params.get("target").split("\\."));
+			List<String> keysToItem = new Vector<String>(Arrays.asList(params.get("target").split("\\.")));
 			 Whiteboard currentWb = parseActionString(wb, keysToItem, state, myId);
 			//Item, dessen useAction(s) ausgeführt werden sollen
 			final Whiteboard item = (Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
@@ -252,7 +252,7 @@ public class ActionParser {
 		Log.i(Interpreter.LOGTAG,"parseParam after replacements:"+param);
 		
 		//Einzelne Teile, die Punkten getrennt sind aufsplitten
-		List<String> splitted = Arrays.asList(param.split("\\."));
+		List<String> splitted = new Vector<String>(Arrays.asList(param.split("\\.")));
 		
 		Log.i(Interpreter.LOGTAG,"parseParam splittedParamLength:"+splitted.size());
 		
@@ -260,14 +260,17 @@ public class ActionParser {
 		if(splitted.get(0).equals("object")){
 			
 			splitted.remove(0);
-			String[] keys = (String[]) splitted.toArray();
+			String[] keys = (String[]) splitted.toArray(new String[0]);
 
 			// TODO: erstmal nur mit einem
 			List<WhiteboardEntry> objects = state.getObjects();
+			if(objects == null){
+				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard");
+			}
 			return (String) ((Whiteboard)objects.get(0).value).getAttribute(keys).value;
 		} else if (splitted.get(0).equals("subject")) {
 			splitted.remove(0);
-			String[] keys = (String[]) splitted.toArray();
+			String[] keys = (String[]) splitted.toArray(new String[0]);
 			// erstmal nur mit einem
 			List<WhiteboardEntry> subjects = state.getSubjects();
 			return (String) ((Whiteboard)subjects.get(0).value).getAttribute(keys).value;
@@ -275,7 +278,7 @@ public class ActionParser {
 		}
 		
 		//Ansonsten Daten aus dem Whiteboard holen
-		return (String) wb.getAttribute((String[]) splitted.toArray()).value;
+		return (String) wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
 		
 				
 	}
