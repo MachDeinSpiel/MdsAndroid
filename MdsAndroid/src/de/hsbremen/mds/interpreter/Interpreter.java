@@ -26,6 +26,7 @@ import de.hsbremen.mds.parser.Parser;
 public class Interpreter implements InterpreterInterface, ClientInterpreterInterface, FsmInterface{
 	
 	public static final String LOGTAG = "InterpreterClient";
+	public static final String WB_PLAYERS = "Players";
 	
 	private ActionParser actionParser;
 	private FsmManager fsmManager;
@@ -41,6 +42,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		this.serverInterpreter = serverInterpreter;
 
 		this.myId = playerId;
+		whiteboard = new Whiteboard();
 		new Parser(this,json);	
 		
 	}
@@ -76,26 +78,30 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 	@Override
 	public void onPositionChanged(double longitude, double latitude) {
+		if(!fsmManager.isRunning()){
+			//FSM läuft noch nicht? Raus hier!
+			return;
+		}
 		Log.i(LOGTAG, "Neue Position von Android bekommen : [long:"+longitude+" ,|lat:"+latitude+"]");
 		try {
-			whiteboard.setAttributeValue(Double.toString(longitude), "players", Integer.toString(myId), "longitude");
+			whiteboard.setAttributeValue(Double.toString(longitude), WB_PLAYERS, Integer.toString(myId), "longitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
 		}
 		List<String> keys = new Vector<String>();
-		keys.add("players");
+		keys.add(WB_PLAYERS);
 		keys.add(""+myId);
 		keys.add("longitude");
-		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute("players", Integer.toString(myId), "longitude"));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, Integer.toString(myId), "longitude"));
 		
 		try {
-			whiteboard.setAttributeValue(Double.toString(latitude), "players", Integer.toString(myId), "latitude");
+			whiteboard.setAttributeValue(Double.toString(latitude), WB_PLAYERS, Integer.toString(myId), "latitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
 		}
 		keys.remove(keys.size()-1);
 		keys.add("latitude");
-		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute("players", Integer.toString(myId), "latitude"));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, Integer.toString(myId), "latitude"));
 		
 		fsmManager.checkEvents(null);
 		
@@ -126,9 +132,9 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	@Override
 	public void onStateChange() {
 		Log.i(LOGTAG, "Zustand geändert");
-		MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
-		MdsActionExecutable startAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
-		MdsActionExecutable doAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute("players",myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
+		MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
+		MdsActionExecutable startAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
+		MdsActionExecutable doAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
 		
 		endAction.execute(gui);
 		startAction.execute(gui);
@@ -164,17 +170,15 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 	@Override
 	public void onFullWhiteboardUpdate(List<WhiteboardUpdateObject> wb) {
+
 		for(WhiteboardUpdateObject wuo: wb){
 			String logKeys = "";
 			for(String s : wuo.getKeys()){
 				logKeys += ","+s;
 			}
 			Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+wuo.getValue().value.toString()+"]");
-			try {
-				whiteboard.setAttributeValue(wuo.getValue(), (String[])wuo.getKeys().toArray());
-			} catch (InvalidWhiteboardEntryException e) {
-				e.printStackTrace();
-			}
+			whiteboard.setAttribute(wuo.getValue(), (String[])wuo.getKeys().toArray(new String[0]));
+			
 		}
 			
 		fsmManager.initiate();

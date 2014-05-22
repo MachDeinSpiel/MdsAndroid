@@ -263,7 +263,7 @@ public class ActionParser {
 		Whiteboard currentWb = root;
 		
 		if(keysToValue.get(0).equals("self")){
-			currentWb = (Whiteboard) root.getAttribute("players",myId+"").value;
+			currentWb = (Whiteboard) root.getAttribute(Interpreter.WB_PLAYERS,myId+"").value;
 			keysToValue.remove(0);
 		}else if(keysToValue.get(0).equals("subject")){
 			currentWb = (Whiteboard) state.getSubjects().get(0).value;

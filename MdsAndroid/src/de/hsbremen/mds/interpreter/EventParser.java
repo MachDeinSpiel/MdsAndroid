@@ -63,8 +63,8 @@ public class EventParser {
 			// wenn das Subject "self" ist, im Einzelspieler immer
 			if(subject.getName().equals("self")){
 				// Locationobjekt des Spielers erzeuegen
-				double longitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "longitude").value;
-				double latitude = (Double) wb.getAttribute("players", Integer.toString(playerId), "latitude").value;
+				double longitude = (Double) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "longitude").value;
+				double latitude = (Double) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "latitude").value;
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);

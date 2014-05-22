@@ -52,7 +52,7 @@ public class FsmManager {
 	 * @return
 	 */
 	private MdsState getCurrentState(){
-		return (MdsState)this.wb.getAttribute("player" ,Integer.toString(myID), CURRENT_STATE).value;
+		return (MdsState)this.wb.getAttribute(Interpreter.WB_PLAYERS ,Integer.toString(myID), CURRENT_STATE).value;
 	}
 
 	/**
@@ -62,8 +62,10 @@ public class FsmManager {
 	private void setState(MdsState current, String setTo){
 		Log.i(Interpreter.LOGTAG, "FsmManager: setState("+current.getName()+", "+setTo+")");
 		if(setTo.equals(CURRENT_STATE) || setTo.equals(LAST_STATE)){
-			
-			wb.getAttribute("players",Integer.toString(myID),setTo).value = current;
+			if(wb == null){
+				Log.e(Interpreter.LOGTAG, "Error: Whiteboard is null while changing state");
+			}
+			wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),setTo).value = current;
 			//TODO: Sneaky methode zum setzen des States enternen, WhiteboardEntry akzeptiert ja eigentlich
 			//nur Strings und Whiteboards (muhahahah *evil face*)
 		
@@ -147,6 +149,10 @@ public class FsmManager {
 			
 		
 
+	}
+
+	public boolean isRunning() {
+		return isRunning;
 	}
 
 
