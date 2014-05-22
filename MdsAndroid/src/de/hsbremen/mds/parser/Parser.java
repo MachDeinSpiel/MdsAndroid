@@ -258,7 +258,7 @@ public class Parser {
 							
 							Set<String> keySet = params.keySet();
 							for (String key : keySet){
-								if(!key.equals("object") || !key.equals("subject")) {
+								if(!key.equals("object") && !key.equals("subject")) {
 									Object values = params.get(key);
 									paramsHM.put(key, values);
 								}
