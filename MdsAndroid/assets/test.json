@@ -2,9 +2,7 @@
     "action": [
         {
             "ident": "updateMap",
-            "defaults": {
-                "target": "self"
-            }
+            "defaults": {}
         },
         {
             "ident": "useItem",

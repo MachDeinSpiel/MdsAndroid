@@ -40,6 +40,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		Log.i(LOGTAG, "Interpreter erzeugt");
 		this.gui = guiInterface;
 		this.serverInterpreter = serverInterpreter;
+		this.actionParser = new ActionParser();
 
 		this.myId = playerId;
 		whiteboard = new Whiteboard();
@@ -132,13 +133,17 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	@Override
 	public void onStateChange() {
 		Log.i(LOGTAG, "Zustand geändert");
-		MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
+		//MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
 		MdsActionExecutable startAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
 		MdsActionExecutable doAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)), whiteboard, myId, serverInterpreter);
 		
-		endAction.execute(gui);
-		startAction.execute(gui);
-		doAction.execute(gui);
+		//endAction.execute(gui);
+		if(startAction != null){
+			startAction.execute(gui);
+		}
+		if(doAction != null){
+			doAction.execute(gui);
+		}
 	}
 
 

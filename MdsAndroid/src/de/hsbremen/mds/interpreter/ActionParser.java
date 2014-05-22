@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
@@ -38,6 +39,11 @@ public class ActionParser {
 	 */
 	public MdsActionExecutable parseAction(MdsAction action, final MdsState state, final Whiteboard wb, final int myId, final ServerInterpreterInterface sii){
 		
+		if(action == null){
+			//Action exisitert eigentlich gar nicht? -> GTFO!
+			//TODO: evtl schon im Interpreter prüfen, ob die Action null ist (also keine in der JSON-Datei spezifieziert ist)
+			return null;
+		}
 	
 		//Parameter der Action
 		final HashMap<String, String> params = action.getParams();
@@ -69,17 +75,27 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					//Map anzeigen
-					MdsMapAction mma = new MdsMapAction("Map", Double.parseDouble(params.get("longitude")), Double.parseDouble(params.get("latitude")));
+					double lat,lon;
+					try{
+						lat  = Double.parseDouble((String)wb.getAttribute(Interpreter.WB_PLAYERS,""+myId, "latitude").value);
+						lon  = Double.parseDouble((String)wb.getAttribute(Interpreter.WB_PLAYERS,""+myId, "longitude").value);
+					}catch(Exception e){
+						lat = 0;
+						lon = 0;
+					}
+					MdsMapAction mma = new MdsMapAction("Map", lat, lon);
 					
 					ArrayList<MdsItem> mapEntities = new ArrayList<MdsItem>();
 					
 					for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
-						Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
-						mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
+						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+						mapEntities.add(new MdsItem(key, ""));
 					}
 					for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
-						Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
-						mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
+						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+						mapEntities.add(new MdsItem(key, ""));
 					}
 					//Map anzeigen
 					mma.execute(guiInterface);
@@ -222,20 +238,27 @@ public class ActionParser {
 	
 	private String parseParam(String param, MdsState state, Whiteboard wb, int playerId){
 		
-		
+		Log.i(Interpreter.LOGTAG,"parseParam:"+param);
 		//Ersetzungen gemäß der Spezisprache vorbereiten 
 		HashMap<String, String> replacements = new HashMap<String, String>();
-		replacements.put("self","players."+playerId);
-			
+		replacements.put("self",Interpreter.WB_PLAYERS+"."+playerId);
+		
+		
+		
 		for(String toReplace : replacements.keySet()){
-			param.replace(toReplace, replacements.get(toReplace));
+			//Log.i(Interpreter.LOGTAG,"parseParam replace every occurence of ["+toReplace+"]");
+			param = param.replace(toReplace, replacements.get(toReplace));
 		}
+		Log.i(Interpreter.LOGTAG,"parseParam after replacements:"+param);
 		
 		//Einzelne Teile, die Punkten getrennt sind aufsplitten
 		List<String> splitted = Arrays.asList(param.split("\\."));
 		
+		Log.i(Interpreter.LOGTAG,"parseParam splittedParamLength:"+splitted.size());
+		
 		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
 		if(splitted.get(0).equals("object")){
+			
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray();
 

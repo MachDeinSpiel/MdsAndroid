@@ -5,12 +5,14 @@ import java.util.List;
 
 
 
+
 import android.util.Log;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
+import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.exceptions.NoStartStateException;
 
 /**
@@ -39,6 +41,13 @@ public class FsmManager {
 	public void initiate(){
 		if(!isRunning){
 			try{
+				wb.setAttribute(new WhiteboardEntry("currentSt","all"), Interpreter.WB_PLAYERS,""+myID,CURRENT_STATE);
+				wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
+			}catch(InvalidWhiteboardEntryException e){
+				e.printStackTrace();
+			}
+			
+			try{
 				this.setState(this.getFirstState(),CURRENT_STATE);
 			} catch (NoStartStateException e){
 				Log.e(Interpreter.LOGTAG, "Error: No start-state found!");
@@ -65,9 +74,20 @@ public class FsmManager {
 			if(wb == null){
 				Log.e(Interpreter.LOGTAG, "Error: Whiteboard is null while changing state");
 			}
-			wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),setTo).value = current;
+			
 			//TODO: Sneaky methode zum setzen des States enternen, WhiteboardEntry akzeptiert ja eigentlich
-			//nur Strings und Whiteboards (muhahahah *evil face*)
+			//nur Strings und Whiteboards, hier wird (falls noch nicht da) erst ein leerer string gesetzt
+			//und dann mit einem MdsState überschrieben (muhahahah *evil face*)
+			
+//			if(wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),setTo) == null){
+//				try {
+//					wb.setAttribute(new WhiteboardEntry("", "all"), Interpreter.WB_PLAYERS,Integer.toString(myID),setTo);
+//				} catch (InvalidWhiteboardEntryException e) {
+//					e.printStackTrace();
+//				}
+//			}
+			wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),setTo).value = current;
+			
 		
 			this.onstateChanged(current);
 		} else {
