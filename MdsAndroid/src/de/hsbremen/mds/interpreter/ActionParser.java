@@ -145,8 +145,12 @@ public class ActionParser {
 					List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("attribute")).split("\\.")));
 					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
 					
-					
-					String attributeToChange = (String)currentWb.getAttribute(keysToValue.toArray(new String[0])).value;
+					String attributeToChange;
+					try{
+						attributeToChange = (String)currentWb.getAttribute(keysToValue.toArray(new String[0])).value;
+					}catch(NullPointerException e){
+						attributeToChange = (String)parsedParams.get("attribute");
+					}
 					
 					if(params.get("valueType").equals(ADD)){
 						try{
