@@ -157,7 +157,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		}
 		Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+entry.value.toString()+"]");
 		try {
-			whiteboard.setAttributeValue(entry, (String[])keys.toArray());
+			whiteboard.setAttributeValue(entry, (String[])keys.toArray(new String[0]));
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
 		}

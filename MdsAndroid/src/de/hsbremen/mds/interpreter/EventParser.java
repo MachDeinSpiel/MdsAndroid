@@ -89,22 +89,28 @@ public class EventParser {
 
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
 				
+				Result result = null;
 				// CheckType des Quantifiers identifizieren
 				if (checkType.equals(MdsCondition.EQUALS)) {
-					if (objects.size() == quanti) return new Result(true, null, null);
+					if (objects.size() == quanti) result = new Result(true, null, null);
 				} else if (checkType.equals(MdsQuantifier.LOWER)) {
-					if (objects.size() < quanti) return new Result(true, null, null);
+					if (objects.size() < quanti) result = new Result(true, null, null);
 				} else if (checkType.equals(MdsQuantifier.HIGHER)) {
-					if (objects.size() > quanti) return new Result(true, null, null);
+					if (objects.size() > quanti) result = new Result(true, null, null);
 				} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
-					if (objects.size() <= quanti) return new Result(true, null, null);
+					if (objects.size() <= quanti) result = new Result(true, null, null);
 				} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
-					if (objects.size() >= quanti) return new Result(true, null, null);
+					if (objects.size() >= quanti) result = new Result(true, null, null);
 				} else if (checkType.equals(MdsQuantifier.EXISTS)) {
-					if (objects.size() >= 1) return new Result(true, null, null);
+					if (objects.size() >= 1) result = new Result(true, null, null);
 				} else if (checkType.equals(MdsQuantifier.ALL)) {
-					if (objects.size() == realObject.entrySet().size()) return new Result(true, null, null);
+					if (objects.size() == realObject.entrySet().size()) result = new Result(true, null, null);
 				} 
+				if(result != null){
+					MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
+					currentState.setObjects(objects);
+					return result;
+				}
 				//TODO : Error if quantifier is invalid
 			}else{
 				// TODO: Hier muss noch viel überlegt werden bei Multiplayer
@@ -121,7 +127,6 @@ public class EventParser {
 				// FIXME:
 				// Hier evtl eine Liste von Locations?
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
-				
 				
 				MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
 				currentState.setObjects(objects);
@@ -145,7 +150,9 @@ public class EventParser {
 					try {
 						//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
 						Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
-						String[] paramsSplitted = ((String)cond.getParams().get("value")).split("\\.");
+						String paramString = (String)cond.getParams().get("value");
+						paramString = paramString.replaceAll("self", Interpreter.WB_PLAYERS+"."+playerId);
+						String[] paramsSplitted = (paramString).split("\\.");
 	
 						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 							//Wenn die Länge abgefragt werden soll
@@ -156,7 +163,7 @@ public class EventParser {
 							//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
 							value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 						}else{
-							//TODO: hier (und im if-block ?) object, subject, self usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
+							//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
 							value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
 						}
 					} catch (NumberFormatException nfe2) {

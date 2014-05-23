@@ -47,10 +47,10 @@ public class ActionParser {
 	
 		//Parameter der Action
 		final HashMap<String, String> params = action.getParams();
-		
+		final HashMap<String, Object> parsedParams = new HashMap<String, Object>();
 		//Jeden Parameter parsen/interpretieren
 		for(String key : params.keySet()){
-			params.put(key, parseParam(params.remove(key), state, wb, myId));
+			parsedParams.put(key, parseParam(params.get(key), state, wb, myId));
 		}
 		
 		/*	showVideo,
@@ -67,7 +67,7 @@ public class ActionParser {
 		//Je nach dem, von welchem Ident die Action ist, werden verschiedene MdsActionExecutables zurückgegeben 
 		switch(action.getIdent()){
 		case showVideo:
-			return new MdsVideoAction(params.get("title"), params.get("url"), params.get("text"));
+			return new MdsVideoAction((String)parsedParams.get("title"), (String)parsedParams.get("url"), (String)parsedParams.get("text"));
 		case showMap:
 		case updateMap:
 			return new MdsActionExecutable() {
@@ -105,9 +105,9 @@ public class ActionParser {
 				}
 			}; 
 		case showImage:
-			return new MdsImageAction(params.get("title"), params.get("url"), params.get("text"));
+			return new MdsImageAction((String)parsedParams.get("title"),(String)parsedParams.get("url"), (String)parsedParams.get("text"));
 		case showText:
-			return new MdsTextAction(params.get("title"), params.get("text"));
+			return new MdsTextAction("Title", (String)parsedParams.get("text"));
 		case addToGroup:
 			return new MdsActionExecutable() {
 				
@@ -123,14 +123,15 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					
-					List<String> keysToValue = new Vector<String>(Arrays.asList(params.get("group").split("\\.")));
-					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
+					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
+					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
 					currentWb.remove(params.get("target"));
-					try {
-						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
-					} catch (InvalidWhiteboardEntryException e) {
-						e.printStackTrace();
-					}
+					//TODO: server bescheid geben
+//					try {
+//						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+//					} catch (InvalidWhiteboardEntryException e) {
+//						e.printStackTrace();
+//					}
 					
 				}
 			};
@@ -141,7 +142,7 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					//Welches Attribut soll geändert werden?
-					List<String> keysToValue = new Vector<String>(Arrays.asList(params.get("attribute").split("\\.")));
+					List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("attribute")).split("\\.")));
 					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
 					
 					
@@ -149,13 +150,13 @@ public class ActionParser {
 					
 					if(params.get("valueType").equals(ADD)){
 						try{
-							attributeToChange = Double.toString(Double.parseDouble(attributeToChange) + Double.parseDouble(params.get("value")));
+							attributeToChange = Double.toString(Double.parseDouble(attributeToChange) + Double.parseDouble((String)parsedParams.get("value")));
 						}catch(NumberFormatException nfe){
 							nfe.printStackTrace();
 						}
 					}else if(params.get("valueType").equals(MULTIPLY)){
 						try{
-							attributeToChange = Double.toString(Double.parseDouble(attributeToChange) * Double.parseDouble(params.get("value")));
+							attributeToChange = Double.toString(Double.parseDouble(attributeToChange) * Double.parseDouble((String)parsedParams.get("value")));
 						}catch(NumberFormatException nfe){
 							nfe.printStackTrace();
 						}
@@ -174,10 +175,10 @@ public class ActionParser {
 		case useItem:
 			
 			//Vorbereitung: Item finden
-			List<String> keysToItem = new Vector<String>(Arrays.asList(params.get("target").split("\\.")));
-			 Whiteboard currentWb = parseActionString(wb, keysToItem, state, myId);
+			//List<String> keysToItem = new Vector<String>(Arrays.asList((String)parsedParams.get("target")).split("\\.")));
+			// Whiteboard currentWb = (Whiteboard)parsedParams.get("target");parseActionString(wb, keysToItem, state, myId);
 			//Item, dessen useAction(s) ausgeführt werden sollen
-			final Whiteboard item = (Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
+			final Whiteboard item = (Whiteboard)parsedParams.get("target");//(Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
 			
 			
 			return new MdsActionExecutable() {
@@ -236,7 +237,7 @@ public class ActionParser {
 		
 	}
 	
-	private String parseParam(String param, MdsState state, Whiteboard wb, int playerId){
+	private Object parseParam(String param, MdsState state, Whiteboard wb, int playerId){
 		
 		Log.i(Interpreter.LOGTAG,"parseParam:"+param);
 		//Ersetzungen gemäß der Spezisprache vorbereiten 
@@ -265,9 +266,27 @@ public class ActionParser {
 			// TODO: erstmal nur mit einem
 			List<WhiteboardEntry> objects = state.getObjects();
 			if(objects == null){
-				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard");
+				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard in state "+state.getName()+ " trying currentState...");
+				MdsState currentState = null;
+				try{
+					currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
+					objects = (currentState).getObjects();
+				}catch(Exception e){
+					String stateName = currentState != null ? currentState.getName() : "null";
+					Log.e(Interpreter.LOGTAG,"Error while getting objects from whiteboard in state "+ stateName);
+				}
+				if(objects == null){
+					Log.e(Interpreter.LOGTAG,"Still no luck while getting objects from whiteboard, still null");
+				}
 			}
-			return (String) ((Whiteboard)objects.get(0).value).getAttribute(keys).value;
+			Log.i(Interpreter.LOGTAG, "parseParam: objectsSize: "+objects.size());
+			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(0).value.toString());
+			Object o = ((Whiteboard)objects.get(0).value).getAttribute(keys);
+			if(keys.length >0 ){
+				return (String) ((Whiteboard)objects.get(0).value).getAttribute(keys).value;
+			}else{
+				return (Whiteboard)objects.get(0).value;
+			}
 		} else if (splitted.get(0).equals("subject")) {
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray(new String[0]);
@@ -278,7 +297,12 @@ public class ActionParser {
 		}
 		
 		//Ansonsten Daten aus dem Whiteboard holen
-		return (String) wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
+		try{
+			return  wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
+		}catch(NullPointerException e){
+			Log.d(Interpreter.LOGTAG,"Could not parse param ["+param+"], returning itself");
+			return param;
+		}
 		
 				
 	}
