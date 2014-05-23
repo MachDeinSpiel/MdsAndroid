@@ -42,7 +42,6 @@ import de.hsbremen.mds.android.fragment.GoogleMapFragment;
 import de.hsbremen.mds.common.communication.EntryHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
-import de.hsbremen.mds.common.interfaces.ClientInterpreterInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
@@ -136,8 +135,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 
-		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent=" + clientname);
-//		URI uri = URI.create(serverlocation + clientname);
+		URI uri = URI.create(serverlocation + "/" + clientname);
 		
 		socketClient = new SocketClient(d, uri, this);
 
