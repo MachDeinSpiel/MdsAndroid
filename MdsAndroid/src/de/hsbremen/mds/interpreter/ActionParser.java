@@ -298,10 +298,20 @@ public class ActionParser {
 			List<WhiteboardEntry> subjects = state.getSubjects();
 			return (String) ((Whiteboard)subjects.get(0).value).getAttribute(keys).value;
 
+		} else if (splitted.get(0).equals("notValue")) {
+			splitted.remove(0);
+			// String wieder zusammen setzen
+			StringBuffer buffer = new StringBuffer();
+			for(String s : splitted) {                                                  
+				buffer.append(s + ".");
+			}
+			String result = buffer.toString();
+			return buffer.toString();
 		}
 		
 		//Ansonsten Daten aus dem Whiteboard holen
 		try{
+			Object o = wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
 			return  wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
 		}catch(NullPointerException e){
 			Log.d(Interpreter.LOGTAG,"Could not parse param ["+param+"], returning itself");

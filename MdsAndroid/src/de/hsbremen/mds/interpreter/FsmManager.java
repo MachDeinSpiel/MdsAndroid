@@ -92,7 +92,7 @@ public class FsmManager {
 			wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),setTo).value = current;
 			
 		
-			this.onstateChanged(current);
+			this.onstateChanged(current, setTo);
 		} else {
 			/*
 			 * TODO fehler auffangen
@@ -102,10 +102,10 @@ public class FsmManager {
 	}
 
 
-	private void onstateChanged(MdsState state) {
+	private void onstateChanged(MdsState state, String setTo) {
 		
-		Log.i(Interpreter.LOGTAG, "onstateChanged im FsmManager ausgeführt");
-		interpreter.onStateChange();
+		Log.i(Interpreter.LOGTAG, "onstateChanged im FsmManager ausgeführt " + state.getName());
+		interpreter.onStateChange(setTo);
 		
 	}
 

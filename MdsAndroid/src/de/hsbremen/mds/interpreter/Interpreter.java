@@ -27,6 +27,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	
 	public static final String LOGTAG = "InterpreterClient";
 	public static final String WB_PLAYERS = "Players";
+	public static final String CURRENT_STATE = "currentState";
 	
 	private ActionParser actionParser;
 	private FsmManager fsmManager;
@@ -60,8 +61,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 	@Override
 	public void onButtonClick(String buttonName) {
-		Log.i(LOGTAG, "onButtonClick ausgeführt");
-		fsmManager.checkEvents(buttonName);
+		Log.i(LOGTAG, "onButtonClick ausgeführt" + buttonName);
+		fsmManager.checkEvents("back");
 		
 	}
 
@@ -131,20 +132,24 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 //	}
 
 	@Override
-	public void onStateChange() {
-		Log.i(LOGTAG, "Zustand geändert");
-		MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
-		MdsActionExecutable startAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
-		MdsActionExecutable doAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
-		
-		if(endAction != null){
-			endAction.execute(gui);
-		}
-		if(startAction != null){
-			startAction.execute(gui);
-		}
-		if(doAction != null){
-			doAction.execute(gui);
+	public void onStateChange(String setTo) {
+		if(setTo.equals(CURRENT_STATE)) {
+			Log.i(LOGTAG, "Zustand geändert");
+			MdsActionExecutable endAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
+			MdsActionExecutable startAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
+			MdsActionExecutable doAction = actionParser.parseAction(((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
+			
+			if(endAction != null){
+				endAction.execute(gui);
+			}
+			if(startAction != null){
+				startAction.execute(gui);
+			}
+			if(doAction != null){
+				doAction.execute(gui);
+			}
+			String health = (String) whiteboard.getAttribute("Players", Integer.toString(this.myId), "health").value;
+			Log.i(LOGTAG, "Player Health: " + health);
 		}
 	}
 
