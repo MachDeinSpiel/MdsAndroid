@@ -7,6 +7,7 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
@@ -19,69 +20,89 @@ import de.hsbremen.mds.common.guiobjects.MdsItem;
 
 public class SwipeAdapter extends FragmentPagerAdapter{
 
+	private HashMap<String, Fragment> activeFragmentsList = new HashMap<String, Fragment>();
+	private List<String> activeFragmentsNumbers = new ArrayList<String>();
 
-	private HashMap<String, Fragment> fragmentList = new HashMap<String, Fragment>();
-	private List<String> fragmentNumber = new ArrayList<String>();
+	private HashMap<String, Fragment> fragmentsPoolList = new HashMap<String, Fragment>();
+	
+	private FragmentManager fm;
 
 	public SwipeAdapter(FragmentManager fm) {
 		super(fm);
+		this.fm = fm;
 		initFragments();
 	}
 
 	private void initFragments() {	
-        
         FragmentStart startFragment = new FragmentStart();
-        fragmentList.put("start", startFragment);
-        fragmentNumber.add("start");
+        activeFragmentsList.put("start", startFragment);
+        activeFragmentsNumbers.add("start");
         
         FragmentLocation locationFragment = new FragmentLocation();
-        fragmentList.put("location", locationFragment);
-        fragmentNumber.add("location");
+        activeFragmentsList.put("location", locationFragment);
+        activeFragmentsNumbers.add("location");
         
         FragmentBackpack backpackFragment = new FragmentBackpack();
         backpackFragment.addItem(new MdsItem("bomb", "bomb"));
-        fragmentList.put("backpack", backpackFragment);
-        fragmentNumber.add("backpack");
-        
-        FragmentText textFragment = new FragmentText();
-        textFragment.setMessage("Es wurde noch kein Ziel erreicht");
-        fragmentList.put("text", textFragment);
-        fragmentNumber.add("text");
+        activeFragmentsList.put("backpack", backpackFragment);
+        activeFragmentsNumbers.add("backpack");
         
         FragmentMonitoring monitoringFragment = new FragmentMonitoring();
-        fragmentList.put("monitoring", monitoringFragment);
-        fragmentNumber.add("monitoring");
+        activeFragmentsList.put("monitoring", monitoringFragment);
+        activeFragmentsNumbers.add("monitoring");
+        
+        //INAKTIVE FRAGMENTS
+        FragmentText textFragment = new FragmentText();
+        textFragment.setMessage("Es wurde noch kein Ziel erreicht");
+        fragmentsPoolList.put("text", textFragment);
         
         FragmentImage imageFragment = new FragmentImage();
-        fragmentList.put("image", imageFragment);
-        fragmentNumber.add("image");
-        
-        FragmentVideo videoFragment = new FragmentVideo();
-        fragmentList.put("video", videoFragment);	
-        fragmentNumber.add("video");
+        fragmentsPoolList.put("image", imageFragment);
 
+        FragmentVideo videoFragment = new FragmentVideo();
+        fragmentsPoolList.put("video", videoFragment);	
+        
         FragmentMinigame minigameFragment = new FragmentMinigame();
-        fragmentList.put("minigame", minigameFragment);
-        fragmentNumber.add("minigame");
+        fragmentsPoolList.put("minigame", minigameFragment);	
+	}
+	
+	public void removeFragment(String fragmentName){
+        FragmentTransaction trans = fm.beginTransaction();
+        trans.remove(activeFragmentsList.get(fragmentName));
+        trans.commit();        
+        
+        activeFragmentsList.remove(fragmentName);
+        activeFragmentsNumbers.remove(fragmentName);
+        
+        notifyDataSetChanged();
+	}
+	
+	public void addFragment(String fragmentName){
+		
+		Fragment newFragment = this.fragmentsPoolList.get(fragmentName);
+		this.activeFragmentsList.put(fragmentName, newFragment);
+		this.activeFragmentsNumbers.add(fragmentName);
+		
+		notifyDataSetChanged();
 	}
 	
 	@Override
 	public Fragment getItem(int index) {
-		return fragmentList.get(fragmentNumber.get(index));
+		return activeFragmentsList.get(activeFragmentsNumbers.get(index));
 	}
 
 	@Override
 	public int getCount() {
-		return fragmentList.size();
+		return activeFragmentsList.size();
 	}
 
 	public Fragment getFragment(String name){
-		return fragmentList.get(name);
+		return activeFragmentsList.get(name);
 	}
 	
 	public int getFragmentName(String name){
 		int index = 0;
-		for(String s : fragmentNumber){
+		for(String s : activeFragmentsNumbers){
 			if(s.equals(name)){
 				return index;
 			}

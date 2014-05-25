@@ -191,6 +191,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsImage mds) {
+		swipeAdapter.addFragment("image");
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("image"), true);
 		
 		Button btn = (Button) findViewById(R.id.btnReturnImage);
@@ -333,5 +334,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	public void getServerData(String type, int id) {
+	}
+
+	public void updateSwipeAdapter(String currFragment) {
+		viewPager.setCurrentItem(1);
+		swipeAdapter.removeFragment(currFragment);
+
 	}
 }

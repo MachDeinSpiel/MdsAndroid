@@ -1,7 +1,12 @@
 /**
  * 
  */
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.login;
+
+import java.net.URI;
+
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_17;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,8 +22,12 @@ import de.hsbremen.mds.mdsandroid.R;
 /**
  * @author flexfit
  */
+
 public class LoginActivity extends Activity {
 
+	private CharSequence user;
+	private LoginSocket loginSocket;
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
@@ -52,30 +61,51 @@ public class LoginActivity extends Activity {
 		
 		setContentView(R.layout.login);
 		
+		connectToServer();
+		
 		Button loginBtn = (Button) findViewById(R.id.loginBtn);
 		final TextView usernameTxt = (TextView) findViewById(R.id.usernameText);
-		//final TextView passwordTxt = (TextView) findViewById(R.id.passwordText);
+		
+		user = usernameTxt.getText();
 		
 		View.OnClickListener loginClick = new View.OnClickListener() {
 		    public void onClick(View v) {
 		      
-		    	String user = String.valueOf(usernameTxt.getText());
-		    	//String pw = String.valueOf(passwordTxt.getText());
-
-		    	if(user.equals("mds")){
+		    	loginSocket.send(user.toString());
+		    	System.out.println(user);
 		    		
 		    		Intent myIntent = new Intent(LoginActivity.this, GameChooser.class);
 		    		myIntent.putExtra("username", user);
 		    		LoginActivity.this.startActivity(myIntent);
 		    		
-		    	} else {
-		    		Toast.makeText(getApplicationContext(), "Ungültige Dateneingabe...", Toast.LENGTH_SHORT).show();;
 		    	}
-		    }
-		  };
+		    //}
+		    };
 		  
 		  loginBtn.setOnClickListener(loginClick);
 		  
 	}	
 	
+public void connectToServer(){
+		
+		// Serverkommunikation
+		Draft d = new Draft_17();
+
+		String clientname = "AndroidClient";
+		String serverIp = "feijnox.no-ip.org";
+		String PROTOKOLL_WS = "ws://";
+		String PORT_WS = ":8000";
+		
+		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
+		
+		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
+				+ clientname);
+		loginSocket = new LoginSocket(d, uri, this);
+		
+		Thread t = new Thread(loginSocket);
+		t.start();
+		
+		loginSocket.send("HALLO");
+
+	}
 }

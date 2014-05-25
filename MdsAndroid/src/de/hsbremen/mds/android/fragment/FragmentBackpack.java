@@ -91,7 +91,9 @@ public class FragmentBackpack extends Fragment {
 			
 			// Item benutzen an Interpreter schicken
 			MainActivity activity = (MainActivity) getActivity();
-			activity.interpreterCom.useItem(itemList.get(info.position));
+//			activity.interpreterCom.useItem(itemList.get(info.position));
+			
+			activity.updateSwipeAdapter("image");
 			
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);

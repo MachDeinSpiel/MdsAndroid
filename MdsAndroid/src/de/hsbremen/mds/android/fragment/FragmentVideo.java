@@ -33,7 +33,7 @@ public class FragmentVideo extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.interpreterCom.buttonClicked("proceedWalk");
+				activity.interpreterCom.buttonClicked("back");
 			}
 		});
 		
@@ -44,7 +44,7 @@ public class FragmentVideo extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.interpreterCom.buttonClicked("endGame");
+				activity.updateSwipeAdapter("video");
 			}
 		});
 		

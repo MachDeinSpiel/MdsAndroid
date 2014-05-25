@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.login;
 
 import android.app.Activity;
 import android.view.LayoutInflater;

@@ -205,4 +205,11 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	}
 
 
+	@Override
+	public void onMinigameResult(int punkte, boolean gewonnen) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

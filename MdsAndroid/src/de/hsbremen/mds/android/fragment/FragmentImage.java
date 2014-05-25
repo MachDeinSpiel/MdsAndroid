@@ -44,7 +44,7 @@ public class FragmentImage extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.interpreterCom.buttonClicked("endGame");
+				activity.updateSwipeAdapter("image");
 			}
 		});
 		
