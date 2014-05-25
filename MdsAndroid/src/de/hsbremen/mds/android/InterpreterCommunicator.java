@@ -59,9 +59,12 @@ public class InterpreterCommunicator {
     }
     
     public void dropItem(MdsItem item){
-    	
     	this.interpreter.dropItem(item);
     }
+
+	public void minigameResult(int punkte, boolean gewonnen) {
+		interpreter.onMinigameResult(punkte, gewonnen);
+	}
     
     
 }

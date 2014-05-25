@@ -6,38 +6,43 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_height="match_parent" >
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:gravity="center"
-            android:text="Video"
-            android:textSize="16dp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-        <VideoView
-            android:id="@+id/placeholderVideo"
-            android:layout_width="match_parent"
-            android:layout_height="222dp"
-            android:layout_marginTop="50dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:gravity="center"
+                android:text="Video"
+                android:textSize="16dp" />
 
-        <Button
-            android:id="@+id/btnReturnVideo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.25"
-            android:text="Return"
-            android:visibility="invisible"/>
+            <VideoView
+                android:id="@+id/placeholderVideo"
+                android:layout_width="match_parent"
+                android:layout_height="222dp"
+                android:layout_marginTop="50dp" />
 
-        <Button
-            android:id="@+id/btnCloseAppVideo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Close App" />
+            <Button
+                android:id="@+id/btnReturnVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:text="Return"
+                android:visibility="invisible" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/btnCloseAppVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Close App" />
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>

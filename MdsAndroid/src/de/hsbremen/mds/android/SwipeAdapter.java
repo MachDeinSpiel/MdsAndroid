@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
+import de.hsbremen.mds.android.fragment.FragmentMinigame;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.FragmentStart;
 import de.hsbremen.mds.android.fragment.FragmentText;
@@ -28,6 +29,7 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	}
 
 	private void initFragments() {	
+        
         FragmentStart startFragment = new FragmentStart();
         fragmentList.put("start", startFragment);
         fragmentNumber.add("start");
@@ -57,6 +59,10 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         FragmentVideo videoFragment = new FragmentVideo();
         fragmentList.put("video", videoFragment);	
         fragmentNumber.add("video");
+
+        FragmentMinigame minigameFragment = new FragmentMinigame();
+        fragmentList.put("minigame", minigameFragment);
+        fragmentNumber.add("minigame");
 	}
 	
 	@Override

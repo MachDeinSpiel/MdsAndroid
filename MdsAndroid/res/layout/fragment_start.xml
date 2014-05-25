@@ -4,10 +4,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/btnServerConnect"
+    <ScrollView
+        android:id="@+id/scrollViewStart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Connect to Server" />
+        android:layout_height="match_parent" >
+
+        <Button
+            android:id="@+id/btnServerConnect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Connect to Server" />
+    </ScrollView>
 
 </LinearLayout>

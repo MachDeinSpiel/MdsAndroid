@@ -6,15 +6,15 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <ScrollView
-        android:id="@+id/svDescription"
-        android:layout_width="289dp"
-        android:layout_height="316dp" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
-        <LinearLayout
+        <ScrollView
+            android:id="@+id/scrollViewTextText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:layout_height="match_parent" >
 
             <TextView
                 android:id="@+id/placeholderText"
@@ -22,27 +22,27 @@
                 android:layout_height="wrap_content"
                 android:text="[PlaceholderText]"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+        </ScrollView>
 
-            <Button
-                android:id="@+id/btnShowVideo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Show Video"
-                android:visibility="invisible" />
+        <Button
+            android:id="@+id/btnShowVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Video"
+            android:visibility="invisible" />
 
-            <Button
-                android:id="@+id/btnReturnText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Aufheben"
-                android:visibility="invisible" />
+        <Button
+            android:id="@+id/btnReturnText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aufheben"
+            android:visibility="invisible" />
 
-            <Button
-                android:id="@+id/btnCloseAppText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Close App" />
-        </LinearLayout>
-    </ScrollView>
+        <Button
+            android:id="@+id/btnCloseAppText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Close App" />
+    </LinearLayout>
 
 </FrameLayout>
