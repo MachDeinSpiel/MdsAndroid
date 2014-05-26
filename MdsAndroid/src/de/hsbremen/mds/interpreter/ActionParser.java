@@ -90,12 +90,19 @@ public class ActionParser {
 					for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
 						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
 						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-						mapEntities.add(new MdsItem(key, ""));
+						MdsItem item = new MdsItem(key, "");
+						item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
+						item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
+						mapEntities.add(item);
+						
 					}
 					for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
 						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
 						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-						mapEntities.add(new MdsItem(key, ""));
+						MdsItem item = new MdsItem(key, "");
+						item.setLongitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"longitude").value));
+						item.setLatitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"latitude").value));
+						mapEntities.add(item);
 					}
 					//Map anzeigen
 					mma.execute(guiInterface);
@@ -126,6 +133,7 @@ public class ActionParser {
 					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
 					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
 					currentWb.remove(params.get("target"));
+					Log.i(Interpreter.LOGTAG, "removeFromGroup: "+params.get("target"));
 					//TODO: server bescheid geben
 //					try {
 //						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
