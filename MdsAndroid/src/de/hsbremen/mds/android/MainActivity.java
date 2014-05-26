@@ -331,7 +331,13 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void showMap(ArrayList<MdsItem> items2display) {
-		// TODO Anzeigen von MdsItems auf der GMaps Karte
+		System.out.println("ShowMap aufgerufen");
+		for(MdsItem i : items2display){
+			System.out.println("Item: " + i.getName());
+			System.out.println("Location: " + i.getLatitude() + i.getLongitude());
+		} 
+		mapFragment.setItemLocations(items2display);
+		mapFragment.gmapsUpdate(mapFragment.getLastLocation());
 	}
 
 	@Override
