@@ -14,7 +14,7 @@
         <ScrollView
             android:id="@+id/scrollViewTextText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="106dp" >
 
             <TextView
                 android:id="@+id/placeholderText"
