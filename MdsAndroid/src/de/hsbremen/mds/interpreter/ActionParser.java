@@ -90,6 +90,7 @@ public class ActionParser {
 					for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
 						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
 						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+						Log.d(Interpreter.LOGTAG, "["+key+"] in die Liste eingefügt.");
 						MdsItem item = new MdsItem(key, "");
 						item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
 						item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
@@ -132,14 +133,19 @@ public class ActionParser {
 					
 					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
 					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
-					currentWb.remove(params.get("target"));
-					Log.i(Interpreter.LOGTAG, "removeFromGroup: "+params.get("target"));
+					String[] keys = params.get("target").split("\\.");
+					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
+					
+					Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result+"]");
 					//TODO: server bescheid geben
-//					try {
-//						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
-//					} catch (InvalidWhiteboardEntryException e) {
-//						e.printStackTrace();
-//					}
+					List<String> keysToValue = new Vector<String>();
+					for(String s : params.get("target").split("\\."))
+					keysToValue.add(s);
+					try {
+						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+					} catch (InvalidWhiteboardEntryException e) {
+						e.printStackTrace();
+					}
 					
 				}
 			};
