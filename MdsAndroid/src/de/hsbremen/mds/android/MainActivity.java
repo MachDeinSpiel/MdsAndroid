@@ -129,9 +129,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		Draft d = new Draft_17();
 
 		String clientname = "AndroidClient";
-		String serverIp = "feijnox.no-ip.org";
+		String serverIp = "195.37.176.178";
 		String PROTOKOLL_WS = "ws://";
-		String PORT_WS = ":8000";
+		String PORT_WS = ":1387";
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 
