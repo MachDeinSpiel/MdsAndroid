@@ -37,6 +37,7 @@ public class FragmentText extends Fragment {
 				MainActivity activity = (MainActivity) getActivity();
 				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnText);
 				returnBtn.setVisibility(Button.GONE);
+//				activity.updateSwipeAdapter("text");
 				activity.interpreterCom.buttonClicked("back");
 			}
 		});
