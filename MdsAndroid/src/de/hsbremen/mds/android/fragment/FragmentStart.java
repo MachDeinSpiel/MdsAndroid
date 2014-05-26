@@ -29,8 +29,7 @@ public class FragmentStart extends Fragment {
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity)getActivity();
 				activity.connectToServer();
-//				activity.nextFragment(new MdsMap("Map", "URL", "Text"));
-				activity.nextFragment(new MdsImage("", "", ""));
+				activity.getViewPager().setCurrentItem(1);
 			}
 		});
 	

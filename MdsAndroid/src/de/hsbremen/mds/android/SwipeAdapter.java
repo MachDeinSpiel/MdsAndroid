@@ -108,6 +108,7 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 			}
 			index++;
 		}
+		System.out.println(index);
 		return index;
 	}
 }

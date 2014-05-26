@@ -142,6 +142,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		Thread t = new Thread(socketClient);
 		t.start();
 		
+		onLocationChanged(location);
+
 	}
 
 	@Override
@@ -201,6 +203,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void nextFragment(MdsVideo mds) {
 		
+		swipeAdapter.addFragment("video");
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("video"), true);
        
 		Button btn = (Button) findViewById(R.id.btnReturnVideo);
@@ -208,10 +211,14 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void nextFragment(MdsText mds) {	      
+	public void nextFragment(MdsText mds) {	
+		
+		swipeAdapter.addFragment("text");
 		FragmentText f = (FragmentText)swipeAdapter.getFragment("text");
         f.setMessage(mds.getText());
         f.setActionbutton(true);
+        
+        System.out.println("Ausgeführt!");
         
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("text"), true);
 	}
@@ -336,6 +343,10 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void getServerData(String type, int id) {
 	}
 
+	public ViewPager getViewPager(){
+		return this.viewPager;
+	}
+	
 	public void updateSwipeAdapter(String currFragment) {
 		viewPager.setCurrentItem(1);
 		swipeAdapter.removeFragment(currFragment);
