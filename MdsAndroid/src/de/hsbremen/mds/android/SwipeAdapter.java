@@ -8,6 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.view.ViewGroup;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
@@ -66,16 +69,27 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         fragmentsPoolList.put("minigame", minigameFragment);	
 	}
 	
-	public void removeFragment(String fragmentName){
-        FragmentTransaction trans = fm.beginTransaction();
-        trans.remove(activeFragmentsList.get(fragmentName));
-        trans.commit();        
+	public void removeFragment(String fragmentName){   
+		
+      FragmentTransaction trans = fm.beginTransaction();
+      trans.remove(activeFragmentsList.get(fragmentName));
+      trans.commit();   
+      fm.executePendingTransactions();
         
         activeFragmentsList.remove(fragmentName);
         activeFragmentsNumbers.remove(fragmentName);
         
         notifyDataSetChanged();
+        
+        
 	}
+	
+	@Override
+	public void destroyItem(ViewGroup container, int position, Object object) {
+		// TODO Auto-generated method stub		
+		super.destroyItem(container, position, object);
+	}
+	
 	
 	public void addFragment(String fragmentName){
 		

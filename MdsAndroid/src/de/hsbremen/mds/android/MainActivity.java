@@ -218,9 +218,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         f.setMessage(mds.getText());
         f.setActionbutton(true);
         
-        System.out.println("Ausgeführt!");
-        
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("text"), true);
+
 	}
 
 	@Override
@@ -356,6 +355,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void updateSwipeAdapter(String currFragment) {
 		viewPager.setCurrentItem(1);
 		swipeAdapter.removeFragment(currFragment);
+		swipeAdapter.notifyDataSetChanged();
 
 	}
 }
