@@ -34,11 +34,6 @@
         <activity
             android:name="de.hsbremen.mds.android.MainActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="de.hsbremen.mds.android.login.LoginActivity"
@@ -52,11 +47,6 @@
         <activity
             android:name="de.hsbremen.mds.android.login.GameChooser"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <meta-data
@@ -65,6 +55,9 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyD-r0Bp0gGBm7QS74yKkmZRuixgsLFtDjU" />
+
+        <service android:name="de.hsbremen.mds.android.WebSocketService.SocketService" >
+        </service>
     </application>
 
 </manifest>

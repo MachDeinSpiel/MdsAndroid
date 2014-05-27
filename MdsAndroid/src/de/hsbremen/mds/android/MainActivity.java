@@ -6,16 +6,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_17;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.res.AssetManager;
 import android.graphics.Color;
@@ -26,6 +26,7 @@ import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +35,8 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import de.hsbremen.mds.android.WebSocketService.WebServices;
+import de.hsbremen.mds.android.WebSocketService.WebServicesInterface;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
@@ -52,129 +55,129 @@ import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.interpreter.Interpreter;
 import de.hsbremen.mds.mdsandroid.R;
 
-public class MainActivity extends FragmentActivity implements LocationListener, 
-					GuiInterface , ServerInterpreterInterface{
+public class MainActivity extends FragmentActivity implements LocationListener,
+		GuiInterface, ServerInterpreterInterface, WebServicesInterface {
 
 	private Location location;
 	public InterpreterCommunicator interpreterCom;
-	
-	private SocketClient socketClient;
-	
+
 	private GoogleMapFragment mapFragment;
-	
+
 	private ViewPager viewPager;
 	public SwipeAdapter swipeAdapter;
+
+	private CharSequence username;
+
+	public WebServices webServ;
 	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		Bundle extras = getIntent().getExtras();
+		username = extras.getCharSequence("username");
+
+		webServ = WebServices.createWebServices(this);
+
 		ActionBar actionbar = getActionBar();
 		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
-		viewPager=(ViewPager) findViewById(R.id.pager);
+		viewPager = (ViewPager) findViewById(R.id.pager);
 		swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
 		viewPager.setAdapter(swipeAdapter);
-			
+
 		FragmentManager fm = getFragmentManager();
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
-		
+
 		// Interpreter Erstellung
 		File jsonDatei = jsonEinlesen();
-		
-		// Hier wird der Interpreter erstellt und wir mitgegeben und als Interface genutzt
+
+		// Hier wird der Interpreter erstellt und wir mitgegeben und als
+		// Interface genutzt
 		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
 		int playerId = 0;
-		Interpreter interpreter = new Interpreter(jsonDatei, this, this, playerId);
+		Interpreter interpreter = new Interpreter(jsonDatei, this, this,
+				playerId);
 
 		// Initiater f¸r die Listener registrierung
 		interpreterCom = new InterpreterCommunicator(interpreter, 5);
+
+	}
+
+	@Override
+	protected void onDestroy() {
+		webServ.closeWebServices();
+		super.onDestroy();
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.main, menu);
-	    return true;
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
-		
-		LinearLayout l = (LinearLayout)findViewById(R.id.containerMap);
-		LinearLayout l2 = (LinearLayout)findViewById(R.id.containerPager);
-		
-		
-		if(item.getItemId() == R.id.toggleMap){
-			
-			if(l.getHeight() > l2.getHeight()){
-				l.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1.5f));
-				l2.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 3.5f));
-			}else{
-				l.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 3.5f));
-				l2.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1.5f));
+
+		LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
+		LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
+
+		if (item.getItemId() == R.id.toggleMap) {
+
+			if (l.getHeight() > l2.getHeight()) {
+				l.setLayoutParams(new TableLayout.LayoutParams(
+						LayoutParams.WRAP_CONTENT, 0, 1.5f));
+				l2.setLayoutParams(new TableLayout.LayoutParams(
+						LayoutParams.WRAP_CONTENT, 0, 3.5f));
+			} else {
+				l.setLayoutParams(new TableLayout.LayoutParams(
+						LayoutParams.WRAP_CONTENT, 0, 3.5f));
+				l2.setLayoutParams(new TableLayout.LayoutParams(
+						LayoutParams.WRAP_CONTENT, 0, 1.5f));
 			}
 		}
 		return true;
-	}
-	
-	public void connectToServer(){
-		
-		// Serverkommunikation
-		Draft d = new Draft_17();
-
-		String clientname = "AndroidClient";
-		String serverIp = "feijnox.no-ip.org";
-		String PROTOKOLL_WS = "ws://";
-		String PORT_WS = ":8000";
-		
-		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
-
-		URI uri = URI.create(serverlocation + "/" + clientname);
-		
-		socketClient = new SocketClient(d, uri, this);
-
-		Thread t = new Thread(socketClient);
-		t.start();
-		
 	}
 
 	@Override
 	public void onLocationChanged(Location loc) {
 
 		mapFragment.gmapsUpdate(loc);
-		
-		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
+
+		FragmentLocation f = (FragmentLocation) swipeAdapter
+				.getFragment("location");
 		f.updateLocationFields();
-		
+
 		interpreterCom.locationChanged(loc);
 	}
-	
+
 	public void showProviderDisable() {
 		TextView view = (TextView) findViewById(R.id.txtGPSVal);
 		view.setText("AUS");
 		view.setBackgroundColor(Color.RED);
-		
-		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
+
+		FragmentLocation f = (FragmentLocation) swipeAdapter
+				.getFragment("location");
 		f.updateLocationFields();
 	}
-	
+
 	public void showProviderEnable() {
 		TextView view = (TextView) findViewById(R.id.txtGPSVal);
 		view.setText("AN");
 		view.setBackgroundColor(Color.GREEN);
-		
-		FragmentLocation f = (FragmentLocation)swipeAdapter.getFragment("location");
+
+		FragmentLocation f = (FragmentLocation) swipeAdapter
+				.getFragment("location");
 		f.updateLocationFields();
-		
+
 		interpreterCom.locationChanged(location);
 	}
-	
+
 	@Override
 	public void onProviderDisabled(String arg0) {
 		showProviderDisable();
@@ -193,43 +196,40 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void nextFragment(MdsImage mds) {
 		swipeAdapter.addFragment("image");
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("image"), true);
-		
+
 		Button btn = (Button) findViewById(R.id.btnReturnImage);
 		btn.setVisibility(1);
 	}
 
 	@Override
 	public void nextFragment(MdsVideo mds) {
-		
+
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("video"), true);
-       
+
 		Button btn = (Button) findViewById(R.id.btnReturnVideo);
 		btn.setVisibility(1);
 	}
 
 	@Override
-	public void nextFragment(MdsText mds) {	      
-		FragmentText f = (FragmentText)swipeAdapter.getFragment("text");
-        f.setMessage(mds.getText());
-        f.setActionbutton(true);
-        
+	public void nextFragment(MdsText mds) {
+		FragmentText f = (FragmentText) swipeAdapter.getFragment("text");
+		f.setMessage(mds.getText());
+		f.setActionbutton(true);
+
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("text"), true);
 	}
 
 	@Override
 	public void nextFragment(MdsMap mds) {
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName("location"), true);
+		viewPager
+				.setCurrentItem(swipeAdapter.getFragmentName("location"), true);
 	}
 
-/*	
-	@Override
-	public void nextFragment(MdsInfoObject mdsInfo) {
-		// Transaction
-		int index = 0; //???
-		Fragment f = fragmentList.get(index);
-		// f.setInfo(mdsInfo);
-	}
-*/
+	/*
+	 * @Override public void nextFragment(MdsInfoObject mdsInfo) { //
+	 * Transaction int index = 0; //??? Fragment f = fragmentList.get(index); //
+	 * f.setInfo(mdsInfo); }
+	 */
 	private File jsonEinlesen() {
 
 		ThreadPolicy tp = ThreadPolicy.LAX;
@@ -302,11 +302,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry entry) {
-		
-		//TODO: Entry Handler wandelt keys und entry in JSON um
 
+		// TODO: Entry Handler wandelt keys und entry in JSON um
+		
 		try {
-			socketClient.send(EntryHandler.toJson(keys, entry));
+			webServ.send(EntryHandler.toJson(keys, entry));
 		} catch (NotYetConnectedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -314,11 +314,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void consoleEntry(String message) {
-		FragmentMonitoring f = (FragmentMonitoring)swipeAdapter.getFragment("monitoring");
+		FragmentMonitoring f = (FragmentMonitoring) swipeAdapter
+				.getFragment("monitoring");
 		f.addConsoleEntry(message);
 	}
 
@@ -329,8 +330,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void addToBackpack(MdsItem item) {
-		FragmentBackpack f = (FragmentBackpack)swipeAdapter.getFragment("backpack");
-        f.addItem(item);
+		FragmentBackpack f = (FragmentBackpack) swipeAdapter
+				.getFragment("backpack");
+		f.addItem(item);
 	}
 
 	public void getServerData(String type, int id) {
@@ -339,6 +341,36 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void updateSwipeAdapter(String currFragment) {
 		viewPager.setCurrentItem(1);
 		swipeAdapter.removeFragment(currFragment);
+	}
 
+	@Override
+	public Activity getActivity() {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
+	@Override
+	public void onWebSocketMessage(String message) {
+		
+		JSONObject json = null;
+		try {
+			json = new JSONObject(message);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//TODO Abfrage ob message für Interpreter wichtig ist, oder z.B. Spieler Disconnect o.Ä.
+		//json.get("updatemode").equals("full");
+		
+		interpreterCom.onWebsocketMessage(json);
+	}
+
+	public CharSequence getUsername() {
+		return username;
+	}
+
+	public void setUsername(CharSequence username) {
+		this.username = username;
 	}
 }

@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.WebSocketService;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -10,70 +10,65 @@ import org.java_websocket.drafts.Draft;
 import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.util.Log;
+import de.hsbremen.mds.android.MainActivity;
+import de.hsbremen.mds.android.login.LoginActivity;
 import de.hsbremen.mds.common.communication.EntryHandler;
 import de.hsbremen.mds.common.whiteboard.WhiteboardUpdateObject;
 
 public class SocketClient extends WebSocketClient {
-	
-	MainActivity main = null;	
-	
-	public SocketClient(Draft d, URI uri, MainActivity main) {
+
+	private SocketService service;
+
+	public SocketClient(Draft d, URI uri, SocketService socketService) {
 		super(uri, d);
-		this.main = main;
+		Log.d("Socket", "SocketClient: Gestartet");
+		this.service = socketService;
 	}
 
 	@Override
 	public void onMessage(String message) {
-		
-		List<WhiteboardUpdateObject> wObj = EntryHandler.toObject(message);
-
-		main.consoleEntry(message);
-		
-		if(wObj.size() == 1)
-			main.interpreterCom.updateLocalWhiteboard(wObj.get(0).getKeys(), wObj.get(0).getValue());
-		else
-			main.interpreterCom.fullUpdateLocalWhiteboard(wObj);
-		
+		Log.d("Socket", "SocketClient: OnMessage: " + message);
+		service.onMessage(message);
 	}
 
 	@Override
 	public void onMessage(ByteBuffer blob) {
-		Log.d("Na", "Message ByteBuffer");
+		Log.d("Socket", "Message ByteBuffer");
 		getConnection().send(blob);
-			main.consoleEntry(blob.toString());
 	}
 
 	@Override
 	public void onError(Exception ex) {
-		Log.d("Na", "Error: [" + ex.getMessage()+ "] ["+ex.getStackTrace().toString()+"]");
+		Log.d("Socket", "Error: [" + ex.getMessage() + "] ["
+				+ ex.getStackTrace().toString() + "]");
 		ex.printStackTrace();
-		main.consoleEntry("Error:" + ex.getMessage());
-		if(ex instanceof ClassCastException){
-			Log.d("SocketClient","Error Details:[ ClasCastException]");
+		if (ex instanceof ClassCastException) {
+			Log.d("SocketClient", "Error Details:[ ClasCastException]");
 		}
+		
+		ex.printStackTrace();
 	}
 
 	@Override
 	public void onOpen(ServerHandshake handshake) {
-		Log.d("Na", "onOpen, Serverhandshake");
-		main.consoleEntry("onOpen, Serverhandshake");
+		Log.d("Socket", "SocketClient: OnOpen");
 	}
 
 	@Override
 	public void onClose(int code, String reason, boolean remote) {
-		Log.d("Na", "Closed: " + code + " " + reason);
-		main.consoleEntry("Closed: " + code + " " + reason);
+		Log.d("Socket", "SocketClient: Closed: " + code + " " + reason);
 	}
 
 	public void onWebsocketMessageFragment(WebSocket conn, Framedata frame) {
-		Log.d("Na", "onWebsocketMessageFragment");
-		main.consoleEntry("onWebsocketMessageFragment");
+		Log.d("Socket", "SocketClient: onWebsocketMessageFragment");
+		
 		FrameBuilder builder = (FrameBuilder) frame;
 		builder.setTransferemasked(true);
 		getConnection().sendFrame(frame);
 	}
 
 }
-
