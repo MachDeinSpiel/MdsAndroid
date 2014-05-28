@@ -11,7 +11,9 @@ import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
@@ -32,12 +34,13 @@ public class ActionParser {
 	/**
 	 * Macht aus einer MdsAction eine ausführbare MdsActionExecutable, die man mit .execute() dann ausführen kann.
 	 * @param action Action, die geparst werden soll
+	 * @param state State in dem die Action ausgeführt wird
 	 * @param triggerEvent	Das Event, dass diese Action auslöste
 	 * @param wb	Whiteboard
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(MdsAction action, final MdsState state, final Whiteboard wb, final String myId, final ServerInterpreterInterface sii){
+	public MdsActionExecutable parseAction(String type, MdsAction action, final MdsState state, final Whiteboard wb, final String myId, final ServerInterpreterInterface sii){
 		
 		if(action == null){
 			//Action exisitert eigentlich gar nicht? -> GTFO!
@@ -48,6 +51,18 @@ public class ActionParser {
 		//Parameter der Action
 		final HashMap<String, String> params = action.getParams();
 		final HashMap<String, Object> parsedParams = new HashMap<String, Object>();
+		
+		// Buttons heraussuchen
+		List<String> buttons = new Vector<String>();
+		if(type.equals("start") || type.equals("do")) {
+			MdsTransition[] trans = state.getTransitions();
+			// Alle Transitions durchgehen
+			for(int i = 0; i < trans.length; i++) {
+				if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
+					buttons.add(trans[i].getCondition().getName());
+				}
+			}
+		}
 		//Jeden Parameter parsen/interpretieren
 		for(String key : params.keySet()){
 			parsedParams.put(key, parseParam(params.get(key), state, wb, myId));
@@ -67,7 +82,7 @@ public class ActionParser {
 		//Je nach dem, von welchem Ident die Action ist, werden verschiedene MdsActionExecutables zurückgegeben 
 		switch(action.getIdent()){
 		case showVideo:
-			return new MdsVideoAction((String)parsedParams.get("title"), (String)parsedParams.get("url"), (String)parsedParams.get("text"));
+			return new MdsVideoAction((String)parsedParams.get("title"), (String)parsedParams.get("url"), (String)parsedParams.get("text"), buttons);
 		case showMap:
 		case updateMap:
 			return new MdsActionExecutable() {
@@ -113,9 +128,9 @@ public class ActionParser {
 				}
 			}; 
 		case showImage:
-			return new MdsImageAction((String)parsedParams.get("title"),(String)parsedParams.get("url"), (String)parsedParams.get("text"));
+			return new MdsImageAction((String)parsedParams.get("title"),(String)parsedParams.get("url"), (String)parsedParams.get("text"), buttons);
 		case showText:
-			return new MdsTextAction("Title", (String)parsedParams.get("text"));
+			return new MdsTextAction("Title", (String)parsedParams.get("text"), buttons);
 		case addToGroup:
 			return new MdsActionExecutable() {
 				
@@ -140,7 +155,7 @@ public class ActionParser {
 					//TODO: server bescheid geben
 					List<String> keysToValue = new Vector<String>();
 					for(String s : params.get("target").split("\\."))
-					keysToValue.add(s);
+						keysToValue.add(s);
 					try {
 						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
 					} catch (InvalidWhiteboardEntryException e) {
@@ -197,6 +212,7 @@ public class ActionParser {
 			// Whiteboard currentWb = (Whiteboard)parsedParams.get("target");parseActionString(wb, keysToItem, state, myId);
 			//Item, dessen useAction(s) ausgeführt werden sollen
 			final Whiteboard item = (Whiteboard)parsedParams.get("target");//(Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
+			final String typeString = type;
 			
 			
 			return new MdsActionExecutable() {
@@ -239,7 +255,7 @@ public class ActionParser {
 						}
 						
 						//Ausführbare Action erzeugen und sie danach ausführen
-						MdsActionExecutable realAction = parseAction(new MdsAction(actionIdent, actionParams), state, wb, myId, sii);
+						MdsActionExecutable realAction = parseAction(typeString, new MdsAction(actionIdent, actionParams), state, wb, myId, sii);
 						realAction.execute(guiInterface);
 					}
 					
