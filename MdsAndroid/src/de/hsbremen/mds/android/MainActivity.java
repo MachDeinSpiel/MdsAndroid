@@ -144,6 +144,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		return true;
 	}
 
+
 	@Override
 	public void onLocationChanged(Location loc) {
 
@@ -203,7 +204,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsVideo mds) {
-
+		
+		swipeAdapter.addFragment("video");
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("video"), true);
 
 		Button btn = (Button) findViewById(R.id.btnReturnVideo);
@@ -211,12 +213,14 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void nextFragment(MdsText mds) {
-		FragmentText f = (FragmentText) swipeAdapter.getFragment("text");
-		f.setMessage(mds.getText());
-		f.setActionbutton(true);
-
+	public void nextFragment(MdsText mds) {	
+		
+		swipeAdapter.addFragment("text");
+		FragmentText f = (FragmentText)swipeAdapter.getFragment("text");
+        f.setMessage(mds.getText());
+        f.setActionbutton(true);
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("text"), true);
+
 	}
 
 	@Override
@@ -325,7 +329,13 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void showMap(ArrayList<MdsItem> items2display) {
-		// TODO Anzeigen von MdsItems auf der GMaps Karte
+		System.out.println("ShowMap aufgerufen");
+		for(MdsItem i : items2display){
+			System.out.println("Item: " + i.getName());
+			System.out.println("Location: " + i.getLatitude() + i.getLongitude());
+		} 
+		mapFragment.setItemLocations(items2display);
+		mapFragment.gmapsUpdate(mapFragment.getLastLocation());
 	}
 
 	@Override
@@ -338,9 +348,14 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void getServerData(String type, int id) {
 	}
 
+	public ViewPager getViewPager(){
+		return this.viewPager;
+	}
+	
 	public void updateSwipeAdapter(String currFragment) {
 		viewPager.setCurrentItem(1);
 		swipeAdapter.removeFragment(currFragment);
+		swipeAdapter.notifyDataSetChanged();
 	}
 
 	@Override

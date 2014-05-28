@@ -1,5 +1,7 @@
 package de.hsbremen.mds.android.fragment;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
@@ -15,10 +17,13 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import de.hsbremen.mds.common.guiobjects.MdsItem;
+
 public class GoogleMapFragment extends MapFragment {
 
 	private GoogleMap map;
 	private Location lastLocation;
+	private ArrayList<MdsItem> itemLocations = null;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -63,6 +68,15 @@ public class GoogleMapFragment extends MapFragment {
 			map.clear();
 	
 			MarkerOptions mp = new MarkerOptions();
+			
+			if(itemLocations != null){
+				for(MdsItem i : itemLocations){
+					MarkerOptions mpi = new MarkerOptions();
+					mpi.position(new LatLng(i.getLatitude(), i.getLongitude()));
+					mpi.title(i.getName());
+					map.addMarker(mpi);
+				}
+			}
 	
 			mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
 	
@@ -73,5 +87,13 @@ public class GoogleMapFragment extends MapFragment {
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
 			new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
 		}
+	}
+	
+	public void setItemLocations(ArrayList<MdsItem> itemLocations){
+		this.itemLocations = itemLocations;
+	}
+	
+	public Location getLastLocation(){
+		return this.lastLocation;
 	}
 }

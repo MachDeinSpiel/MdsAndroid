@@ -90,12 +90,20 @@ public class ActionParser {
 					for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
 						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
 						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-						mapEntities.add(new MdsItem(key, ""));
+						Log.d(Interpreter.LOGTAG, "["+key+"] in die Liste eingefügt.");
+						MdsItem item = new MdsItem(key, "");
+						item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
+						item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
+						mapEntities.add(item);
+						
 					}
 					for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
 						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
 						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-						mapEntities.add(new MdsItem(key, ""));
+						MdsItem item = new MdsItem(key, "");
+						item.setLongitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"longitude").value));
+						item.setLatitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"latitude").value));
+						mapEntities.add(item);
 					}
 					//Map anzeigen
 					mma.execute(guiInterface);
@@ -125,13 +133,19 @@ public class ActionParser {
 					
 					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
 					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
-					currentWb.remove(params.get("target"));
+					String[] keys = params.get("target").split("\\.");
+					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
+					
+					Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result+"]");
 					//TODO: server bescheid geben
-//					try {
-//						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
-//					} catch (InvalidWhiteboardEntryException e) {
-//						e.printStackTrace();
-//					}
+					List<String> keysToValue = new Vector<String>();
+					for(String s : params.get("target").split("\\."))
+					keysToValue.add(s);
+					try {
+						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+					} catch (InvalidWhiteboardEntryException e) {
+						e.printStackTrace();
+					}
 					
 				}
 			};

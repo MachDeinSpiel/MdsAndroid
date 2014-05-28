@@ -46,7 +46,8 @@ public class FragmentStart extends Fragment {
 
 				// activity.connectToServer();
 				// activity.nextFragment(new MdsMap("Map", "URL", "Text"));
-				activity.nextFragment(new MdsImage("", "", ""));
+				// activity.nextFragment(new MdsImage("", "", ""));
+				activity.getViewPager().setCurrentItem(1);
 			}
 		});
 

@@ -1,6 +1,7 @@
 package de.hsbremen.mds.interpreter;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -161,10 +162,30 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			logKeys += ","+s;
 		}
 		Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+entry.value.toString()+"]");
-		try {
-			whiteboard.setAttributeValue(entry, (String[])keys.toArray(new String[0]));
-		} catch (InvalidWhiteboardEntryException e) {
-			e.printStackTrace();
+		
+		if(keys.size() == 0){
+			return;
+		}
+		
+		if(entry.getValue().equals("delete")){
+			String elementKey = keys.remove(keys.size()-1);
+			try{
+				Whiteboard group = (Whiteboard)whiteboard.getAttribute(keys.toArray(new String[0])).value;
+				group.remove(elementKey);
+			}catch(ClassCastException cce){
+				logKeys = "";
+				for(String s : keys){
+					logKeys += ","+s;
+				}
+				Log.e(LOGTAG, "Couldn't delete ["+elementKey+"] from 'group' ["+logKeys+"] since it's not a group");
+			}
+		}else{
+		
+			try {
+				whiteboard.setAttributeValue(entry, (String[])keys.toArray(new String[0]));
+			} catch (InvalidWhiteboardEntryException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		fsmManager.checkEvents(null);
