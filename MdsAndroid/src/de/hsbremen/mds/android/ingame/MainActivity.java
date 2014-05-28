@@ -100,7 +100,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
 		int playerId = 0;
 		Interpreter interpreter = new Interpreter(jsonDatei, this, this,
-				username.toString());
+				playerId);
 
 		// Initiater für die Listener registrierung
 		interpreterCom = new InterpreterCommunicator(interpreter, 5);
