@@ -8,9 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.view.View;
-import android.view.ViewGroup;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
@@ -20,6 +17,7 @@ import de.hsbremen.mds.android.fragment.FragmentStart;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 
 public class SwipeAdapter extends FragmentPagerAdapter{
 
@@ -29,6 +27,8 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	private HashMap<String, Fragment> fragmentsPoolList = new HashMap<String, Fragment>();
 	
 	private FragmentManager fm;
+	
+	private MdsInfoObject fragmentInfo;
 
 	public SwipeAdapter(FragmentManager fm) {
 		super(fm);
@@ -56,17 +56,20 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         
         //INAKTIVE FRAGMENTS
         FragmentText textFragment = new FragmentText();
+        textFragment.setSwipeAdapter(this);
         textFragment.setMessage("Es wurde noch kein Ziel erreicht");
-        fragmentsPoolList.put("text", textFragment);
+        fragmentsPoolList.put("showText", textFragment);
         
         FragmentImage imageFragment = new FragmentImage();
-        fragmentsPoolList.put("image", imageFragment);
+        imageFragment.setSwipeAdapter(this);
+        fragmentsPoolList.put("showImage", imageFragment);
 
         FragmentVideo videoFragment = new FragmentVideo();
-        fragmentsPoolList.put("video", videoFragment);	
+        videoFragment.setSwipeAdapter(this);
+        fragmentsPoolList.put("showVideo", videoFragment);	
         
         FragmentMinigame minigameFragment = new FragmentMinigame();
-        fragmentsPoolList.put("minigame", minigameFragment);	
+        fragmentsPoolList.put("showMinigame", minigameFragment);	
 	}
 	
 	public void removeFragment(String fragmentName){   
@@ -80,16 +83,7 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         activeFragmentsNumbers.remove(fragmentName);
         
         notifyDataSetChanged();
-        
-        
-	}
-	
-	@Override
-	public void destroyItem(ViewGroup container, int position, Object object) {
-		// TODO Auto-generated method stub		
-		super.destroyItem(container, position, object);
-	}
-	
+	}	
 	
 	public void addFragment(String fragmentName){
 		
@@ -124,5 +118,13 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 		}
 		System.out.println(index);
 		return index;
+	}
+
+	public void setFragmentInformation(MdsInfoObject mds) {
+		this.fragmentInfo = mds;
+	}
+	
+	public MdsInfoObject getFragmentInformation(){
+		return this.fragmentInfo;
 	}
 }

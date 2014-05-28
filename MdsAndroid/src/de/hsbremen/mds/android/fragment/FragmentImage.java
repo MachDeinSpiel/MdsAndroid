@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import de.hsbremen.mds.android.ingame.MainActivity;
+import de.hsbremen.mds.android.ingame.SwipeAdapter;
 import de.hsbremen.mds.mdsandroid.R;
 
 /**
@@ -19,6 +20,7 @@ import de.hsbremen.mds.mdsandroid.R;
 public class FragmentImage extends Fragment {
 
 	private String imagePath = "";
+	private SwipeAdapter sA;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,7 +35,10 @@ public class FragmentImage extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.interpreterCom.buttonClicked("proceedWalk");
+				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnImage);
+				returnBtn.setVisibility(Button.GONE);
+				activity.updateSwipeAdapter("showImage");
+				activity.interpreterCom.buttonClicked("back");
 			}
 		});
 		
@@ -51,12 +56,25 @@ public class FragmentImage extends Fragment {
         return view;
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		// TODO: hier kann der View bearbeitet werden(sA.getFragmentInformation())
+		Button b = (Button)getActivity().findViewById(R.id.btnReturnImage);
+		b.setVisibility(1);
+	}
+	
 	public View setImage(View view, String url){
 
         ImageView imageView = (ImageView) view.findViewById(R.id.placeholderImage);
         imageView.setImageResource(R.drawable.bremenroland);
 		
 		return view;
+	}
+
+	public void setSwipeAdapter(SwipeAdapter swipeAdapter) {
+		// TODO Auto-generated method stub
+		this.sA = swipeAdapter;
 	}
 	
 }

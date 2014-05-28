@@ -26,10 +26,10 @@ import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
@@ -40,17 +40,13 @@ import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
-import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
 import de.hsbremen.mds.common.communication.WhiteboardHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
-import de.hsbremen.mds.common.valueobjects.MdsImage;
-import de.hsbremen.mds.common.valueobjects.MdsMap;
-import de.hsbremen.mds.common.valueobjects.MdsText;
-import de.hsbremen.mds.common.valueobjects.MdsVideo;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.interpreter.Interpreter;
 import de.hsbremen.mds.mdsandroid.R;
@@ -70,6 +66,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	public WebServices webServ;
 	
+	private String fragmentToDelete = "";
+	private int count = 0;
+	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +86,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
 		viewPager.setAdapter(swipeAdapter);
+		setPageChangedListener();
 
 		FragmentManager fm = getFragmentManager();
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
@@ -104,6 +104,38 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		// Initiater für die Listener registrierung
 		interpreterCom = new InterpreterCommunicator(interpreter, 5);
 
+	}
+
+	private void setPageChangedListener() {
+		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int arg0) {
+				
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				if(!(fragmentToDelete.equals(""))){
+					Log.d("hallo", "blao: " + count);
+					count++;
+				}
+				
+				if(!(fragmentToDelete.equals("")) && (count == 2)){
+
+					swipeAdapter.removeFragment(fragmentToDelete);
+					fragmentToDelete = "";
+					Log.d("hallo", "Page wurde gelöscht");
+					count = 0;
+				}
+			}
+		});
+		
 	}
 
 	@Override
@@ -143,7 +175,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		}
 		return true;
 	}
-
 
 	@Override
 	public void onLocationChanged(Location loc) {
@@ -193,47 +224,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 	}
 
-	@Override
-	public void nextFragment(MdsImage mds) {
-		swipeAdapter.addFragment("image");
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName("image"), true);
 
-		Button btn = (Button) findViewById(R.id.btnReturnImage);
-		btn.setVisibility(1);
-	}
-
-	@Override
-	public void nextFragment(MdsVideo mds) {
-		
-		swipeAdapter.addFragment("video");
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName("video"), true);
-
-		Button btn = (Button) findViewById(R.id.btnReturnVideo);
-		btn.setVisibility(1);
-	}
-
-	@Override
-	public void nextFragment(MdsText mds) {	
-		
-		swipeAdapter.addFragment("text");
-		FragmentText f = (FragmentText)swipeAdapter.getFragment("text");
-        f.setMessage(mds.getText());
-        f.setActionbutton(true);
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName("text"), true);
-
-	}
-
-	@Override
-	public void nextFragment(MdsMap mds) {
-		viewPager
-				.setCurrentItem(swipeAdapter.getFragmentName("location"), true);
-	}
-
-	/*
-	 * @Override public void nextFragment(MdsInfoObject mdsInfo) { //
-	 * Transaction int index = 0; //??? Fragment f = fragmentList.get(index); //
-	 * f.setInfo(mdsInfo); }
-	 */
 	private File jsonEinlesen() {
 
 		ThreadPolicy tp = ThreadPolicy.LAX;
@@ -353,14 +344,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 	
 	public void updateSwipeAdapter(String currFragment) {
-		viewPager.setCurrentItem(1);
-		swipeAdapter.removeFragment(currFragment);
-		swipeAdapter.notifyDataSetChanged();
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("location"));
+		this.fragmentToDelete = currFragment;
 	}
 
 	@Override
 	public Activity getActivity() {
-		// TODO Auto-generated method stub
 		return this;
 	}
 
@@ -387,5 +376,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	public void setUsername(CharSequence username) {
 		this.username = username;
+	}
+
+	@Override
+	public void nextFragment(MdsInfoObject mds) {
+		swipeAdapter.addFragment(mds.getName());
+		swipeAdapter.setFragmentInformation(mds);
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()), true);
 	}
 }

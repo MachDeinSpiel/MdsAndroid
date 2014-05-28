@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import de.hsbremen.mds.android.ingame.MainActivity;
+import de.hsbremen.mds.android.ingame.SwipeAdapter;
 import de.hsbremen.mds.mdsandroid.R;
 
 @SuppressLint("ValidFragment")
@@ -17,7 +18,8 @@ public class FragmentText extends Fragment {
 	private boolean actionButton;
 	private View view;
 	private String message;
-
+	private SwipeAdapter sA;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -37,7 +39,7 @@ public class FragmentText extends Fragment {
 				MainActivity activity = (MainActivity) getActivity();
 				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnText);
 				returnBtn.setVisibility(Button.GONE);
-//				activity.updateSwipeAdapter("text");
+				activity.updateSwipeAdapter("showText");
 				activity.interpreterCom.buttonClicked("back");
 			}
 		});
@@ -49,7 +51,7 @@ public class FragmentText extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
-				activity.updateSwipeAdapter("text");
+				activity.updateSwipeAdapter("showText");
 			}
 		});
 		
@@ -59,8 +61,11 @@ public class FragmentText extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		this.message = sA.getFragmentInformation().getText();
 		TextView t = (TextView)view.findViewById(R.id.placeholderText);
 		t.setText(this.message);
+		Button b = (Button)view.findViewById(R.id.btnReturnText);
+		b.setVisibility(1);
 	}
 	
 	public void setMessage(String message){
@@ -69,6 +74,10 @@ public class FragmentText extends Fragment {
 
 	public void setActionbutton(boolean b) {
 		actionButton = b;
+	}
+
+	public void setSwipeAdapter(SwipeAdapter swipeAdapter) {
+		this.sA = swipeAdapter;
 	}
 	
 }

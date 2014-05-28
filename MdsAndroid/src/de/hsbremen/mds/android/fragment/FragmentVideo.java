@@ -11,13 +11,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.VideoView;
 import de.hsbremen.mds.android.ingame.MainActivity;
+import de.hsbremen.mds.android.ingame.SwipeAdapter;
 import de.hsbremen.mds.mdsandroid.R;
 
 @SuppressLint("ValidFragment")
 public class FragmentVideo extends Fragment {
 
 	private String url = "http://bdmobi.in/videos/load/Hindi%203GP%20Music%20Videos/Ram%20Leela%20-%20Laal%20Ishq.3gp";
-
+	private SwipeAdapter sA;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -33,6 +35,9 @@ public class FragmentVideo extends Fragment {
 			@Override
 			public void onClick(View v) {
 				MainActivity activity = (MainActivity) getActivity();
+				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnVideo);
+				returnBtn.setVisibility(Button.GONE);
+				activity.updateSwipeAdapter("showImage");
 				activity.interpreterCom.buttonClicked("back");
 			}
 		});
@@ -51,6 +56,13 @@ public class FragmentVideo extends Fragment {
 		return view;
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		Button b = (Button)getActivity().findViewById(R.id.btnReturnVideo);
+		b.setVisibility(1);
+	}
+	
 	public View setVideo(View view, String url){
 		
 		final VideoView videoView = (VideoView) view.findViewById(R.id.placeholderVideo);
@@ -64,6 +76,10 @@ public class FragmentVideo extends Fragment {
 		});
 
 		return view;
+	}
+
+	public void setSwipeAdapter(SwipeAdapter swipeAdapter) {
+		this.sA = swipeAdapter;
 	}
 	
 

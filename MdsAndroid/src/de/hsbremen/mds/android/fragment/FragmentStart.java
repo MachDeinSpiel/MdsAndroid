@@ -12,9 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.common.valueobjects.MdsImage;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentStart extends Fragment {
+	
+	private int count;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,11 +45,8 @@ public class FragmentStart extends Fragment {
 					e.printStackTrace();
 				}
 
-				activity.webServ.send(mes.toString());
-
-				// activity.connectToServer();
-				// activity.nextFragment(new MdsMap("Map", "URL", "Text"));
-				// activity.nextFragment(new MdsImage("", "", ""));
+				activity.webServ.send(mes.toString());				
+				
 				activity.getViewPager().setCurrentItem(1);
 			}
 		});
