@@ -2,12 +2,11 @@ package de.hsbremen.mds.android.communication;
 
 import java.util.List;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.location.Location;
 import android.util.Log;
-import de.hsbremen.mds.common.communication.EntryHandler;
+import de.hsbremen.mds.common.communication.WhiteboardHandler;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.ClientInterpreterInterface;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
@@ -76,7 +75,7 @@ public class InterpreterCommunicator {
 	public void onWebsocketMessage(JSONObject json) {
 		// TODO ENTRY HANDLER Soll Whiteboard Handler heissen und JSONObject
 		// annehmen
-		List<WhiteboardUpdateObject> wObj = EntryHandler.toObject(json
+		List<WhiteboardUpdateObject> wObj = WhiteboardHandler.toObject(json
 				.toString());
 
 		if (wObj.size() == 1)

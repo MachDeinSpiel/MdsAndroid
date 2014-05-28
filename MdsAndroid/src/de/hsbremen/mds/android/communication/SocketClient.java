@@ -2,7 +2,6 @@ package de.hsbremen.mds.android.communication;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -10,14 +9,8 @@ import org.java_websocket.drafts.Draft;
 import org.java_websocket.framing.FrameBuilder;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.util.Log;
-import de.hsbremen.mds.android.ingame.MainActivity;
-import de.hsbremen.mds.android.login.LoginActivity;
-import de.hsbremen.mds.common.communication.EntryHandler;
-import de.hsbremen.mds.common.whiteboard.WhiteboardUpdateObject;
 
 public class SocketClient extends WebSocketClient {
 

@@ -26,7 +26,6 @@ import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,7 +42,7 @@ import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
-import de.hsbremen.mds.common.communication.EntryHandler;
+import de.hsbremen.mds.common.communication.WhiteboardHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
@@ -311,7 +310,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		// TODO: Entry Handler wandelt keys und entry in JSON um
 		
 		try {
-			webServ.send(EntryHandler.toJson(keys, entry));
+			webServ.send(WhiteboardHandler.toJson(keys, entry));
 		} catch (NotYetConnectedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
