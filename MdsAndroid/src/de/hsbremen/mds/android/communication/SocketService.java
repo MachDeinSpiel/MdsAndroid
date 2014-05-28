@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android.WebSocketService;
+package de.hsbremen.mds.android.communication;
 
 import java.net.URI;
 
@@ -36,9 +36,9 @@ public class SocketService extends Service {
 		// Serverkommunikation
 		Draft d = new Draft_17();
 
-		String serverIp = "192.168.2.110";
+		String serverIp = "195.37.176.178";
 		String PROTOKOLL_WS = "ws://";
-		String PORT_WS = ":8887";
+		String PORT_WS = ":1387";
 
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 

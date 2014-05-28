@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import de.hsbremen.mds.android.MainActivity;
-import de.hsbremen.mds.android.WebSocketService.SocketService;
+import de.hsbremen.mds.android.communication.SocketService;
+import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class GameChooser extends Activity {

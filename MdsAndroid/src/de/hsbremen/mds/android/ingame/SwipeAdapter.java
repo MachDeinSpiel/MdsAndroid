@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.ingame;
 
 import java.util.ArrayList;
 import java.util.HashMap;

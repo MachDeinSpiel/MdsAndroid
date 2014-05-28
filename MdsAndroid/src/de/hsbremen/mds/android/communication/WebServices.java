@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android.WebSocketService;
+package de.hsbremen.mds.android.communication;
 
 import android.content.ComponentName;
 import android.content.Context;

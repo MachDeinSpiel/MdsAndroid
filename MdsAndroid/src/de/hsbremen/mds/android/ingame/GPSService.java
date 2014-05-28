@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.ingame;
 //package com.example.gpstest;
 //
 //import android.app.Activity;

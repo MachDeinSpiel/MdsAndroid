@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import de.hsbremen.mds.android.MainActivity;
+import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentMinigame extends Fragment {

@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android;
+package de.hsbremen.mds.android.ingame;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,8 +35,9 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import android.widget.TextView;
-import de.hsbremen.mds.android.WebSocketService.WebServices;
-import de.hsbremen.mds.android.WebSocketService.WebServicesInterface;
+import de.hsbremen.mds.android.communication.InterpreterCommunicator;
+import de.hsbremen.mds.android.communication.WebServices;
+import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;

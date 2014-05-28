@@ -15,9 +15,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import de.hsbremen.mds.android.WebSocketService.SocketClient;
-import de.hsbremen.mds.android.WebSocketService.SocketService;
-import de.hsbremen.mds.android.WebSocketService.WebServicesInterface;
+import de.hsbremen.mds.android.communication.SocketClient;
+import de.hsbremen.mds.android.communication.SocketService;
+import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.mdsandroid.R;
 
 
