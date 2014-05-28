@@ -33,12 +33,12 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	private ActionParser actionParser;
 	private FsmManager fsmManager;
 	private Whiteboard whiteboard;
-	private int myId;
+	private String myId;
 	private GuiInterface gui;
 	private ServerInterpreterInterface serverInterpreter;
 
 		
-	public Interpreter(File json, GuiInterface guiInterface, ServerInterpreterInterface serverInterpreter, int playerId){
+	public Interpreter(File json, GuiInterface guiInterface, ServerInterpreterInterface serverInterpreter, String playerId){
 		Log.i(LOGTAG, "Interpreter erzeugt");
 		this.gui = guiInterface;
 		this.serverInterpreter = serverInterpreter;
@@ -55,7 +55,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	public void pushParsedObjects(MdsObjectContainer objectContainer) {		
 		Log.i(LOGTAG, "Geparste Objekte vom Parser bekommen");
 		//this.gui.setAndroidListener(this, 5);
-		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard, this);
+		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard, this, myId);
 	}
 	
 
@@ -87,7 +87,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		}
 		Log.i(LOGTAG, "Neue Position von Android bekommen : [long:"+longitude+" ,|lat:"+latitude+"]");
 		try {
-			whiteboard.setAttributeValue(Double.toString(longitude), WB_PLAYERS, Integer.toString(myId), "longitude");
+			whiteboard.setAttributeValue(Double.toString(longitude), WB_PLAYERS, myId, "longitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
 		}
@@ -95,16 +95,16 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		keys.add(WB_PLAYERS);
 		keys.add(""+myId);
 		keys.add("longitude");
-		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, Integer.toString(myId), "longitude"));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, myId, "longitude"));
 		
 		try {
-			whiteboard.setAttributeValue(Double.toString(latitude), WB_PLAYERS, Integer.toString(myId), "latitude");
+			whiteboard.setAttributeValue(Double.toString(latitude), WB_PLAYERS, myId, "latitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
 		}
 		keys.remove(keys.size()-1);
 		keys.add("latitude");
-		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, Integer.toString(myId), "latitude"));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, myId, "latitude"));
 		
 		fsmManager.checkEvents(null);
 		
@@ -149,7 +149,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if(doAction != null){
 				doAction.execute(gui);
 			}
-			String health = (String) whiteboard.getAttribute("Players", Integer.toString(this.myId), "health").value;
+			String health = (String) whiteboard.getAttribute("Players", myId, "health").value;
 			Log.i(LOGTAG, "Player Health: " + health);
 		}
 	}

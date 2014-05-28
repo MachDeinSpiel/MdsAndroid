@@ -31,7 +31,7 @@ public class EventParser {
 //		return false;
 //	}
 	
-	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, int playerId) {
+	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, String playerId) {
 		Result result = new Result(false, null, null);
 		//TODO: vorerst rausgenommen da kein Multiplayer und wirft exception (ist whiteboardevent, es wird nach locationkram gesucht -> NullPointer)
 		//result = checkLocationEvent(condition, wb, playerId);
@@ -41,7 +41,7 @@ public class EventParser {
 		return result;
 	}
 
-	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, int playerId) {
+	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, String playerId) {
 		
 		// ------------------ Werte holen ---------------//
 		// get Params
@@ -76,8 +76,8 @@ public class EventParser {
 			// wenn das Subject "self" ist, im Einzelspieler immer
 			if(subject.getName().equals("self")){
 				// Locationobjekt des Spielers erzeuegen
-				double longitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "longitude").value);
-				double latitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, Integer.toString(playerId), "latitude").value);
+				double longitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "longitude").value);
+				double latitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "latitude").value);
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
@@ -136,7 +136,7 @@ public class EventParser {
 	}
 	
 	// TODO: ValueNotANumber Exception
-	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, int playerId) {
+	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, String playerId) {
 			// get value and compValue
 			double value = -1;
 			double compValue = -2;
@@ -227,7 +227,7 @@ public class EventParser {
 	 * @param playerId
 	 * @return
 	 */
-	public static Result checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb, int playerId) {
+	public static Result checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb, String playerId) {
 		//Wenn ein uiEvent geprüft werden soll, wird es stumpf verglichen
 		return new Result((cond.getName().equals(btnName)), null, null);
 	}

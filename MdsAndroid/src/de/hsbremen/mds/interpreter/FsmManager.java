@@ -24,15 +24,16 @@ public class FsmManager {
 	public static final String LAST_STATE = "lastState";
 	
 	private List<MdsState> states;
-	private int myID;
+	private String myID;
 	private Whiteboard wb;
 	private Interpreter interpreter; //TODO: interface
 	private boolean isRunning = false;
 	
-	public FsmManager(List<MdsState> states, Whiteboard wb, Interpreter interpreter){
+	public FsmManager(List<MdsState> states, Whiteboard wb, Interpreter interpreter, String id){
 		this.states = states;
 		this.interpreter = interpreter;
 		this.wb = wb;
+		this.myID = id;
 	}
 	
 	/**
@@ -44,7 +45,7 @@ public class FsmManager {
 				wb.setAttribute(new WhiteboardEntry("currentSt","all"), Interpreter.WB_PLAYERS,""+myID,CURRENT_STATE);
 				wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
 				//TODO: fix my shit up
-				wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
+				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
 				
 			}catch(InvalidWhiteboardEntryException e){
 				e.printStackTrace();
@@ -64,7 +65,7 @@ public class FsmManager {
 	 * @return
 	 */
 	private MdsState getCurrentState(){
-		return (MdsState)this.wb.getAttribute(Interpreter.WB_PLAYERS ,Integer.toString(myID), CURRENT_STATE).value;
+		return (MdsState)this.wb.getAttribute(Interpreter.WB_PLAYERS ,myID, CURRENT_STATE).value;
 	}
 
 	/**
@@ -82,14 +83,14 @@ public class FsmManager {
 			//nur Strings und Whiteboards, hier wird (falls noch nicht da) erst ein leerer string gesetzt
 			//und dann mit einem MdsState überschrieben (muhahahah *evil face*)
 			
-//			if(wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),setTo) == null){
+//			if(wb.getAttribute(Interpreter.WB_PLAYERS,myID,setTo) == null){
 //				try {
-//					wb.setAttribute(new WhiteboardEntry("", "all"), Interpreter.WB_PLAYERS,Integer.toString(myID),setTo);
+//					wb.setAttribute(new WhiteboardEntry("", "all"), Interpreter.WB_PLAYERS,myID,setTo);
 //				} catch (InvalidWhiteboardEntryException e) {
 //					e.printStackTrace();
 //				}
 //			}
-			wb.getAttribute(Interpreter.WB_PLAYERS,Integer.toString(myID),setTo).value = current;
+			wb.getAttribute(Interpreter.WB_PLAYERS,myID,setTo).value = current;
 			
 		
 			this.onstateChanged(current, setTo);

@@ -37,7 +37,7 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausf¸hrt
 	 * @return	Ausf¸hrbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(MdsAction action, final MdsState state, final Whiteboard wb, final int myId, final ServerInterpreterInterface sii){
+	public MdsActionExecutable parseAction(MdsAction action, final MdsState state, final Whiteboard wb, final String myId, final ServerInterpreterInterface sii){
 		
 		if(action == null){
 			//Action exisitert eigentlich gar nicht? -> GTFO!
@@ -255,7 +255,7 @@ public class ActionParser {
 		
 	}
 	
-	private Object parseParam(String param, MdsState state, Whiteboard wb, int playerId){
+	private Object parseParam(String param, MdsState state, Whiteboard wb, String playerId){
 		
 		Log.i(Interpreter.LOGTAG,"parseParam:"+param);
 		//Ersetzungen gem‰ﬂ der Spezisprache vorbereiten 
@@ -336,7 +336,7 @@ public class ActionParser {
 	}
 	
 	
-	private Whiteboard parseActionString(Whiteboard root, List<String> keysToValue, MdsState state, int myId){
+	private Whiteboard parseActionString(Whiteboard root, List<String> keysToValue, MdsState state, String myId){
 		//Whiteboard, in dem das zu‰ndernde Attribut liegt
 		Whiteboard currentWb = root;
 		
