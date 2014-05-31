@@ -41,6 +41,8 @@ import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
+import de.hsbremen.mds.android.login.GameChooser;
+import de.hsbremen.mds.android.login.GameList;
 import de.hsbremen.mds.common.communication.WhiteboardHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
@@ -65,16 +67,16 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	private CharSequence username;
 
 	public WebServices webServ;
-	
+
 	private String fragmentToDelete = "";
 	private int count = 0;
-	
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		Bundle extras = getIntent().getExtras();
 		username = extras.getCharSequence("username");
 
@@ -108,25 +110,25 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	private void setPageChangedListener() {
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			
+
 			@Override
 			public void onPageSelected(int arg0) {
-				
+
 			}
-			
+
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
-				
+
 			}
-			
+
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
-				if(!(fragmentToDelete.equals(""))){
+				if (!(fragmentToDelete.equals(""))) {
 					Log.d("hallo", "blao: " + count);
 					count++;
 				}
-				
-				if(!(fragmentToDelete.equals("")) && (count == 2)){
+
+				if (!(fragmentToDelete.equals("")) && (count == 2)) {
 
 					swipeAdapter.removeFragment(fragmentToDelete);
 					fragmentToDelete = "";
@@ -135,7 +137,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 				}
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -224,7 +226,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 	}
 
-
 	private File jsonEinlesen() {
 
 		ThreadPolicy tp = ThreadPolicy.LAX;
@@ -299,7 +300,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void onWhiteboardUpdate(List<String> keys, WhiteboardEntry entry) {
 
 		// TODO: Entry Handler wandelt keys und entry in JSON um
-		
+
 		try {
 			webServ.send(WhiteboardHandler.toJson(keys, entry));
 		} catch (NotYetConnectedException e) {
@@ -321,10 +322,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void showMap(ArrayList<MdsItem> items2display) {
 		System.out.println("ShowMap aufgerufen");
-		for(MdsItem i : items2display){
+		for (MdsItem i : items2display) {
 			System.out.println("Item: " + i.getName());
-			System.out.println("Location: " + i.getLatitude() + i.getLongitude());
-		} 
+			System.out.println("Location: " + i.getLatitude()
+					+ i.getLongitude());
+		}
 		mapFragment.setItemLocations(items2display);
 		mapFragment.gmapsUpdate(mapFragment.getLastLocation());
 	}
@@ -339,10 +341,10 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void getServerData(String type, int id) {
 	}
 
-	public ViewPager getViewPager(){
+	public ViewPager getViewPager() {
 		return this.viewPager;
 	}
-	
+
 	public void updateSwipeAdapter(String currFragment) {
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName("location"));
 		this.fragmentToDelete = currFragment;
@@ -355,19 +357,25 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void onWebSocketMessage(String message) {
-		
-		JSONObject json = null;
+
 		try {
-			json = new JSONObject(message);
+			final JSONObject json = new JSONObject(message);
+
+			// TODO Abfrage ob message für Interpreter wichtig ist, oder z.B.
+			// Spieler Disconnect o.Ä.
+			// json.get("updatemode").equals("full");
+			this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Log.d("Socket", "MainActivity: JSSSSSSSOOOOON: " + json.toString());
+					interpreterCom.onWebsocketMessage(json);
+				}
+			});
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//TODO Abfrage ob message für Interpreter wichtig ist, oder z.B. Spieler Disconnect o.Ä.
-		//json.get("updatemode").equals("full");
-		
-		interpreterCom.onWebsocketMessage(json);
+
 	}
 
 	public CharSequence getUsername() {
@@ -382,6 +390,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void nextFragment(MdsInfoObject mds) {
 		swipeAdapter.addFragment(mds.getName());
 		swipeAdapter.setFragmentInformation(mds);
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()), true);
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
+				true);
+	}
+
+	@Override
+	public void onWebserviceConnected() {
+
 	}
 }

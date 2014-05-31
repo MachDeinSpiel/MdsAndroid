@@ -31,7 +31,9 @@ public class WebServices {
 				// This is called when the connection with the service has been
 				// established.
 				socketService = ((SocketService.MyBinder) service).getService(WebServices.this);
+				Log.d("Socket", "ServiceConnection muss vor TESTNACHRICHT");
 				socketService.setActivity(WebServices.this.actInterface.getActivity());
+				WebServices.this.onSocketConnected();
 			}
 
 			public void onServiceDisconnected(ComponentName className) {
@@ -67,5 +69,9 @@ public class WebServices {
 	public void closeWebServices() {
 		// Detach our existing connection.
 		actInterface.getActivity().unbindService(serviceConn);
+	}
+	
+	public void onSocketConnected(){
+		actInterface.onWebserviceConnected();
 	}
 }
