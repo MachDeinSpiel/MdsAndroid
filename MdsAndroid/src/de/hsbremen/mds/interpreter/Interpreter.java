@@ -209,7 +209,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			for(String s : wuo.getKeys()){
 				logKeys += ","+s;
 			}
-			Log.i(LOGTAG, "onWhiteboardUpdate [keys:"+logKeys+" values:"+wuo.getValue().value.toString()+"]");
+			Log.i(LOGTAG, "Ich bin ein onFullWhiteboardUpdate [keys:"+logKeys+" values:"+wuo.getValue().value.toString()+"]");
 			whiteboard.setAttribute(wuo.getValue(), (String[])wuo.getKeys().toArray(new String[0]));
 			
 		}

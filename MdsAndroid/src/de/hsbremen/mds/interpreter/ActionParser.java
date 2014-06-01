@@ -52,17 +52,20 @@ public class ActionParser {
 		final HashMap<String, String> params = action.getParams();
 		final HashMap<String, Object> parsedParams = new HashMap<String, Object>();
 		
-		// Buttons heraussuchen
+		// Buttons heraussuchen, falls state transitions hat
+		MdsTransition[] trans = state.getTransitions();
 		List<String> buttons = new Vector<String>();
-		if(type.equals("start") || type.equals("do")) {
-			MdsTransition[] trans = state.getTransitions();
-			// Alle Transitions durchgehen
-			for(int i = 0; i < trans.length; i++) {
-				if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
-					buttons.add(trans[i].getCondition().getName());
+		if (trans != null) {
+			if(type.equals("start") || type.equals("do")) {		
+				// Alle Transitions durchgehen
+				for(int i = 0; i < trans.length; i++) {
+					if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
+						buttons.add(trans[i].getCondition().getName());
+					}
 				}
 			}
 		}
+		
 		//Jeden Parameter parsen/interpretieren
 		for(String key : params.keySet()){
 			parsedParams.put(key, parseParam(params.get(key), state, wb, myId));
