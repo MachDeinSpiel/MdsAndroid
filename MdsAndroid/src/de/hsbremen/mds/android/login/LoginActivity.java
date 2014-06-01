@@ -101,4 +101,10 @@ public class LoginActivity extends Activity implements WebServicesInterface{
 		
 	}
 
+	@Override
+	public void onWebserviceConnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

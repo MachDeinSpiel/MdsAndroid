@@ -32,25 +32,14 @@ public class FragmentStart extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				
-				MainActivity activity = (MainActivity) getActivity();
-				JSONObject mes = null;
-				try {
-					mes = new JSONObject();
-					mes.put("mode", "join");
-					mes.put("id", 0);
-					mes.put("name", activity.getUsername().toString());
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				activity.webServ.send(mes.toString());				
-				
-				activity.getViewPager().setCurrentItem(1);
+				// TODO Fragment start kann gelšscht werden? Oder die Lobby werden!
 			}
 		});
 
+
+		MainActivity activity = (MainActivity) getActivity();
+		activity.getViewPager().setCurrentItem(1);
+		
 		return view;
 	}
 }

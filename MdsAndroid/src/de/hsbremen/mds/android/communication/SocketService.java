@@ -20,6 +20,7 @@ public class SocketService extends Service {
 	// Websocket:
 	private SocketClient socketClient;
 	private WebServices webServices;
+	private WebServicesInterface webInterface;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -36,8 +37,8 @@ public class SocketService extends Service {
 		// Serverkommunikation
 		Draft d = new Draft_17();
 
-		String serverIp = "195.37.176.178";
 		String PROTOKOLL_WS = "ws://";
+		String serverIp = "195.37.176.178";
 		String PORT_WS = ":1387";
 
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;

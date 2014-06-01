@@ -14,10 +14,12 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.hsbremen.mds.common.guiobjects.MdsItem;
+import de.hsbremen.mds.mdsandroid.R;
 
 public class GoogleMapFragment extends MapFragment {
 
@@ -73,7 +75,8 @@ public class GoogleMapFragment extends MapFragment {
 				for(MdsItem i : itemLocations){
 					MarkerOptions mpi = new MarkerOptions();
 					mpi.position(new LatLng(i.getLatitude(), i.getLongitude()));
-					mpi.title(i.getName());
+					mpi.title("Item");
+					mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.unknown));
 					map.addMarker(mpi);
 				}
 			}
@@ -82,6 +85,8 @@ public class GoogleMapFragment extends MapFragment {
 	
 			mp.title("Player Position");
 	
+			mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
+			
 			map.addMarker(mp);
 	
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
