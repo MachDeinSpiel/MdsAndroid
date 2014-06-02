@@ -184,7 +184,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		mapFragment.gmapsUpdate(loc);
 
 		FragmentLocation f = (FragmentLocation) swipeAdapter
-				.getFragment("location");
+				.getFragment("showMap");
 		f.updateLocationFields();
 
 		interpreterCom.locationChanged(loc);
@@ -196,7 +196,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		view.setBackgroundColor(Color.RED);
 
 		FragmentLocation f = (FragmentLocation) swipeAdapter
-				.getFragment("location");
+				.getFragment("showMap");
 		f.updateLocationFields();
 	}
 
@@ -206,7 +206,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		view.setBackgroundColor(Color.GREEN);
 
 		FragmentLocation f = (FragmentLocation) swipeAdapter
-				.getFragment("location");
+				.getFragment("showMap");
 		if(f != null){
 			f.updateLocationFields();
 		}
@@ -348,7 +348,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	public void updateSwipeAdapter(String currFragment) {
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName("location"));
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("showMap"));
 		this.fragmentToDelete = currFragment;
 	}
 
