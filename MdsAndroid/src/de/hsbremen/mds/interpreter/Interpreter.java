@@ -149,8 +149,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if(doAction != null){
 				doAction.execute(gui);
 			}
-			String health = (String) whiteboard.getAttribute("Players", myId, "health").value;
-			Log.i(LOGTAG, "Player Health: " + health);
 		}
 	}
 
