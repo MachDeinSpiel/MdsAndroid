@@ -207,7 +207,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		FragmentLocation f = (FragmentLocation) swipeAdapter
 				.getFragment("location");
-		f.updateLocationFields();
+		if(f != null){
+			f.updateLocationFields();
+		}
 
 		interpreterCom.locationChanged(location);
 	}
@@ -388,8 +390,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
-		swipeAdapter.addFragment(mds.getName());
-		swipeAdapter.setFragmentInformation(mds);
+		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
+		if(!(mds.getName().equals("showMap"))){
+			swipeAdapter.addFragment(mds.getName());
+			swipeAdapter.setFragmentInformation(mds);
+		}
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
 				true);
 	}
