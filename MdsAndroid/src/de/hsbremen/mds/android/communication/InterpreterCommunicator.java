@@ -56,6 +56,7 @@ public class InterpreterCommunicator {
 	public void fullUpdateLocalWhiteboard(List<WhiteboardUpdateObject> list) {
 		if (interpreter != null) {
 			// Callback mit Event Informationen
+			Log.d("Socket", "WhiteboardUpdateObjectlistenlänge: " + list.size());
 			interpreter.onFullWhiteboardUpdate(list);
 		}
 	}

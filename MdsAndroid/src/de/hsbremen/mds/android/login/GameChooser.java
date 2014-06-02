@@ -24,6 +24,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	ListView list;
 	String[] gameNames;
 	Integer[] gameImages;
+	Integer[] gameIds;
 
 	private WebServices webServ;
 
@@ -53,35 +54,38 @@ public class GameChooser extends Activity implements WebServicesInterface {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				JSONObject json = null;
-				switch (position) {
-				case 0:
-					try {
-						json = new JSONObject();
-						json.put("mode", "create");
-						json.put("id", 0);
-						json.put("name", user);
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
-				case 1:
-					try {
-						json = new JSONObject();
-						json.put("mode", "join");
-						json.put("id", 0);
-						json.put("name", user);
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
+//				switch (position) {
+//				case 0:
+//					break;
+//				case 1:
+//					try {
+//						json = new JSONObject();
+//						json.put("mode", "join");
+//						json.put("id", 0);
+//						json.put("name", user);
+//					} catch (JSONException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					break;
+//				}
+
+				try {
+					json = new JSONObject();
+					json.put("mode", "create");
+					// TODO Später GameID einkommentieren
+//					json.put("id", gameIds[position]);
+					json.put("id", 0);
+					json.put("name", user);
+					json.put("maxplayers", 3);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				webServ.send(json.toString());
+				webServ.unbindService();
+				Log.d("Socket", "GameChooser Service ungebindet");
 
-				// Toast.makeText(GameChooser.this,
-				// "You Clicked at " + web[+position], Toast.LENGTH_SHORT)
-				// .show();
 				Intent myIntent = new Intent(GameChooser.this,
 						MainActivity.class);
 				myIntent.putExtra("username", user);
@@ -104,7 +108,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		JSONObject json;
 		try {
 			json = new JSONObject(message);
-			if (json.getString("mode").equals("games")) {
+			if (json.getString("mode").equals("gametemplates")) {
 				onGameUpdate(json.getJSONArray("games"));
 			}
 			;
@@ -117,8 +121,9 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 	private void onGameUpdate(JSONArray jsonArray) throws JSONException {
 		JSONObject jsonObj = null;
-		this.gameImages = new Integer[jsonArray.length()];
 		this.gameNames = new String[jsonArray.length()];
+		this.gameImages = new Integer[jsonArray.length()];
+		this.gameIds = new Integer[jsonArray.length()];
 
 		Log.d("Socket", "GameChooser: OnGameUpdate");
 
@@ -131,10 +136,10 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 			} else {
 				gameNames[i] = jsonObj.getString("name") + " ("
-						+ jsonObj.getInt("activeplayers") + " / "
 						+ jsonObj.getInt("maxplayers") + ")";
 			}
 			gameImages[i] = R.drawable.bomb;
+			gameIds[i] = jsonObj.getInt("id");
 		}
 
 		this.runOnUiThread(new Runnable() {
@@ -148,12 +153,19 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 	}
 
+	
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
 	@Override
 	public void onWebserviceConnected() {
 		Log.d("Socket", "GameChooser: OnWebserviceConnected()");
 		JSONObject json = new JSONObject();
 		try {
-			json.put("mode", "games");
+			json.put("mode", "gametemplates");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
