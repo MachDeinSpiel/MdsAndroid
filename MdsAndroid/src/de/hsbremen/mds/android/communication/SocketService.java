@@ -20,7 +20,7 @@ public class SocketService extends Service {
 	// Websocket:
 	private SocketClient socketClient;
 	private WebServices webServices;
-	private WebServicesInterface webInterface;
+	private String bufferedMessage;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -58,10 +58,23 @@ public class SocketService extends Service {
 		context.startService(intent);
 	}
 
+	public void setWebService(WebServices web) {
+		webServices = web;
+	}
+
 	public class MyBinder extends Binder {
 		SocketService getService(WebServices service) {
 			Log.d("Socket", "MyBinder: getService");
 			SocketService.this.webServices = service;
+
+			if (bufferedMessage != null) {
+				webServices.onMessage(bufferedMessage);
+				bufferedMessage = null;
+				Log.d("Socket", "SocketService: Buffered Message");
+			}
+			Log.d("Socket",
+					"SocketService: Buffered Message sollte gesendet sein");
+
 			return SocketService.this;
 		}
 	}
@@ -71,12 +84,19 @@ public class SocketService extends Service {
 		return mBinder;
 	}
 
+	@Override
+	public boolean onUnbind(Intent intent) {
+		webServices = null;
+		return super.onUnbind(intent);
+	}
+
 	public void send(String s) {
 		try {
 			Log.d("Socket", "SocketService: Wird gesendet: " + s);
 			socketClient.getConnection().send(s);
 		} catch (NullPointerException ex) {
-			Log.d("Socket", "SocketService: Noch keine Connection" + ex.getMessage());
+			Log.d("Socket",
+					"SocketService: Noch keine Connection" + ex.getMessage());
 		}
 	}
 
@@ -95,6 +115,8 @@ public class SocketService extends Service {
 	public void onMessage(String message) {
 		if (this.webServices != null)
 			webServices.onMessage(message);
+		else
+			bufferedMessage = message;
 	}
 
 }

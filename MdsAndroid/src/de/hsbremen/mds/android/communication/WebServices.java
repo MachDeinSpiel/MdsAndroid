@@ -74,4 +74,11 @@ public class WebServices {
 	public void onSocketConnected(){
 		actInterface.onWebserviceConnected();
 	}
+
+	public void unbindService() {
+		// Null um ihn zu unbinden vom service
+		socketService.setWebService(null);	
+		//TODO Service richtig unbinden:
+//		socketService.unbindService(serviceConn);
+	}
 }
