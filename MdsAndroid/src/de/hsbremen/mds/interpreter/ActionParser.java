@@ -101,7 +101,7 @@ public class ActionParser {
 						lat = 0;
 						lon = 0;
 					}
-					MdsMapAction mma = new MdsMapAction("Map", lat, lon);
+					MdsMapAction mma = new MdsMapAction("showMap", lat, lon);
 					
 					ArrayList<MdsItem> mapEntities = new ArrayList<MdsItem>();
 					
