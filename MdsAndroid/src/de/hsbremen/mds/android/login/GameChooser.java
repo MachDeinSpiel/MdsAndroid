@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.ingame.MainActivity;
@@ -42,13 +43,26 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 		webServ = WebServices.createWebServices(this);
 
-		Button usernameLabel = (Button) findViewById(R.id.labelUsername);
+		Button usernameLabel = (Button) findViewById(R.id.labelGameName);
 
 		usernameLabel.setText("Spieler: " + user);
 
-		list = (ListView) findViewById(R.id.gamelist);
+		list = (ListView) findViewById(R.id.playerList);
 		// list.setAdapter(adapter);
 
+		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+
+				Toast toast = Toast.makeText(getApplicationContext(), gameNames[+position] , Toast.LENGTH_SHORT);
+				toast.show();
+				
+				return false;
+			}
+		});
+		
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -74,7 +88,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 					json = new JSONObject();
 					json.put("mode", "create");
 					// TODO Später GameID einkommentieren
-//					json.put("id", gameIds[position]);
+					//json.put("id", gameIds[position]);
 					json.put("id", 0);
 					json.put("name", user);
 					json.put("maxplayers", 3);
@@ -87,7 +101,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 				Log.d("Socket", "GameChooser Service ungebindet");
 
 				Intent myIntent = new Intent(GameChooser.this,
-						MainActivity.class);
+						GameLobby.class);
 				myIntent.putExtra("username", user);
 				myIntent.putExtra("game", gameNames[+position]);
 				myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

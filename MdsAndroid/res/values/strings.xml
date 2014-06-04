@@ -11,6 +11,10 @@
     <string name="loginBtnRes">Login</string>
     <string name="helpRes">Help</string>
     <string name="gamecenter">Gamecenter</string>
+    <string name="_spiel_">##Spiel##</string>
+    <string name="_playername_">##Playername##</string>
+    <string name="_1_10">1/10</string>
+    <string name="start">Start</string>
 
 
 </resources>
