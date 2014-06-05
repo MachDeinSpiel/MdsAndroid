@@ -75,8 +75,8 @@ public class GoogleMapFragment extends MapFragment {
 				for(MdsItem i : itemLocations){
 					MarkerOptions mpi = new MarkerOptions();
 					mpi.position(new LatLng(i.getLatitude(), i.getLongitude()));
-					mpi.title("Item");
-					mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.unknown));
+					mpi.title(i.getName());
+					mpi.icon(BitmapDescriptorFactory.fromResource(R.drawable.unknown));
 					map.addMarker(mpi);
 				}
 			}
