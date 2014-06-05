@@ -122,18 +122,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
-				if (!(fragmentToDelete.equals(""))) {
-					Log.d("hallo", "blao: " + count);
-					count++;
-				}
 
-				if (!(fragmentToDelete.equals("")) && (count == 2)) {
-
-					swipeAdapter.removeFragment(fragmentToDelete);
-					fragmentToDelete = "";
-					Log.d("hallo", "Page wurde gelöscht");
-					count = 0;
-				}
 			}
 		});
 
@@ -180,6 +169,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void onLocationChanged(Location loc) {
 
+		validateFragments();
+		
 		mapFragment.gmapsUpdate(loc);
 
 		FragmentLocation f = (FragmentLocation) swipeAdapter
@@ -187,6 +178,22 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		f.updateLocationFields();
 
 		interpreterCom.locationChanged(loc);
+	}
+
+	private void validateFragments() {
+		if (!(fragmentToDelete.equals(""))) {
+			Log.d("hallo", "blao: " + count);
+			count++;
+		}
+
+		if (!(fragmentToDelete.equals("")) && (count == 2)) {
+
+			swipeAdapter.removeFragment(fragmentToDelete);
+			fragmentToDelete = "";
+			Log.d("hallo", "Page wurde gelöscht");
+			count = 0;
+		}
+		
 	}
 
 	public void showProviderDisable() {

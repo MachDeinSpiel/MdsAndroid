@@ -1,5 +1,7 @@
 package de.hsbremen.mds.android.fragment;
 
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.android.ingame.SwipeAdapter;
@@ -26,34 +29,34 @@ public class FragmentText extends Fragment {
 		
 		view = inflater.inflate(R.layout.fragment_text, container, false);
 		
-		Button btn = (Button) view.findViewById(R.id.btnReturnText);
-		
-		if(actionButton){
-			btn.setVisibility(1);
-		}
-		
-		btn.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				MainActivity activity = (MainActivity) getActivity();
-				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnText);
-				returnBtn.setVisibility(Button.GONE);
-				activity.updateSwipeAdapter("showText");
-				activity.interpreterCom.buttonClicked("back");
-			}
-		});
-		
-		Button btn2 = (Button) view.findViewById(R.id.btnCloseAppText);
-		
-		btn2.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				MainActivity activity = (MainActivity) getActivity();
-				activity.updateSwipeAdapter("showText");
-			}
-		});
+//		Button btn = (Button) view.findViewById(R.id.btnReturnText);
+//		
+//		if(actionButton){
+//			btn.setVisibility(1);
+//		}
+//		
+//		btn.setOnClickListener(new View.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				MainActivity activity = (MainActivity) getActivity();
+//				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnText);
+//				returnBtn.setVisibility(Button.GONE);
+//				activity.updateSwipeAdapter("showText");
+//				activity.interpreterCom.buttonClicked("back");
+//			}
+//		});
+//		
+//		Button btn2 = (Button) view.findViewById(R.id.btnCloseAppText);
+//		
+//		btn2.setOnClickListener(new View.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				MainActivity activity = (MainActivity) getActivity();
+//				activity.updateSwipeAdapter("showText");
+//			}
+//		});
 		
 		return view;
 	}
@@ -64,9 +67,35 @@ public class FragmentText extends Fragment {
 		this.message = sA.getFragmentInformation().getText();
 		TextView t = (TextView)view.findViewById(R.id.placeholderText);
 		t.setText(this.message);
-		Button b = (Button)view.findViewById(R.id.btnReturnText);
-		b.setVisibility(1);
+//		Button b = (Button)view.findViewById(R.id.btnReturnText);
+//		b.setVisibility(1);
+		showButtons();
 	}
+	
+
+	private void showButtons() {
+		System.out.println("Shotbuttons aufgerufen");
+		LinearLayout ll = (LinearLayout)view.findViewById(R.id.buttonContainerText);
+ 		List<String> l = sA.getFragmentInformation().getButtons();
+ 		for(String s : l){
+ 			System.out.println("Button adden " + s);
+ 			Button button = new Button(getActivity());
+ 			ll.addView(button);
+ 			button.setText(s);
+ 			button.setOnClickListener(new View.OnClickListener() {
+ 				
+ 				@Override
+ 				public void onClick(View v) {
+ 					Button b = (Button)v;
+ 					MainActivity activity = (MainActivity) getActivity();
+ 					activity.updateSwipeAdapter("showText");
+ 					String buttonText = (String)b.getText();
+ 					activity.interpreterCom.buttonClicked(buttonText);
+ 				}
+ 			});
+ 			
+ 		}
+ 	}
 	
 	public void setMessage(String message){
 		this.message = message;
