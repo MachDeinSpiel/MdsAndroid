@@ -101,7 +101,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 				Log.d("Socket", "GameChooser Service ungebindet");
 
 				Intent myIntent = new Intent(GameChooser.this,
-						MainActivity.class);
+						GameLobby.class);
 				myIntent.putExtra("username", user);
 				myIntent.putExtra("game", gameNames[+position]);
 				myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -159,8 +159,8 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				GameList adapter = new GameList(GameChooser.this, gameNames,
-						gameImages);
+				GameListItem adapter = new GameListItem(GameChooser.this, gameNames,
+						gameImages, "2");
 				list.setAdapter(adapter);
 			}
 		});

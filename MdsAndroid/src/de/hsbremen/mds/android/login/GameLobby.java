@@ -20,12 +20,9 @@ import de.hsbremen.mds.mdsandroid.R;
 
 public class GameLobby extends Activity implements WebServicesInterface{
 
-	String[] gameNames;
-	Integer[] gameImages;
+	String[] gameNames = new String[3];
+	Integer[] gameImages = new Integer[3];
 	Integer[] gameIds;
-
-	
-	//gameImages[i] = R.drawable.bomb
 	
 	private WebServices webServ;
 	
@@ -80,15 +77,15 @@ public class GameLobby extends Activity implements WebServicesInterface{
 		lblPlayerName.setText(user);
 		lblPlayers.setText(gameNames.length+"/3");
 		
-//		gameNames[0] = "Mario";
-//		gameNames[1] = "Diddy";
-//		gameNames[2] = user.toString();
-//				
-//		gameImages [0] = R.drawable.marioavatar;
-//		gameImages [1] = R.drawable.diddyavatar;
-//		gameImages [2] = R.drawable.player;
+		gameNames[0] = "Mario";
+		gameNames[1] = "Diddy";
+		gameNames[2] = user.toString();
+				
+		gameImages [0] = R.drawable.marioavatar;
+		gameImages [1] = R.drawable.diddyavatar;
+		gameImages [2] = R.drawable.player;
 		
-		GameList adapter = new GameList(GameLobby.this, gameNames,
+		PlayerListItem adapter = new PlayerListItem(GameLobby.this, gameNames,
 				gameImages);
 		playerList.setAdapter(adapter);
 		
