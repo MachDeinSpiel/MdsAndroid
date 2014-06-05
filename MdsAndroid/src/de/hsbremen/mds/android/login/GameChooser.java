@@ -68,34 +68,46 @@ public class GameChooser extends Activity implements WebServicesInterface {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				JSONObject json = null;
-//				switch (position) {
-//				case 0:
-//					break;
-//				case 1:
-//					try {
-//						json = new JSONObject();
-//						json.put("mode", "join");
-//						json.put("id", 0);
-//						json.put("name", user);
-//					} catch (JSONException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					break;
-//				}
-
-				try {
-					json = new JSONObject();
-					json.put("mode", "create");
-					// TODO Später GameID einkommentieren
-					//json.put("id", gameIds[position]);
-					json.put("id", 0);
-					json.put("name", user);
-					json.put("maxplayers", 3);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				switch (position) {
+				case 0:
+					try {
+						json = new JSONObject();
+						json.put("mode", "create");
+						// TODO Später GameID einkommentieren
+						//json.put("id", gameIds[position]);
+						json.put("id", 0);
+						json.put("name", user);
+						json.put("maxplayers", 3);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+				case 1:
+					try {
+						json = new JSONObject();
+						json.put("mode", "join");
+						json.put("id", 0);
+						json.put("name", user);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
 				}
+//
+//				try {
+//					json = new JSONObject();
+//					json.put("mode", "create");
+//					// TODO Später GameID einkommentieren
+//					//json.put("id", gameIds[position]);
+//					json.put("id", 0);
+//					json.put("name", user);
+//					json.put("maxplayers", 3);
+//				} catch (JSONException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				webServ.send(json.toString());
 				webServ.unbindService();
 				Log.d("Socket", "GameChooser Service ungebindet");
@@ -106,7 +118,6 @@ public class GameChooser extends Activity implements WebServicesInterface {
 				myIntent.putExtra("game", gameNames[+position]);
 				myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				getApplicationContext().startActivity(myIntent);
-
 			}
 		});
 	}
