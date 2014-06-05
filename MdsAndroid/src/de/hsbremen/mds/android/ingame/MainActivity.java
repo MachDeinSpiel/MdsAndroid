@@ -118,23 +118,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
-
 			}
 
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
-				if (!(fragmentToDelete.equals(""))) {
-					Log.d("hallo", "blao: " + count);
-					count++;
-				}
 
-				if (!(fragmentToDelete.equals("")) && (count == 2)) {
-
-					swipeAdapter.removeFragment(fragmentToDelete);
-					fragmentToDelete = "";
-					Log.d("hallo", "Page wurde gelöscht");
-					count = 0;
-				}
 			}
 		});
 
@@ -181,6 +169,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void onLocationChanged(Location loc) {
 
+		validateFragments();
+		
 		mapFragment.gmapsUpdate(loc);
 
 		FragmentLocation f = (FragmentLocation) swipeAdapter
@@ -188,6 +178,21 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		f.updateLocationFields();
 
 		interpreterCom.locationChanged(loc);
+	}
+	
+	public void validateFragments(){
+		if (!(fragmentToDelete.equals(""))) {
+			Log.d("hallo", "blao: " + count);
+			count++;
+		}
+
+		if (!(fragmentToDelete.equals("")) && (count == 2)) {
+
+			swipeAdapter.removeFragment(fragmentToDelete);
+			fragmentToDelete = "";
+			Log.d("hallo", "Page wurde gelöscht");
+			count = 0;
+		}
 	}
 
 	public void showProviderDisable() {
@@ -390,6 +395,17 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
+		List<String> l = mds.getButtons();
+		if(l != null){
+			System.out.println("Bei " + mds.getName() + " ist die Liste nicht null");
+			System.out.println("Listenlänge ist: " + l.size());
+			for(String s : l){
+				System.out.println("Button: " + s);
+			}
+		}else{
+			System.out.println("Bei " + mds.getName() + " ist die Liste null");
+		}
+
 		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
 		if(!(mds.getName().equals("showMap"))){
 			swipeAdapter.addFragment(mds.getName());

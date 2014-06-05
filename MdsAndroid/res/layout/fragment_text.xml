@@ -24,25 +24,13 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </ScrollView>
 
-        <Button
-            android:id="@+id/btnShowVideo"
+        <LinearLayout
+            android:id= "@+id/buttonContainerText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Show Video"
-            android:visibility="invisible" />
+            android:orientation="vertical" >
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/btnReturnText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Aufheben"
-            android:visibility="invisible" />
-
-        <Button
-            android:id="@+id/btnCloseAppText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Close App" />
     </LinearLayout>
 
 </FrameLayout>
