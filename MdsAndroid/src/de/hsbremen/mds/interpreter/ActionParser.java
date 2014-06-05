@@ -133,7 +133,8 @@ public class ActionParser {
 		case showImage:
 			return new MdsImageAction((String)parsedParams.get("title"),(String)parsedParams.get("url"), (String)parsedParams.get("text"), buttons);
 		case showText:
-			return new MdsTextAction("Title", (String)parsedParams.get("text"), buttons);
+			Log.i("InterpreterClient", "Title der showText " + (action.getIdent() == MdsAction.MdsActionIdent.showText ? "showText" : "error"));
+			return new MdsTextAction("showText", (String)parsedParams.get("text"), buttons);
 		case addToGroup:
 			return new MdsActionExecutable() {
 				
