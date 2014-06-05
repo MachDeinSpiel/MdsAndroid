@@ -101,7 +101,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 				Log.d("Socket", "GameChooser Service ungebindet");
 
 				Intent myIntent = new Intent(GameChooser.this,
-						GameLobby.class);
+						MainActivity.class);
 				myIntent.putExtra("username", user);
 				myIntent.putExtra("game", gameNames[+position]);
 				myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
