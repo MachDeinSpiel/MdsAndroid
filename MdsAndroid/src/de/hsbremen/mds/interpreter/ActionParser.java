@@ -53,7 +53,8 @@ public class ActionParser {
 		final HashMap<String, Object> parsedParams = new HashMap<String, Object>();
 		
 		// Buttons heraussuchen, falls state transitions hat
-		MdsTransition[] trans = state.getTransitions();
+		MdsState buttonState = (MdsState) wb.getAttribute("Players",myId+"","currentState").value;
+		MdsTransition[] trans = buttonState.getTransitions();
 		List<String> buttons = new Vector<String>();
 		if (trans != null) {
 			if(type.equals("start") || type.equals("do")) {		
