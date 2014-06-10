@@ -168,8 +168,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void onLocationChanged(Location loc) {
-
-		validateFragments();
 		
 		mapFragment.gmapsUpdate(loc);
 
@@ -396,6 +394,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
+		
+		validateFragments();
+		
 		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
 		if(!(mds.getName().equals("showMap"))){
 			swipeAdapter.addFragment(mds.getName());
