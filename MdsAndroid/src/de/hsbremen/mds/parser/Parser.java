@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.MdsObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
@@ -23,7 +24,6 @@ import de.hsbremen.mds.common.valueobjects.statemachine.MdsQuantifier;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
-import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 
 public class Parser {
 
@@ -60,7 +60,7 @@ public class Parser {
 					JSONObject defaultsO = (JSONObject) element.get("defaults");
 					// zwischenspeicherung der KeySet
 					Set<String> keySet = defaultsO.keySet();
-					// die param werte aus dem KeySet werden dem params HashMap übergeben
+					// die param werte aus dem KeySet werden dem params HashMap ï¿½bergeben
 					for (String key : keySet){
 						Object value = defaultsO.get(key);
 						defaults.put(key, value.toString());
@@ -70,7 +70,7 @@ public class Parser {
 					JSONObject paramsO = (JSONObject) element.get("params");
 					// zwischenspeicherung der KeySet
 					Set<String> keySet = paramsO.keySet();
-					// die param werte aus dem KeySet werden dem params HashMap übergeben
+					// die param werte aus dem KeySet werden dem params HashMap ï¿½bergeben
 					for (String key : keySet){
 						Object value = paramsO.get(key);
 						defaults.put(key, value.toString());
@@ -95,7 +95,7 @@ public class Parser {
 					allMdsActions[i] = new MdsAction(MdsActionIdent.useItem, defaults);
 				else if(ident.equals("updateMap"))
 					allMdsActions[i] = new MdsAction(MdsActionIdent.updateMap, defaults);
-
+				
 			}
 			
 			JSONArray MdsState = (JSONArray) jsonObject.get("states");	// lesen des MdsState arrays aus der JSON datei
@@ -104,9 +104,7 @@ public class Parser {
 			
 			// temp variablen
 			int id;
-			MdsAction doMdsAction = null;
 			boolean startMdsState, finalMdsState;
-			MdsAction startAction = null, endAction = null;
 			String name;
 			
 			for(int i = 0; i < MdsState.size(); i++) {
@@ -132,7 +130,8 @@ public class Parser {
 				
 				//Verarbeitung fehlt, da diese felder leer sind
 				//JSONObject startMdsActionObject = (JSONObject) element.get("startAction");
-								
+				
+				MdsAction doMdsAction = null;
 				if(element.get("doAction") instanceof JSONObject) {
 					JSONObject doMdsActionObject = (JSONObject) element.get("doAction");
 					
@@ -142,7 +141,7 @@ public class Parser {
 						defaults = new HashMap<String, String>();
 						Set<String> keySet = defaultsO.keySet();
 						
-						// die param werte aus dem KeySet werden dem params HashMap übergeben
+						// die param werte aus dem KeySet werden dem params HashMap ï¿½bergeben
 						for (String key : keySet){
 							Object value = defaultsO.get(key);
 							defaults.put(key, value.toString());
@@ -150,7 +149,6 @@ public class Parser {
 					}
 					
 					for(int j = 0; j < allMdsActions.length;j++) {
-						System.out.println(allMdsActions[j].getIdent().toString());
 						if (doMdsActionObject.get("name").toString().equals(allMdsActions[j].getIdent().toString())) {
 								doMdsAction = new MdsAction(allMdsActions[j].getIdent(), allMdsActions[j].getParams());
 								if(defaults != null) {
@@ -160,6 +158,7 @@ public class Parser {
 					}
 				}
 				
+				MdsAction startAction = null, endAction = null;
 				ident = element.get("startAction").toString();
 				if(!ident.equals("null")) {
 					JSONObject sAction = (JSONObject) element.get("startAction");
@@ -215,7 +214,7 @@ public class Parser {
 				
 				if(!element.get("transition").equals("null")) {
 					JSONArray transition = (JSONArray) element.get("transition");	// lesen des transition arrays aus der JSON datei
-					allTrans = new MdsTransition[transition.size()];	// die größe des arrays wird festgelegt
+					allTrans = new MdsTransition[transition.size()];	// die grï¿½ï¿½e des arrays wird festgelegt
 					String event, nameTransition;
 					MdsState target = null;			// temp variablen
 					
@@ -258,7 +257,7 @@ public class Parser {
 							
 							Set<String> keySet = params.keySet();
 							for (String key : keySet){
-								if(!key.equals("object") && !key.equals("subject")) {
+								if(!key.equals("object") || !key.equals("subject")) {
 									Object values = params.get(key);
 									paramsHM.put(key, values);
 								}
@@ -293,7 +292,6 @@ public class Parser {
 						else if(event.equals("whiteboardEvent"))
 							allTrans[j] = new MdsTransition(target, MdsTransition.EventType.whiteboardEvent);
 						allTrans[j].setCondition(conditionObj);
-						
 					}
 				}
 				allMdsStates[i].setTransitions(allTrans); 
@@ -315,5 +313,5 @@ public class Parser {
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-}
+	}
 }
