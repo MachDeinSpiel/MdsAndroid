@@ -47,6 +47,8 @@ public class EventParser {
 		// get Params
 		HashMap<String, Object> params = cond.getParams();
 		// get Object
+		Log.i("Mistake", cond.getName());
+		Log.i("Mistake", params.get("object").toString());
 		MdsObject object = (MdsObject) params.get("object");
 		// get Subject
 		MdsObject subject = (MdsObject) params.get("subject");
@@ -137,41 +139,44 @@ public class EventParser {
 	
 	// TODO: ValueNotANumber Exception
 	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, String playerId) {
-			// get value and compValue
-			double value = -1;
-			double compValue = -2;
+		Log.i(Interpreter.LOGTAG, "CheckCondition: " + cond.getName());
 		
-		    try {  
-			    value = (Double)cond.getParams().get("value");  
-			} catch(ClassCastException cce){
-				try{
-					value = Double.parseDouble(cond.getParams().get("value").toString());
-				}catch(NumberFormatException nfe) {  
-					try {
-						//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-						Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
-						String paramString = (String)cond.getParams().get("value");
-						paramString = paramString.replaceAll("self", Interpreter.WB_PLAYERS+"."+playerId);
-						String[] paramsSplitted = (paramString).split("\\.");
-	
-						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
-							//Wenn die Länge abgefragt werden soll
-							//Entferne "length" aus den Parametern
-							List<String> temp = new Vector<String>(Arrays.asList(paramsSplitted));
-							temp.remove(paramsSplitted.length-1);
-							//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die Länge haben wollen)
-							//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
-							value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
-						}else{
-							//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
-							value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
-						}
-					} catch (NumberFormatException nfe2) {
-						// something went wrong, Value is not a Number
+		// get value and compValue
+		double value = -1;
+		double compValue = -2;
+		
+		try {  
+		    value = (Double)cond.getParams().get("value");  
+		} catch(ClassCastException cce){
+			try{
+				value = Double.parseDouble(cond.getParams().get("value").toString());
+			}catch(NumberFormatException nfe) {  
+				try {
+					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
+					Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
+					String paramString = (String)cond.getParams().get("value");
+					paramString = paramString.replaceAll("self", Interpreter.WB_PLAYERS+"."+playerId);
+					String[] paramsSplitted = (paramString).split("\\.");
+
+					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
+						//Wenn die Länge abgefragt werden soll
+						//Entferne "length" aus den Parametern
+						List<String> temp = new Vector<String>(Arrays.asList(paramsSplitted));
+						temp.remove(paramsSplitted.length-1);
+						//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die Länge haben wollen)
+						//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
+						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
+					}else{
+						//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
+						value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
 					}
+				} catch (NumberFormatException nfe2) {
+					// something went wrong, Value is not a Number
 				}
-			} 
-			
+			}
+		} 
+	
+		if (cond.getName().equals("condition") || cond.getName().equals("compare")) {
 			try {  
 			    compValue = (Double)cond.getParams().get("compValue");  
 			} catch(ClassCastException cce){
@@ -180,9 +185,9 @@ public class EventParser {
 				}catch(NumberFormatException nfe) {  
 					try {
 						//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
-	
+
 						String[] paramsSplitted = ((String) cond.getParams().get("value")).split("\\.");
-	
+
 						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 							//Wenn die Länge abgefragt werden soll
 							//Entferne "length" aus den Parametern
@@ -200,9 +205,6 @@ public class EventParser {
 				} 
 			}
 			
-				
-			
-				// Doch nicht, ist nur bei Location Events wenn ich mich nicht irre
 			// get checkType
 			if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
 				if (value == compValue) return new Result(true, null, null);
@@ -215,6 +217,7 @@ public class EventParser {
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.HIGHEQUALS)) {
 				if (value >= compValue) return new Result(true, null, null);
 			} 
+		}
 			
 		return new Result(false, null, null);
 	}

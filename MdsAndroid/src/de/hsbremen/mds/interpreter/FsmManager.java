@@ -6,9 +6,11 @@ import java.util.List;
 
 
 
+
 import android.util.Log;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition.EventType;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
@@ -34,6 +36,8 @@ public class FsmManager {
 		this.interpreter = interpreter;
 		this.wb = wb;
 		this.myID = id;
+		MdsState last = states.get(states.size() -1);
+		Log.i("Mistake", "Letzter State: " + last.getName() + " start Action: " + (last.getStartAction() == null ? "Keine Start Action" : last.getStartAction().getIdent()));
 	}
 	
 	/**
@@ -102,7 +106,6 @@ public class FsmManager {
 		}
 	}
 
-
 	private void onstateChanged(MdsState state, String setTo) {
 		
 		Log.i(Interpreter.LOGTAG, "onstateChanged im FsmManager ausgeführt " + state.getName());
@@ -139,6 +142,7 @@ public class FsmManager {
 		
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
 			EventParser.Result result;
+			Log.i(Interpreter.LOGTAG, t.getEventType().toString());
 			
 			switch(t.getEventType()){
 			case locationEvent:
@@ -173,6 +177,39 @@ public class FsmManager {
 			
 		
 
+	}
+	
+	/**
+	 * Check WB Conditions only for game end etc.
+	 * Changes state, if fullfilled
+	 */
+	public void checkWBCondition() {
+		// check WB Cond in state
+		MdsState state = (MdsState) wb.getAttribute(Interpreter.WB_PLAYERS ,myID+"","currentState").value;
+		Log.i(Interpreter.LOGTAG, "checking Events again on " + state.getName());
+		MdsTransition[] trans = state.getTransitions();
+		// Only start if trans is not null
+		if(trans != null) {
+			Log.i(Interpreter.LOGTAG, "Found transition: " + trans.length);
+			for (int i = 0; i < trans.length; i++) {
+				if (trans[i].getEventType() == EventType.whiteboardEvent) {
+					Log.i(Interpreter.LOGTAG, "WhiteboardEvent");
+					EventParser.Result res = EventParser.checkWhiteboardEvent(trans[i].getCondition(), wb, myID);
+					if(res.isfullfilled){
+						Log.i(Interpreter.LOGTAG, "Event is fullfilled");
+						// TODO: Evtl keine Liste sondern ein Whiteboard eintragen
+						if(res.subjects != null)
+							this.getCurrentState().setSubjects(res.subjects);
+						if(res.objects != null)
+							this.getCurrentState().setObjects(res.objects);
+						this.setState(getCurrentState(), LAST_STATE);
+						this.setState(trans[i].getTarget(), CURRENT_STATE);
+
+						return;
+					}
+				}
+			}
+		}
 	}
 
 	public boolean isRunning() {

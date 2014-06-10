@@ -12,13 +12,18 @@ import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition.EventType;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.common.whiteboard.WhiteboardUpdateObject;
+import de.hsbremen.mds.interpreter.EventParser.Result;
 import de.hsbremen.mds.parser.Parser;
 
 /**
@@ -55,6 +60,25 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	public void pushParsedObjects(MdsObjectContainer objectContainer) {		
 		Log.i(LOGTAG, "Geparste Objekte vom Parser bekommen");
 		//this.gui.setAndroidListener(this, 5);
+		// FIXME: Testausgabe der Objecte
+//		for(int i = 0; i < objectContainer.getStates().size(); i++) {
+//			Log.i("Mistake", "Getting Transitions of State: " + objectContainer.getStates().get(i).getName());
+//			MdsTransition[] trans = objectContainer.getStates().get(i).getTransitions();
+//			if(trans != null) {
+//				for(int j = 0; j < trans.length; j++) {
+//					if(trans[j].getTarget() != null) {
+//						Log.i("Mistake", "Transition Target: " + trans[j].getTarget().getName());
+//						if(trans[j].getCondition() != null) {
+//							Log.i("Mistake", "Condition: " + trans[j].getCondition().getName());
+//							if (trans[j].getCondition().getParams().get("object") != null)
+//								Log.i("Mistake", "Object der Condition: " + trans[j].getCondition().getParams().get("object").toString());
+//							if (trans[j].getCondition().getParams().get("subject") != null)
+//								Log.i("Mistake", "Subject der Condition: " + trans[j].getCondition().getParams().get("subject").toString());
+//						}	
+//					}
+//				}
+//			}
+//		}
 		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard, this, myId);
 	}
 	
@@ -136,9 +160,20 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	public void onStateChange(String setTo) {
 		if(setTo.equals(CURRENT_STATE)) {
 			Log.i(LOGTAG, "Zustand geändert");
+			Log.i(LOGTAG, "Last State" + ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getName());
+			MdsState current = (MdsState) whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value;
+			Log.i(LOGTAG, "Current State" + current.getName());
+			// Actions des Current states
+			
+			if (current.getDoAction() != null) Log.i(LOGTAG, "Do Action des States: " + current.getDoAction().getIdent());
+			if (current.getStartAction() != null) Log.i(LOGTAG, "Start Action des States: " + current.getStartAction().getIdent());
+			if (current.getEndAction() != null) Log.i(LOGTAG, "End Action des States: " + current.getEndAction().getIdent());
+			
 			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
 			MdsActionExecutable startAction = actionParser.parseAction("start", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
 			MdsActionExecutable doAction = actionParser.parseAction("do", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
+			
+			Log.i(LOGTAG, "Executing Action");
 			
 			if(endAction != null){
 				endAction.execute(gui);
@@ -149,6 +184,9 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if(doAction != null){
 				doAction.execute(gui);
 			}
+			fsmManager.checkWBCondition();
+			
+			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","health").value);
 		}
 	}
 

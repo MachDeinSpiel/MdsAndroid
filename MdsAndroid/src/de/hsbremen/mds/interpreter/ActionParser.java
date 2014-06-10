@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import android.R.interpolator;
 import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
@@ -54,6 +55,7 @@ public class ActionParser {
 		
 		// Buttons heraussuchen, falls state transitions hat
 		MdsState buttonState = (MdsState) wb.getAttribute("Players",myId+"","currentState").value;
+		Log.i(Interpreter.LOGTAG, "Parse Action: " + action.getIdent() + " des States: " + buttonState.getName());
 		MdsTransition[] trans = buttonState.getTransitions();
 		List<String> buttons = new Vector<String>();
 		if (trans != null) {
@@ -134,6 +136,7 @@ public class ActionParser {
 		case showImage:
 			return new MdsImageAction((String)parsedParams.get("title"),(String)parsedParams.get("url"), (String)parsedParams.get("text"), buttons);
 		case showText:
+			Log.i(Interpreter.LOGTAG, "Returning Text Action");
 			return new MdsTextAction("showText", (String)parsedParams.get("text"), buttons);
 		case addToGroup:
 			return new MdsActionExecutable() {
@@ -141,6 +144,21 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					
+					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
+					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
+					String[] keys = params.get("target").split("\\.");
+					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
+					
+					Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result+"]");
+					//TODO: server bescheid geben
+					List<String> keysToValue = new Vector<String>();
+					for(String s : params.get("target").split("\\."))
+						keysToValue.add(s);
+					try {
+						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+					} catch (InvalidWhiteboardEntryException e) {
+						e.printStackTrace();
+					}
 					
 				}
 			};
@@ -161,6 +179,7 @@ public class ActionParser {
 					for(String s : params.get("target").split("\\."))
 						keysToValue.add(s);
 					try {
+						// TODO: get copie of object and pass it into new group
 						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
 					} catch (InvalidWhiteboardEntryException e) {
 						e.printStackTrace();
