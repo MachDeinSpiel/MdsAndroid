@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import android.util.Log;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.MdsObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
@@ -256,7 +257,7 @@ public class Parser {
 							
 							Set<String> keySet = params.keySet();
 							for (String key : keySet){
-								if(!key.equals("object") || !key.equals("subject")) {
+								if(!(key.equals("object") || key.equals("subject"))) {
 									Object values = params.get(key);
 									paramsHM.put(key, values);
 								}
