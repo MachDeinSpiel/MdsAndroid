@@ -41,7 +41,6 @@ import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
-import de.hsbremen.mds.android.login.GameChooser;
 import de.hsbremen.mds.common.communication.WhiteboardHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
@@ -67,9 +66,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	public WebServices webServ;
 
-	private String fragmentToDelete = "";
-	private int count = 0;
-
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +83,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
 		viewPager.setAdapter(swipeAdapter);
-		setPageChangedListener();
 
 		FragmentManager fm = getFragmentManager();
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
@@ -97,8 +92,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		// Hier wird der Interpreter erstellt und wir mitgegeben und als
 		// Interface genutzt
-		// TODO PlayerId vom Server holen (beim erstellen des Websockets)
-		int playerId = 0;
 		Interpreter interpreter = new Interpreter(jsonDatei, this, this,
 				username.toString());
 
@@ -107,26 +100,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	}
 
-	private void setPageChangedListener() {
-		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-			@Override
-			public void onPageSelected(int arg0) {
-
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-
-			}
-		});
-
-	}
 
 	@Override
 	protected void onDestroy() {
@@ -176,22 +149,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		f.updateLocationFields();
 
 		interpreterCom.locationChanged(loc);
-	}
-
-	private void validateFragments() {
-		if (!(fragmentToDelete.equals(""))) {
-			Log.d("hallo", "blao: " + count);
-			count++;
-		}
-
-		if (!(fragmentToDelete.equals("")) && (count == 2)) {
-
-			swipeAdapter.removeFragment(fragmentToDelete);
-			fragmentToDelete = "";
-			Log.d("hallo", "Page wurde gelöscht");
-			count = 0;
-		}
-		
 	}
 
 	public void showProviderDisable() {
@@ -352,8 +309,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	public void updateSwipeAdapter(String currFragment) {
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName("showMap"));
-		this.fragmentToDelete = currFragment;
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("showMap"));	
+		swipeAdapter.removeFragment(currFragment);
 	}
 
 	@Override
@@ -394,8 +351,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
-		
-		validateFragments();
 		
 		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
 		if(!(mds.getName().equals("showMap"))){

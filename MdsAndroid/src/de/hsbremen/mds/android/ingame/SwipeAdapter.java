@@ -7,12 +7,10 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMinigame;
-import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.FragmentStart;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
@@ -26,13 +24,14 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 
 	private HashMap<String, Fragment> fragmentsPoolList = new HashMap<String, Fragment>();
 	
-	private FragmentManager fm;
-	
 	private MdsInfoObject fragmentInfo;
+	
+	public boolean getItemPositionStandard = true;
+	private int fragmentsCount = 0;
+	private boolean skip = false;
 
 	public SwipeAdapter(FragmentManager fm) {
 		super(fm);
-		this.fm = fm;
 		initFragments();
 	}
 
@@ -50,9 +49,9 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         activeFragmentsList.put("backpack", backpackFragment);
         activeFragmentsNumbers.add("backpack");
         
-        FragmentMonitoring monitoringFragment = new FragmentMonitoring();
-        activeFragmentsList.put("monitoring", monitoringFragment);
-        activeFragmentsNumbers.add("monitoring");
+//        FragmentMonitoring monitoringFragment = new FragmentMonitoring();
+//        activeFragmentsList.put("monitoring", monitoringFragment);
+//        activeFragmentsNumbers.add("monitoring");
         
         //INAKTIVE FRAGMENTS
         FragmentText textFragment = new FragmentText();
@@ -74,15 +73,17 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	
 	public void removeFragment(String fragmentName){   
 		
-      FragmentTransaction trans = fm.beginTransaction();
-      trans.remove(activeFragmentsList.get(fragmentName));
-      trans.commit();   
-      fm.executePendingTransactions();
-        
+		// Special behaviour for getItemPosition()
+		getItemPositionStandard = false;
+		
         activeFragmentsList.remove(fragmentName);
         activeFragmentsNumbers.remove(fragmentName);
         
+        System.out.println("Fragment Notify für Remove");
         notifyDataSetChanged();
+        
+		// Set Behaviour for getItemPosition() to standard again
+        getItemPositionStandard = true;
 	}	
 	
 	public void addFragment(String fragmentName){
@@ -97,6 +98,30 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	@Override
 	public Fragment getItem(int index) {
 		return activeFragmentsList.get(activeFragmentsNumbers.get(index));
+	}
+	
+	@Override
+	public int getItemPosition(Object object) {
+		
+		
+		if(getItemPositionStandard){
+			fragmentsCount = 0;
+			return super.getItemPosition(object);
+		}
+		
+		if(fragmentsCount < 3 && !skip){
+			fragmentsCount++;
+			if(fragmentsCount == 3){
+				fragmentsCount = 0;
+				skip = true;
+			}
+			return super.getItemPosition(object);
+		}else {
+			skip = false;
+			return POSITION_NONE;
+		}
+
+			
 	}
 
 	@Override
