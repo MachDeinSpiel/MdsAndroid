@@ -7,12 +7,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import android.R.interpolator;
 import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
@@ -144,20 +142,28 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					
-					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
-					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
+					// get target
 					String[] keys = params.get("target").split("\\.");
-					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
 					
-					Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result+"]");
-					//TODO: server bescheid geben
-					List<String> keysToValue = new Vector<String>();
-					for(String s : params.get("target").split("\\."))
-						keysToValue.add(s);
+					// create copy of object
+					WhiteboardEntry target = wb.getAttribute(keys);
+					WhiteboardEntry copy;
 					try {
-						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
-					} catch (InvalidWhiteboardEntryException e) {
-						e.printStackTrace();
+						copy = new WhiteboardEntry(target.value, target.visibility);
+						// fill new Element into Whiteboard
+						wb.setAttribute(copy, (String) parsedParams.get("group"), keys[keys.length-1]);
+						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) to group [" + params.get("group").toString()+"]");
+						
+						// immer gruppe + name
+						List<String> keysToValue = new Vector<String>();
+						keysToValue.add((String) parsedParams.get("group"));
+						keysToValue.add(keys[keys.length-1]);
+						
+						// tell the server
+						sii.onWhiteboardUpdate(keysToValue, copy);
+					} catch (InvalidWhiteboardEntryException e1) {
+						Log.e(Interpreter.LOGTAG, "Could not create Copy-WBEntry");
+						e1.printStackTrace();
 					}
 					
 				}
@@ -179,7 +185,6 @@ public class ActionParser {
 					for(String s : params.get("target").split("\\."))
 						keysToValue.add(s);
 					try {
-						// TODO: get copie of object and pass it into new group
 						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
 					} catch (InvalidWhiteboardEntryException e) {
 						e.printStackTrace();
