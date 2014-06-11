@@ -11,7 +11,6 @@ import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMinigame;
-import de.hsbremen.mds.android.fragment.FragmentStart;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
@@ -36,9 +35,9 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	}
 
 	private void initFragments() {	
-        FragmentStart startFragment = new FragmentStart();
-        activeFragmentsList.put("start", startFragment);
-        activeFragmentsNumbers.add("start");
+//        FragmentStart startFragment = new FragmentStart();
+//        activeFragmentsList.put("start", startFragment);
+//        activeFragmentsNumbers.add("start");
         
         FragmentLocation locationFragment = new FragmentLocation();
         activeFragmentsList.put("showMap", locationFragment);
@@ -109,9 +108,9 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 			return super.getItemPosition(object);
 		}
 		
-		if(fragmentsCount < 3 && !skip){
+		if(fragmentsCount < 2 && !skip){
 			fragmentsCount++;
-			if(fragmentsCount == 3){
+			if(fragmentsCount == 2){
 				fragmentsCount = 0;
 				skip = true;
 			}
