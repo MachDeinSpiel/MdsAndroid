@@ -123,7 +123,6 @@ public class GameChooser extends Activity implements WebServicesInterface {
 						lobbyIntent.putExtra("players", activeGamesAdapter.getPlayers(position));
 						lobbyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-
 					}
 				});
 

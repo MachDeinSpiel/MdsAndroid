@@ -11,13 +11,13 @@ import de.hsbremen.mds.mdsandroid.R;
 
 public class PlayerListItem extends ArrayAdapter<String> {
 	private final Activity context;
-	private final String[] web;
+	private final String[] playername;
 	private final Integer[] imageId;
 
-	public PlayerListItem(Activity context, String[] web, Integer[] imageId) {
-		super(context, R.layout.gamelistitem, web);
+	public PlayerListItem(Activity context, String[] playername, Integer[] imageId) {
+		super(context, R.layout.gamelistitem, playername);
 		this.context = context;
-		this.web = web;
+		this.playername = playername;
 		this.imageId = imageId;
 	}
 
@@ -27,7 +27,7 @@ public class PlayerListItem extends ArrayAdapter<String> {
 		View rowView = inflater.inflate(R.layout.playerlistitem, null, true);
 		TextView txtTitle = (TextView) rowView.findViewById(R.id.gameText);
 		ImageView imageView = (ImageView) rowView.findViewById(R.id.gameIcon);
-		txtTitle.setText(web[position]);
+		txtTitle.setText(playername[position]);
 		imageView.setImageResource(imageId[position]);
 		
 		//TextView maxplayersLabel = (TextView) view.findViewById(R.id.labelMaxPlayers);

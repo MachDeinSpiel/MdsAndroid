@@ -3,11 +3,13 @@
  */
 package de.hsbremen.mds.android.login;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -23,14 +25,14 @@ public class GameLobby extends Activity implements WebServicesInterface{
 	Integer[] gameImages = new Integer[3];
 	Integer[] gameIds;
 	
+	ListView playerList;
+	PlayerListItem playerAdapter;
+	
 	private WebServices webServ;
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
-
 		getMenuInflater().inflate(R.menu.login, menu);
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -47,13 +49,11 @@ public class GameLobby extends Activity implements WebServicesInterface{
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.gamelobby);
@@ -62,36 +62,34 @@ public class GameLobby extends Activity implements WebServicesInterface{
 		Button lblGameName = (Button) findViewById(R.id.labelGameName);
 		Button lblPlayerName = (Button) findViewById(R.id.labelPlayername);
 		Button lblPlayers = (Button) findViewById(R.id.labelPlayers);
-		ListView playerList = (ListView) findViewById(R.id.playerList);
-		
-//		startBtn.setEnabled(false);
+		playerList = (ListView) findViewById(R.id.playerList);
 		
 		Bundle extras = getIntent().getExtras();
+		boolean isInitial = extras.getBoolean("isInitail");
+		
+		if(isInitial){
+			startBtn.setEnabled(false);
+		}
+		
 		CharSequence user = (CharSequence) extras.get("username");
 		CharSequence game = (CharSequence) extras.get("game");
 		int players =  (Integer) extras.get("players");
 		int maxplayers = (Integer) extras.get("maxplayers");
-		//CharSequence id = (CharSequence) extras.get("id");
-		//CharSequence maxplayer = (CharSequence) extras.get("maxplayers");
-		
+
 		webServ = WebServices.createWebServices(this);
 
 		lblGameName.setText(game);
 		lblPlayerName.setText(user);
-//		lblPlayers.setText(players+"/"+maxplayers);
-		lblPlayers.setText("3/5");
 		
-		gameNames[0] = "Mario";
-		gameNames[1] = "Diddy";
-		gameNames[2] = user.toString();
-				
-		gameImages [0] = R.drawable.marioavatar;
-		gameImages [1] = R.drawable.diddyavatar;
-		gameImages [2] = R.drawable.player;
+		//Hier mŸssen die aktuellen Spieler und das Maximum an Spielern rein
+		lblPlayers.setText(players + "/" +maxplayers);
 		
-		PlayerListItem adapter = new PlayerListItem(GameLobby.this, gameNames,
-				gameImages);
-		playerList.setAdapter(adapter);
+		//DUMMYS -> bzw. eingelogger!
+		gameNames[1] = user.toString();
+		gameImages[0] = R.drawable.marioavatar;
+		
+		//gameImages [1] = R.drawable.diddyavatar;
+		//gameImages [2] = R.drawable.player;
 		
 	}
 
@@ -106,7 +104,7 @@ public class GameLobby extends Activity implements WebServicesInterface{
 		try {
 			json = new JSONObject(message);
 			if(json.get("mode").equals("gamelobby")){
-				
+					onPlayerUpdate(json.getJSONArray("players"));
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -118,6 +116,41 @@ public class GameLobby extends Activity implements WebServicesInterface{
 	@Override
 	public void onWebserviceConnected() {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	private void onPlayerUpdate(JSONArray jsonArray) throws JSONException {
+		JSONObject jsonObj = null;
+
+		String[] playerNames;
+		Integer[] playerImages;
+		Integer[] playerIds;
+		
+		playerNames = new String[jsonArray.length()];
+		playerImages = new Integer[jsonArray.length()];
+		playerIds = new Integer[jsonArray.length()];
+
+		Log.d("Socket", "GameLobby: onPlayerUpdate");
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			jsonObj = jsonArray.getJSONObject(i);
+			
+			playerNames[i] = jsonObj.getString("name");
+			playerIds[i] = jsonObj.getInt("id");
+			playerImages[i] = R.drawable.player;
+
+		}
+		
+		playerAdapter = new PlayerListItem(GameLobby.this, playerNames,
+				playerImages);
+		playerList.setAdapter(playerAdapter);
+		
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				playerList.setAdapter(playerAdapter);
+			}
+		});
 		
 	}
 
