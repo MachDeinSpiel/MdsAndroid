@@ -17,7 +17,6 @@ import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.mdsandroid.R;
 
-
 public class GameLobby extends Activity implements WebServicesInterface{
 
 	String[] gameNames = new String[3];
@@ -68,6 +67,8 @@ public class GameLobby extends Activity implements WebServicesInterface{
 		Bundle extras = getIntent().getExtras();
 		CharSequence user = (CharSequence) extras.get("username");
 		CharSequence game = (CharSequence) extras.get("game");
+		int players =  (Integer) extras.get("players");
+		int maxplayers = (Integer) extras.get("maxplayers");
 		//CharSequence id = (CharSequence) extras.get("id");
 		//CharSequence maxplayer = (CharSequence) extras.get("maxplayers");
 		
@@ -75,7 +76,8 @@ public class GameLobby extends Activity implements WebServicesInterface{
 
 		lblGameName.setText(game);
 		lblPlayerName.setText(user);
-		lblPlayers.setText(gameNames.length+"/3");
+//		lblPlayers.setText(players+"/"+maxplayers);
+		lblPlayers.setText("3/5");
 		
 		gameNames[0] = "Mario";
 		gameNames[1] = "Diddy";

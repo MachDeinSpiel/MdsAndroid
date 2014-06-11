@@ -6,92 +6,31 @@
     android:layout_marginTop="5dp"
     android:background="#FFFFFF" >
 
-    <TableRow 
-        android:layout_marginTop="10dp" 
-        android:layout_marginBottom="10dp">
+   <TableRow
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp" >
 
         <ImageView
             android:id="@+id/gameIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.1"
             android:src="@drawable/bomb" />
 
         <TextView
             android:id="@+id/gameText"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:gravity="center"
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:text="Bomb Defuser"
-            android:textSize="17sp"
+            android:text="Spieler#1"
+            android:textSize="14sp"
             android:textStyle="bold" />
-
-<!--         <TableLayout -->
-<!--             android:layout_width="wrap_content" -->
-<!--             android:layout_height="wrap_content" > -->
-
-<!--             <TableRow -->
-<!--                 android:id="@+id/tableRow1" -->
-<!--                 android:layout_width="fill_parent" -->
-<!--                 android:layout_height="fill_parent" -->
-<!--                 android:layout_marginTop="3dp" > -->
-
-<!--                 <TextView -->
-<!--                     android:id="@+id/TextView02" -->
-<!--                     android:layout_width="fill_parent" -->
-<!--                     android:layout_height="fill_parent" -->
-<!--                     android:text="Genre:" -->
-<!--                     android:textAppearance="?android:attr/textAppearanceSmall" -->
-<!--                     android:textSize="10sp" -->
-<!--                     android:textStyle="bold" /> -->
-
-<!--                 <TextView -->
-<!--                     android:id="@+id/labelGenre" -->
-<!--                     android:layout_width="fill_parent" -->
-<!--                     android:layout_height="fill_parent" -->
-<!--                     android:layout_marginLeft="5dp" -->
-<!--                     android:text="Action" -->
-<!--                     android:textAppearance="?android:attr/textAppearanceSmall" -->
-<!--                     android:textSize="10sp" /> -->
-
-<!--             </TableRow> -->
-
-<!--             <TableRow -->
-<!--                 android:id="@+id/tableRow2" -->
-<!--                 android:layout_width="fill_parent" -->
-<!--                 android:layout_height="fill_parent" -->
-<!--                 android:layout_marginTop="3dp" > -->
-
-<!--                 <TextView -->
-<!--                     android:id="@+id/TextView03" -->
-<!--                     android:layout_width="fill_parent" -->
-<!--                     android:layout_height="fill_parent" -->
-<!--                     android:text="Spieler:" -->
-<!--                     android:textAppearance="?android:attr/textAppearanceSmall" -->
-<!--                     android:textSize="10sp" -->
-<!--                     android:textStyle="bold" /> -->
-
-<!--                 <TextView -->
-<!--                     android:id="@+id/labelMaxPlayers" -->
-<!--                     android:layout_width="fill_parent" -->
-<!--                     android:layout_height="fill_parent" -->
-<!--                     android:layout_marginLeft="5dp" -->
-<!--                     android:text="2/10" -->
-<!--                     android:textAppearance="?android:attr/textAppearanceSmall" -->
-<!--                     android:textSize="10sp" /> -->
-
-<!--             </TableRow> -->
-
-<!--             <TableRow -->
-<!--                 android:id="@+id/TableRow01" -->
-<!--                 android:layout_width="fill_parent" -->
-<!--                 android:layout_height="fill_parent" -->
-<!--                 android:layout_marginTop="3dp" > -->
-
-<!--             </TableRow> -->
-
-<!--         </TableLayout> -->
 
 </TableRow>
 
