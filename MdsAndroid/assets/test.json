@@ -2,7 +2,9 @@
     "action": [
         {
             "ident": "updateMap",
-            "defaults": {}
+            "defaults": {
+                "target": "self"
+            }
         },
         {
             "ident": "useItem",
@@ -15,9 +17,21 @@
             "defaults": {
                 "text": "text"
             }
+        },
+        {
+            "ident": "showMapWButton",
+            "defaults": {
+                "target": "self"
+            }
+        },
+        {
+            "ident": "addToGroup",
+            "defaults": {
+                "target": "object.name",
+                "group": "name"
+            }
         }
     ],
-
     "states": [
         {
             "ID": "0",
@@ -56,7 +70,7 @@
                     }
                 },
                 {
-                    "target": "trigger Item",
+                    "target": "medipack buttons",
                     "event": "locationEvent",
                     "condition": {
                         "name": "nearby",
@@ -83,7 +97,7 @@
                     "target": "gameOver Bombs",
                     "event": "whiteboardEvent",
                     "condition": {
-                        "name": "compare",
+                        "name": "condition",
                         "params": {
                             "checkType": "equals",
                             "value": "Bombs.length",
@@ -98,7 +112,7 @@
                         "name": "condition",
                         "params": {
                             "checkType": "equals",
-                            "value": "self.health",
+                            "value": "Player.health",
                             "compValue": 0
                         }
                     }
@@ -112,7 +126,7 @@
             "startState": false,
             "finalState": false,
             "doAction": {
-                "name": "showText",
+                "name": "showInfo",
                 "params": {
                     "text": "object.text"
                 }
@@ -139,12 +153,77 @@
         },
         {
             "ID": "2",
+            "name": "medipack buttons",
+            "parentState": "null",
+            "startState": false,
+            "finalState": false,
+            "doAction": {
+                "name": "showMapWButton",
+                "params": {
+                    "target": "self"
+                }
+            },
+            "startAction": "null",
+            "endAction": "null",
+            "transition": [
+                {
+                    "target": "trigger Item",
+                    "event": "uiEvent",
+                    "condition": {
+                        "name": "use",
+                        "params": {
+                            "action": "RELEASE"
+                        }
+                    }
+                },
+                {
+                    "target": "pickup Medipack",
+                    "event": "uiEvent",
+                    "condition": {
+                        "name": "pickup",
+                        "params": {
+                            "action": "RELEASE"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": "3",
+            "name": "pickup Medipack",
+            "parentState": "null",
+            "startState": false,
+            "finalState": false,
+            "doAction": "null",
+            "startAction": {
+                "name": "addToGroup",
+                "params": {
+                    "target": "object.name",
+                    "group": "self.Inventory"
+                }
+            },
+            "endAction": "null",
+            "transition": {
+                "target": "move around",
+                "event": "whiteboardEvent",
+                "condition": {
+                  "name": "condition",
+                  "params": {
+                               "checkTyp": "equals",
+                               "value": "0",
+                               "compValue": "0" 
+                            }     
+                }
+            }
+        },
+        {
+            "ID": "4",
             "name": "gameOver Bombs",
             "parentState": "null",
             "startState": false,
             "finalState": true,
             "doAction": {
-                "name": "showText",
+                "name": "showInfo",
                 "params": {
                     "text": "Du hast alle Bomben erfolgreich hochgejagt!"
                 }
@@ -154,13 +233,13 @@
             "transition": "null"
         },
         {
-            "ID": "3",
+            "ID": "5",
             "name": "gameOver Health",
             "parentState": "null",
             "startState": false,
             "finalState": true,
             "doAction": {
-                "name": "showText",
+                "name": "showInfo",
                 "params": {
                     "text": "Du hast es scheinbar nicht geschafft alle Bomben zu vernichten!"
                 }
