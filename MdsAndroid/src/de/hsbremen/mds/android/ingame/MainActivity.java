@@ -92,6 +92,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		// Hier wird der Interpreter erstellt und wir mitgegeben und als
 		// Interface genutzt
+		username = "digga";
 		Interpreter interpreter = new Interpreter(jsonDatei, this, this,
 				username.toString());
 

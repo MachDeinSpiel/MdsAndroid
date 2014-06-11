@@ -11,19 +11,21 @@ import de.hsbremen.mds.mdsandroid.R;
 
 public class GameListItem extends ArrayAdapter<String> {
 	private final Activity context;
-	private final String[] web;
+	private final String[] name;
 	private final Integer[] imageId;
 	private final Integer[] maxplayers;
-	private final Integer[] players;
+	private final Integer[] activePlayers;
+	private final Integer[] id;
 
-	public GameListItem(Activity context, String[] web, Integer[] imageId,
-			Integer[] maxPlayers, Integer[] players) {
-		super(context, R.layout.gamelistitem, web);
+	public GameListItem(Activity context, String[] name, Integer[] imageId,
+			Integer[] maxPlayers, Integer[] players, Integer[] id) {
+		super(context, R.layout.gamelistitem, name);
 		this.context = context;
-		this.web = web;
+		this.name = name;
 		this.imageId = imageId;
 		this.maxplayers = maxPlayers;
-		this.players = players;
+		this.activePlayers = players;
+		this.id = id;
 	}
 
 	@Override
@@ -32,17 +34,17 @@ public class GameListItem extends ArrayAdapter<String> {
 		View rowView = inflater.inflate(R.layout.gamelistitem, null, true);
 		TextView txtTitle = (TextView) rowView.findViewById(R.id.gameText);
 		ImageView imageView = (ImageView) rowView.findViewById(R.id.gameIcon);
-		txtTitle.setText(web[position]);
+		txtTitle.setText(name[position]);
 		imageView.setImageResource(imageId[position]);
 
 		TextView maxPlayers = (TextView) rowView
 				.findViewById(R.id.labelMaxPlayers);
 
-			if(this.players[position] == null){
-				this.players[position] = 0;
+			if(this.activePlayers[position] == null){
+				this.activePlayers[position] = 0;
 			}
 		
-			maxPlayers.setText(this.players[position] + " / "
+			maxPlayers.setText(this.activePlayers[position] + " / "
 					+ this.maxplayers[position]);
 
 		// TextView maxplayersLabel = (TextView)
@@ -51,4 +53,25 @@ public class GameListItem extends ArrayAdapter<String> {
 
 		return rowView;
 	}
+
+	public Integer getImageId(int pos) {
+		return imageId[pos];
+	}
+
+	public String getName(int pos) {
+		return name[pos];
+	}
+
+	public Integer getMaxplayers(int pos) {
+		return maxplayers[pos];
+	}
+
+	public Integer getPlayers(int pos) {
+		return activePlayers[pos];
+	}
+
+	public Integer getId(int pos) {
+		return id[pos];
+	}
+	
 }

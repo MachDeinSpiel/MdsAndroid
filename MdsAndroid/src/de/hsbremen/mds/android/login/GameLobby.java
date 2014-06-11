@@ -64,6 +64,8 @@ public class GameLobby extends Activity implements WebServicesInterface{
 		Button lblPlayers = (Button) findViewById(R.id.labelPlayers);
 		ListView playerList = (ListView) findViewById(R.id.playerList);
 		
+//		startBtn.setEnabled(false);
+		
 		Bundle extras = getIntent().getExtras();
 		CharSequence user = (CharSequence) extras.get("username");
 		CharSequence game = (CharSequence) extras.get("game");
