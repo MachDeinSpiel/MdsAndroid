@@ -3,6 +3,7 @@ package de.hsbremen.mds.android.fragment;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
@@ -33,6 +35,7 @@ public class FragmentBackpack extends Fragment {
 	private ArrayList<String> itemAsStringList = new ArrayList<String>();
 	private BaseAdapter adapter;
 	private ListView lv;
+	private int style;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,7 +70,37 @@ public class FragmentBackpack extends Fragment {
 		lv.setAdapter(adapter);
 		registerForContextMenu(lv);
 		
+		// Style des Fragments anpassen
+		MainActivity a = (MainActivity)getActivity();
+		style = a.getStyleNumber();
+		styleFragment(view);
+		
 		return view;
+	}
+	
+	private void styleFragment(View view) {
+		
+		TextView t1 = (TextView)view.findViewById(R.id.labelBackpack);
+		
+		int styleText = 0;
+		int styleLabel = 0;
+		int styleLabelBgr = 0;
+		
+		switch(style){
+			case 0:
+				styleText = R.style.textColorDefaultBlue;
+				styleLabel = R.style.labelDefault;
+				styleLabelBgr = R.drawable.labelshape;
+				break;
+			case 1:
+				styleText = R.style.textColorDarkBlue;
+				styleLabel = R.style.labelDark;
+				styleLabelBgr = R.drawable.labelshapedark;
+				break;
+		}
+		
+		t1.setTextAppearance(getActivity(), styleLabel);
+		t1.setBackgroundResource(styleLabelBgr);
 	}
 	
 	

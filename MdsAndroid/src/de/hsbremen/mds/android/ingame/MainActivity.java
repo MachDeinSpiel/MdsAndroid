@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
@@ -65,6 +66,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	private CharSequence username;
 
 	public WebServices webServ;
+	
+	private int style = 0;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -87,6 +90,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		FragmentManager fm = getFragmentManager();
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
 
+		styleFragment();
+		
 		// Interpreter Erstellung
 		File jsonDatei = jsonEinlesen();
 
@@ -97,9 +102,23 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		// Initiater für die Listener registrierung
 		interpreterCom = new InterpreterCommunicator(interpreter, 5);
-
 	}
-
+	
+	private void styleFragment(){
+		
+		FrameLayout f = (FrameLayout)findViewById(R.id.container);
+		
+		switch(style){
+			case 0: 
+				f.setBackgroundColor(Color.parseColor("#fafafa"));
+				break;
+			case 1:
+				f.setBackgroundColor(Color.parseColor("#6e6e6e"));
+				break;
+			default:
+				break;
+		}
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -364,5 +383,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void onWebserviceConnected() {
 
+	}
+	
+	public int getStyleNumber(){
+		return this.style;
 	}
 }

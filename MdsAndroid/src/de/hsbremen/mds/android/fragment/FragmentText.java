@@ -18,10 +18,10 @@ import de.hsbremen.mds.mdsandroid.R;
 @SuppressLint("ValidFragment")
 public class FragmentText extends Fragment {
 
-	private boolean actionButton;
 	private View view;
 	private String message;
 	private SwipeAdapter sA;
+	private int style;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,46 +29,46 @@ public class FragmentText extends Fragment {
 		
 		view = inflater.inflate(R.layout.fragment_text, container, false);
 		
-//		Button btn = (Button) view.findViewById(R.id.btnReturnText);
-//		
-//		if(actionButton){
-//			btn.setVisibility(1);
-//		}
-//		
-//		btn.setOnClickListener(new View.OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				MainActivity activity = (MainActivity) getActivity();
-//				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnText);
-//				returnBtn.setVisibility(Button.GONE);
-//				activity.updateSwipeAdapter("showText");
-//				activity.interpreterCom.buttonClicked("back");
-//			}
-//		});
-//		
-//		Button btn2 = (Button) view.findViewById(R.id.btnCloseAppText);
-//		
-//		btn2.setOnClickListener(new View.OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				MainActivity activity = (MainActivity) getActivity();
-//				activity.updateSwipeAdapter("showText");
-//			}
-//		});
+		// Style des Fragments anpassen
+		MainActivity a = (MainActivity)getActivity();
+		style = a.getStyleNumber();
+		styleFragment(view);
 		
 		return view;
 	}
 	
+	private void styleFragment(View view) {
+		TextView t = (TextView)view.findViewById(R.id.text);
+		TextView t2 = (TextView)view.findViewById(R.id.labelText);
+		
+		int styleText = 0;
+		int styleLabel = 0;
+		int styleLabelBgr = 0;
+		
+		switch(style){
+			case 0:
+				styleText = R.style.textColorDefaultBlue;
+				styleLabel = R.style.labelDefault;
+				styleLabelBgr = R.drawable.labelshape;
+				break;
+			case 1:
+				styleText = R.style.textColorDarkBlue;
+				styleLabel = R.style.labelDark;
+				styleLabelBgr = R.drawable.labelshapedark;
+				break;
+		}
+		
+		t.setTextAppearance(getActivity(), styleText);
+		t2.setTextAppearance(getActivity(), styleLabel);
+		t2.setBackgroundResource(styleLabelBgr);
+	}
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		this.message = sA.getFragmentInformation().getText();
-		TextView t = (TextView)view.findViewById(R.id.placeholderText);
+		TextView t = (TextView)view.findViewById(R.id.text);
 		t.setText(this.message);
-//		Button b = (Button)view.findViewById(R.id.btnReturnText);
-//		b.setVisibility(1);
 		showButtons();
 	}
 	
@@ -82,6 +82,16 @@ public class FragmentText extends Fragment {
  			Button button = new Button(getActivity());
  			ll.addView(button);
  			button.setText(s);
+ 			
+ 			switch(style){
+ 				case 0:
+ 					button.setBackgroundResource(R.drawable.buttonshape);
+ 					break;
+ 				case 1:
+ 					button.setBackgroundResource(R.drawable.buttonshapedark);
+ 					break;
+ 			}
+ 			
  			button.setOnClickListener(new View.OnClickListener() {
  				
  				@Override
@@ -99,10 +109,6 @@ public class FragmentText extends Fragment {
 	
 	public void setMessage(String message){
 		this.message = message;
-	}
-
-	public void setActionbutton(boolean b) {
-		actionButton = b;
 	}
 
 	public void setSwipeAdapter(SwipeAdapter swipeAdapter) {

@@ -19,6 +19,7 @@ public class FragmentLocation extends Fragment{
 	private LocationManager manager; 
     private Location location;
     private View mapView;
+    private int style;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,7 +29,6 @@ public class FragmentLocation extends Fragment{
 		mapView = inflater.inflate(R.layout.fragment_location, container,false);
 		
 		Button btn1 = (Button) mapView.findViewById(R.id.btnCloseAppMap);
-		
 		btn1.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -38,7 +38,55 @@ public class FragmentLocation extends Fragment{
 			}
 		});
 		
+		// Style des Fragments anpassen
+		MainActivity a = (MainActivity)getActivity();
+		style = a.getStyleNumber();
+		styleFragment(mapView);
+		
 		return mapView;
+	}
+	
+	private void styleFragment(View view) {
+		
+		TextView t1 = (TextView)view.findViewById(R.id.txtLat);
+		TextView t2 = (TextView)view.findViewById(R.id.txtLong);
+		TextView t3 = (TextView)view.findViewById(R.id.txtLatVal);
+		TextView t4 = (TextView)view.findViewById(R.id.txtLongVal);
+		TextView t5 = (TextView)view.findViewById(R.id.txtGPS);
+		TextView t6 = (TextView)view.findViewById(R.id.txtGPSVal);
+		TextView t7 = (TextView)view.findViewById(R.id.labelLocation);
+		Button b1 = (Button)view.findViewById(R.id.btnCloseAppMap);
+		
+		int styleText = 0;
+		int styleLabel = 0;
+		int styleButton = 0;
+		int styleLabelBgr = 0;
+		
+		switch(style){
+			case 0:
+				styleText = R.style.textColorDefaultBlue;
+				styleLabel = R.style.labelDefault;
+				styleButton = R.drawable.buttonshape;
+				styleLabelBgr = R.drawable.labelshape;
+				break;
+			case 1:
+				styleText = R.style.textColorDarkBlue;
+				styleLabel = R.style.labelDark;
+				styleButton = R.drawable.buttonshapedark;
+				styleLabelBgr = R.drawable.labelshapedark;
+				break;
+		}
+		
+		t1.setTextAppearance(getActivity(), styleText);
+		t2.setTextAppearance(getActivity(), styleText);
+		t3.setTextAppearance(getActivity(), styleText);
+		t4.setTextAppearance(getActivity(), styleText);
+		t5.setTextAppearance(getActivity(), styleText);
+		t6.setTextAppearance(getActivity(), styleText);
+		t7.setTextAppearance(getActivity(), styleLabel);
+		t7.setBackgroundResource(styleLabelBgr);
+		b1.setTextAppearance(getActivity(), styleText);
+		b1.setBackgroundResource(styleButton);
 	}
 	
 	@Override
