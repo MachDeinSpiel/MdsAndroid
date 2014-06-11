@@ -104,31 +104,13 @@ public class ActionParser {
 					}
 					MdsMapAction mma = new MdsMapAction("showMap", lat, lon);
 					
-					ArrayList<MdsItem> mapEntities = new ArrayList<MdsItem>();
 					
-					for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
-						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
-						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-						Log.d(Interpreter.LOGTAG, "["+key+"] in die Liste eingefügt.");
-						MdsItem item = new MdsItem(key, "");
-						item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
-						item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
-						mapEntities.add(item);
-						
-					}
-					for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
-						//Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
-						//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-						MdsItem item = new MdsItem(key, "");
-						item.setLongitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"longitude").value));
-						item.setLatitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"latitude").value));
-						mapEntities.add(item);
-					}
+					changeMapEntities(guiInterface, wb);
 					//Map anzeigen
 					mma.execute(guiInterface);
 					//Und Bomben und Medipacks anzeigen
 					//TODO: Wenn die Visibillity klar definiert wird, entsprechende Items anzeigen
-					guiInterface.showMap(mapEntities);
+					
 				}
 			}; 
 		case showImage:
@@ -165,6 +147,7 @@ public class ActionParser {
 						Log.e(Interpreter.LOGTAG, "Could not create Copy-WBEntry");
 						e1.printStackTrace();
 					}
+					changeMapEntities(guiInterface, wb);
 					
 				}
 			};
@@ -189,6 +172,7 @@ public class ActionParser {
 					} catch (InvalidWhiteboardEntryException e) {
 						e.printStackTrace();
 					}
+					changeMapEntities(guiInterface, wb);
 					
 				}
 			};
@@ -396,6 +380,39 @@ public class ActionParser {
 		}
 		
 		return currentWb;
+	}
+	
+	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb) {
+		
+		ArrayList<MdsItem> mapEntities = new ArrayList<MdsItem>();
+		
+		for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
+			//Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
+			//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+			Log.d(Interpreter.LOGTAG, "["+key+"] in die Liste eingefügt.");
+			// get visibility of item
+			String vis = ((Whiteboard) wb.getAttribute("Bombs").value).get(key).visibility;
+			MdsItem item = new MdsItem(key, "");
+			if(vis == "mine" || vis == "all") {
+				item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
+				item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
+				mapEntities.add(item);
+			}
+			
+		}
+		for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
+			//Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
+			//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
+			// get visibility of item
+			String vis = ((Whiteboard) wb.getAttribute("Medipacks").value).get(key).visibility;
+			MdsItem item = new MdsItem(key, "");
+			if(vis == "mine" || vis == "all") {
+				item.setLongitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"longitude").value));
+				item.setLatitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"latitude").value));
+				mapEntities.add(item);
+			}
+		}
+		guiInterface.showMap(mapEntities);	
 	}
 	
 }
