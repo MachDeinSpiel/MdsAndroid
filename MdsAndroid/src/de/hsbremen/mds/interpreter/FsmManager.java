@@ -149,6 +149,7 @@ public class FsmManager {
 				result = EventParser.checkLocationEvent(t.getCondition(), wb, myID);
 				break;
 			case uiEvent:
+				Log.i("Mistake", "Buttonname des Ui-Events" + buttonName);
 				result = EventParser.checkUiEvent(buttonName, t.getCondition(), wb, myID);
 				break;
 			case whiteboardEvent:

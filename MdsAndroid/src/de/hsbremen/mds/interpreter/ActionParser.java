@@ -105,6 +105,7 @@ public class ActionParser {
 					MdsMapAction mma = new MdsMapAction("showMap", lat, lon);
 					
 					
+					Log.i(Interpreter.LOGTAG, "Changing Map Entities: Interface is: " + guiInterface.toString());
 					changeMapEntities(guiInterface, wb);
 					//Map anzeigen
 					mma.execute(guiInterface);
@@ -124,6 +125,7 @@ public class ActionParser {
 				@Override
 				public void execute(GuiInterface guiInterface) {
 					
+					Log.i(Interpreter.LOGTAG, "AddToGroup wird ausgeführt");
 					// get target
 					String[] keys = params.get("target").split("\\.");
 					
@@ -303,6 +305,12 @@ public class ActionParser {
 		
 		Log.i(Interpreter.LOGTAG,"parseParam splittedParamLength:"+splitted.size());
 		
+		// Wenn das Schlüsselwort "self vorkommt"
+		if(splitted.get(0).equals("self")) {
+			if(splitted.get(0).equals("object")){
+				
+			}
+		}
 		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
 		if(splitted.get(0).equals("object")){
 			
@@ -393,11 +401,11 @@ public class ActionParser {
 			// get visibility of item
 			String vis = ((Whiteboard) wb.getAttribute("Bombs").value).get(key).visibility;
 			MdsItem item = new MdsItem(key, "");
-			if(vis == "mine" || vis == "all") {
+//			if(vis == "mine" || vis == "all") {
 				item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
 				item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
 				mapEntities.add(item);
-			}
+//			}
 			
 		}
 		for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
@@ -412,6 +420,7 @@ public class ActionParser {
 				mapEntities.add(item);
 			}
 		}
+		Log.i(Interpreter.LOGTAG, "Size of Entities ist: " + mapEntities.size() + ", GuiInterface: " + guiInterface);
 		guiInterface.showMap(mapEntities);	
 	}
 	

@@ -212,6 +212,7 @@ public class EventParser {
 			}catch(NumberFormatException nfe) {  
 				try {
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
+					Log.i("Mistake", "ConditionName ist: " + cond.getName());
 					Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
 					String paramString = (String)cond.getParams().get("value");
 					paramString = paramString.replaceAll("self", Interpreter.WB_PLAYERS+"."+playerId);
@@ -227,7 +228,11 @@ public class EventParser {
 						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 					}else{
 						//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
+						WhiteboardEntry player = wb.getAttribute(paramsSplitted);
+						Log.i("Mistake", "params sind:" + paramsSplitted[0] + " : " + paramsSplitted[1]);
+						Log.i("Mistake", "WB ist: " + wb);
 						value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+						Log.i("Mistake", "Value ist: " + value);
 					}
 				} catch (NumberFormatException nfe2) {
 					// something went wrong, Value is not a Number
