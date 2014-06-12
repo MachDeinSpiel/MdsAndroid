@@ -38,10 +38,10 @@ public class SocketService extends Service {
 		Draft d = new Draft_17();
 
 		String PROTOKOLL_WS = "ws://";
-//		String serverIp = "195.37.176.178";
-//		String PORT_WS = ":1387";
-		String serverIp = "192.168.2.110";
-		String PORT_WS = ":8887";
+		String serverIp = "195.37.176.178";
+		String PORT_WS = ":1387";
+//		String serverIp = "192.168.2.110";
+//		String PORT_WS = ":8887";
 
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
