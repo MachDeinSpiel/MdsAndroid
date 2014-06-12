@@ -52,7 +52,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		this.myId = playerId;
 		whiteboard = new Whiteboard();
 		new Parser(this,json);	
-		
 	}
 
 	
@@ -87,7 +86,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	@Override
 	public void onButtonClick(String buttonName) {
 		Log.i(LOGTAG, "onButtonClick ausgeführt" + buttonName);
-		fsmManager.checkEvents("back");
+		fsmManager.checkEvents(buttonName);
 		
 	}
 
@@ -249,7 +248,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			whiteboard.setAttribute(wuo.getValue(), (String[])wuo.getKeys().toArray(new String[0]));
 			
 		}
-			
+		WhiteboardEntry player = whiteboard.getAttribute("Players", myId);
+		Log.i("Mistake", "Player Health von " + myId + " beim erzeugen ist" + ((Whiteboard)player.value).get("health").value);	
 		fsmManager.initiate();
 		
 	}
