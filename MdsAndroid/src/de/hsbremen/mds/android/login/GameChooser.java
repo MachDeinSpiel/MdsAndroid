@@ -12,11 +12,16 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.ingame.MainActivity;
@@ -87,7 +92,23 @@ public class GameChooser extends Activity implements WebServicesInterface {
 						lobbyIntent.putExtra("maxplayers", activeGamesAdapter.getMaxplayers(position));
 						lobbyIntent.putExtra("players", activeGamesAdapter.getPlayers(position));
 						lobbyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						
+						// TODO Sollte eigentlich ohne anfrage vom server gesendet werden
+						// LobbyListe anfordern:
+						json = null;
 
+						try {
+							json = new JSONObject();
+							json.put("mode", "gamelobby");
+							// TODO Später GameID einkommentieren
+							// json.put("id", gameIds[position]);
+							json.put("action", "players");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						webServ.send(json.toString());
 					}
 				});
 
@@ -118,10 +139,27 @@ public class GameChooser extends Activity implements WebServicesInterface {
 						lobbyIntent = new Intent(GameChooser.this, GameLobby.class);
 						lobbyIntent.putExtra("isInitial", true);
 						lobbyIntent.putExtra("username", user);
-						lobbyIntent.putExtra("game", activeGamesAdapter.getName(position));
-						lobbyIntent.putExtra("maxplayers", activeGamesAdapter.getMaxplayers(position));
-						lobbyIntent.putExtra("players", activeGamesAdapter.getPlayers(position));
+						lobbyIntent.putExtra("game", gametemplatesAdapter.getName(position));
+						lobbyIntent.putExtra("maxplayers", gametemplatesAdapter.getMaxplayers(position));
+						lobbyIntent.putExtra("players", gametemplatesAdapter.getPlayers(position));
 						lobbyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						
+						// TODO Sollte eigentlich ohne anfrage vom server gesendet werden
+						// LobbyListe anfordern:
+						json = null;
+
+						try {
+							json = new JSONObject();
+							json.put("mode", "gamelobby");
+							// TODO Später GameID einkommentieren
+							// json.put("id", gameIds[position]);
+							json.put("action", "players");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						webServ.send(json.toString());
 
 					}
 				});
@@ -164,12 +202,14 @@ public class GameChooser extends Activity implements WebServicesInterface {
 			} else if(json.getString("mode").equals("activegames")){
 				onActiveGamesUpdate(json.getJSONArray("games"));
 			} else if(json.getString("mode").equals("gamelobby")){
+				lobbyIntent.putExtra("json", json.toString());
 				webServ.unbindService();
 				getApplicationContext().startActivity(lobbyIntent);
 			} // TODO Eigentlich soll hier nur die Lobby erstellt werden 
 			else if(json.getString("mode").equals("full")){
 				Intent intent = new Intent(GameChooser.this, MainActivity.class);
 				intent.putExtra("username", user);
+				intent.putExtra("json", json.toString());
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				getApplicationContext().startActivity(intent);
 			}
@@ -274,6 +314,41 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	@Override
 	protected void onStop() {
 		super.onStop();
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+		super.onCreateContextMenu(menu, v, menuInfo);
+		menu.add("Kick");
+	}
+	
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item){
+		super.onContextItemSelected(item);
+
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		
+		if(item.getTitle()=="Kick"){
+			
+			JSONObject json = null;
+
+			try {
+				json = new JSONObject();
+				json.put("mode", "gamelobby");
+				// TODO Später GameID einkommentieren
+				// json.put("id", gameIds[position]);
+				json.put("action", "kick");
+				json.put("player", info.position);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			webServ.send(json.toString());
+		}
+		
+		return super.onContextItemSelected(item);
 	}
 
 	@Override

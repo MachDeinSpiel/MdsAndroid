@@ -8,15 +8,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
+import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class GameLobby extends Activity implements WebServicesInterface{
@@ -24,11 +28,75 @@ public class GameLobby extends Activity implements WebServicesInterface{
 	String[] gameNames = new String[3];
 	Integer[] gameImages = new Integer[3];
 	Integer[] gameIds;
+	CharSequence username;
+	boolean isInitialPlayer;
 	
 	ListView playerList;
 	PlayerListItem playerAdapter;
 	
 	private WebServices webServ;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.gamelobby);
+
+		Button startBtn = (Button) findViewById(R.id.startBtn);
+		Button lblGameName = (Button) findViewById(R.id.labelGameName);
+		Button lblPlayerName = (Button) findViewById(R.id.labelPlayername);
+		Button lblPlayers = (Button) findViewById(R.id.labelPlayers);
+		playerList = (ListView) findViewById(R.id.playerList);
+		
+		Bundle extras = getIntent().getExtras();
+		isInitialPlayer = extras.getBoolean("isInitail");
+		
+			startBtn.setEnabled(true);
+		
+		startBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				JSONObject json = new JSONObject();
+				try {
+					json.put("mode", "gamelobby");
+					json.put("action", "start");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				webServ.send(json.toString());
+			}
+		});
+		
+		// TODO ContextmenŸ:
+		/*
+		JSONObject json = new JSONObject();
+		try {
+			json.put("mode", "gamelobby");
+			json.put("action", "kick");
+			json.put("player", id);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		webServ.send(json.toString()); */
+		
+		username = (CharSequence) extras.get("username");
+		CharSequence game = (CharSequence) extras.get("game");
+		int players =  (Integer) extras.get("players");
+		int maxplayers = (Integer) extras.get("maxplayers");
+
+		webServ = WebServices.createWebServices(this);
+
+		lblGameName.setText(game);
+		lblPlayerName.setText(username);
+		
+		//Hier mŸssen die aktuellen Spieler und das Maximum an Spielern rein
+		lblPlayers.setText(players + "/" +maxplayers);
+		
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -53,47 +121,6 @@ public class GameLobby extends Activity implements WebServicesInterface{
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		setContentView(R.layout.gamelobby);
-
-		Button startBtn = (Button) findViewById(R.id.startBtn);
-		Button lblGameName = (Button) findViewById(R.id.labelGameName);
-		Button lblPlayerName = (Button) findViewById(R.id.labelPlayername);
-		Button lblPlayers = (Button) findViewById(R.id.labelPlayers);
-		playerList = (ListView) findViewById(R.id.playerList);
-		
-		Bundle extras = getIntent().getExtras();
-		boolean isInitial = extras.getBoolean("isInitail");
-		
-		if(isInitial){
-			startBtn.setEnabled(false);
-		}
-		
-		CharSequence user = (CharSequence) extras.get("username");
-		CharSequence game = (CharSequence) extras.get("game");
-		int players =  (Integer) extras.get("players");
-		int maxplayers = (Integer) extras.get("maxplayers");
-
-		webServ = WebServices.createWebServices(this);
-
-		lblGameName.setText(game);
-		lblPlayerName.setText(user);
-		
-		//Hier mŸssen die aktuellen Spieler und das Maximum an Spielern rein
-		lblPlayers.setText(players + "/" +maxplayers);
-		
-		//DUMMYS -> bzw. eingelogger!
-		gameNames[1] = user.toString();
-		gameImages[0] = R.drawable.marioavatar;
-		
-		//gameImages [1] = R.drawable.diddyavatar;
-		//gameImages [2] = R.drawable.player;
-		
-	}
-
-	@Override
 	public Activity getActivity() {
 		return this;
 	}
@@ -103,8 +130,16 @@ public class GameLobby extends Activity implements WebServicesInterface{
 		JSONObject json;
 		try {
 			json = new JSONObject(message);
-			if(json.get("mode").equals("gamelobby")){
+			if(json.getString("mode").equals("gamelobby")){
 					onPlayerUpdate(json.getJSONArray("players"));
+			}
+			if(json.getString("mode").equals("full")){
+				// Fullwhiteboardupdate (Spiel wurde gestartet)
+				Intent intent = new Intent(GameLobby.this, MainActivity.class);
+				intent.putExtra("username", username);
+				intent.putExtra("json", json.toString());
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				getApplicationContext().startActivity(intent);
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

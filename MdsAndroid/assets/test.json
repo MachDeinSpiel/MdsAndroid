@@ -19,12 +19,6 @@
             }
         },
         {
-            "ident": "showMapWButton",
-            "defaults": {
-                "target": "self"
-            }
-        },
-        {
             "ident": "addToGroup",
             "defaults": {
                 "target": "object.name",
@@ -112,7 +106,7 @@
                         "name": "condition",
                         "params": {
                             "checkType": "equals",
-                            "value": "Player.health",
+                            "value": "self.health",
                             "compValue": 0
                         }
                     }
@@ -126,7 +120,7 @@
             "startState": false,
             "finalState": false,
             "doAction": {
-                "name": "showInfo",
+                "name": "showText",
                 "params": {
                     "text": "object.text"
                 }
@@ -158,9 +152,9 @@
             "startState": false,
             "finalState": false,
             "doAction": {
-                "name": "showMapWButton",
+                "name": "showText",
                 "params": {
-                    "target": "self"
+                    "text": "Das ist ein Medipack! Aufnehmen oder benutzen?"
                 }
             },
             "startAction": "null",
@@ -185,6 +179,30 @@
                             "action": "RELEASE"
                         }
                     }
+                },
+                {
+                    "target": "move around",
+                    "event": "locationEvent",
+                    "condition": {
+                        "name": "!nearby",
+                        "params": {
+                            "object": {
+                                "name": "Medipacks",
+                                "quantifier": {
+                                    "checkType": "equals",
+                                    "value": 1
+                                }
+                            },
+                            "subject": {
+                                "name": "self",
+                                "quantifier": {
+                                    "checkType": "equals",
+                                    "value": 1
+                                }
+                            },
+                            "radius": 20
+                        }
+                    }
                 }
             ]
         },
@@ -203,18 +221,20 @@
                 }
             },
             "endAction": "null",
-            "transition": {
-                "target": "move around",
-                "event": "whiteboardEvent",
-                "condition": {
-                  "name": "condition",
-                  "params": {
+            "transition": [
+               {
+                    "target": "move around",
+                    "event": "whiteboardEvent",
+                    "condition": {
+                        "name": "condition",
+                        "params": {
                                "checkTyp": "equals",
                                "value": "0",
                                "compValue": "0" 
-                            }     
+                        }     
+                    }
                 }
-            }
+            ]
         },
         {
             "ID": "4",
@@ -223,7 +243,7 @@
             "startState": false,
             "finalState": true,
             "doAction": {
-                "name": "showInfo",
+                "name": "showText",
                 "params": {
                     "text": "Du hast alle Bomben erfolgreich hochgejagt!"
                 }
@@ -239,7 +259,7 @@
             "startState": false,
             "finalState": true,
             "doAction": {
-                "name": "showInfo",
+                "name": "showText",
                 "params": {
                     "text": "Du hast es scheinbar nicht geschafft alle Bomben zu vernichten!"
                 }

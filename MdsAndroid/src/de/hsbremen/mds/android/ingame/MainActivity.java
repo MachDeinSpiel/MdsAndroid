@@ -103,6 +103,13 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		// Initiater für die Listener registrierung
 		interpreterCom = new InterpreterCommunicator(interpreter, 5);
+		
+		try {
+			interpreterCom.onWebsocketMessage(new JSONObject(extras.getString("json")));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void styleFragment(){
