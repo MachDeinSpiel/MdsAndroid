@@ -127,21 +127,24 @@ public class ActionParser {
 					
 					Log.i(Interpreter.LOGTAG, "AddToGroup wird ausgeführt");
 					// get target
-					String[] keys = params.get("target").split("\\.");
+					WhiteboardEntry target = (WhiteboardEntry) parsedParams.get("target");
+					//String[] keys = { "Players", "1", "object"};
 					
 					// create copy of object
-					WhiteboardEntry target = wb.getAttribute(keys);
+					if(target == null) Log.e(Interpreter.LOGTAG, "Target Null");
+					//Log.i(Interpreter.LOGTAG, "Keys sind" + keys[0] + keys[1] + ((keys[2] != null) ? keys[2] : "kein dritter key"));
 					WhiteboardEntry copy;
 					try {
 						copy = new WhiteboardEntry(target.value, target.visibility);
 						// fill new Element into Whiteboard
-						wb.setAttribute(copy, (String) parsedParams.get("group"), keys[keys.length-1]);
-						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) to group [" + params.get("group").toString()+"]");
+						Log.i("Mistake", (String) parsedParams.get("group"));
+						wb.setAttribute(copy, (String) parsedParams.get("group"), (String)((Whiteboard)target.value).get("name").value);
+						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("name").value+"]) to group [" + params.get("group").toString()+"]");
 						
 						// immer gruppe + name
 						List<String> keysToValue = new Vector<String>();
 						keysToValue.add((String) parsedParams.get("group"));
-						keysToValue.add(keys[keys.length-1]);
+						keysToValue.add((String)((Whiteboard)target.value).get("name").value);
 						
 						// tell the server
 						sii.onWhiteboardUpdate(keysToValue, copy);
@@ -305,50 +308,80 @@ public class ActionParser {
 		
 		Log.i(Interpreter.LOGTAG,"parseParam splittedParamLength:"+splitted.size());
 		
+		Object tmpObj = wb;
 		// Wenn das Schlüsselwort "self vorkommt"
-		if(splitted.get(0).equals("self")) {
-			if(splitted.get(0).equals("object")){
-				
-			}
+		if(splitted.size() > 1 && splitted.get(0).equals("Players") &&  splitted.get(1).equals(""+playerId)) {
+			Log.i(Interpreter.LOGTAG, "Parse Self");
+			// auf Whiteboard des Spielers setzen und "Players" + ID löschen
+			splitted.remove(0);
+			splitted.remove(0);
+			tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(Interpreter.WB_PLAYERS, ""+playerId).value;
+		}
+		if(splitted.size() > 0 && splitted.get(0).equals(FsmManager.CURRENT_STATE)) {
+			Log.i(Interpreter.LOGTAG, "Parse Current");
+			splitted.remove(0);
+			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(Interpreter.WB_PLAYERS,""+playerId, FsmManager.CURRENT_STATE).value;
+			
+		} else if (splitted.size() > 0 &&  splitted.get(0).equals(FsmManager.LAST_STATE)) {
+			Log.i(Interpreter.LOGTAG, "Parse Last");
+			splitted.remove(0);
+			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(Interpreter.WB_PLAYERS,""+playerId, FsmManager.LAST_STATE).value;
 		}
 		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
-		if(splitted.get(0).equals("object")){
+		if(splitted.size() > 0 && splitted.get(0).equals("object")){
 			
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray(new String[0]);
 
+			Log.i("Mistake", "Object found...");
 			// TODO: erstmal nur mit einem
-			List<WhiteboardEntry> objects = state.getObjects();
+			Whiteboard objects = new Whiteboard();
+			// Wenn das tmpObj ein Whiteboard ist einfach auf Objects setzen
+			if (tmpObj instanceof Whiteboard) {
+				Log.i(Interpreter.LOGTAG, "Type: Whiteboard");
+				WhiteboardEntry wbe = ((Whiteboard)tmpObj).getAttribute("object");
+				objects.put(""+0, wbe);
+				if (objects == null) Log.i(Interpreter.LOGTAG, "Objects ist null");
+				Log.i(Interpreter.LOGTAG, "Size der Objects: " + objects.size());
+			// sonst die Objects des States einfügen
+			} else if (tmpObj instanceof MdsState) {
+				Log.i(Interpreter.LOGTAG, "Type: State");
+				List<WhiteboardEntry> objectList = ((MdsState)tmpObj).getObjects();
+				for(int i = 0; i < objectList.size(); i++) {
+					objects.put(""+i, objectList.get(0));
+				}
+			}
+			
 			if(objects == null){
 				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard in state "+state.getName()+ " trying currentState...");
-				MdsState currentState = null;
+				Whiteboard currentState = null;
 				try{
-					currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
-					objects = (currentState).getObjects();
+					currentState = (Whiteboard)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
+					Object o = ((Whiteboard) ((Whiteboard)currentState.get("objects").value).get(0).value).getAttribute(keys);
 				}catch(Exception e){
-					String stateName = currentState != null ? currentState.getName() : "null";
-					Log.e(Interpreter.LOGTAG,"Error while getting objects from whiteboard in state "+ stateName);
+					Log.e(Interpreter.LOGTAG,"Error while getting objects from whiteboard in state ");
 				}
 				if(objects == null){
 					Log.e(Interpreter.LOGTAG,"Still no luck while getting objects from whiteboard, still null");
 				}
 			}
 			Log.i(Interpreter.LOGTAG, "parseParam: objectsSize: "+objects.size());
-			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(0).value.toString());
-			Object o = ((Whiteboard)objects.get(0).value).getAttribute(keys);
+			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).toString());
+			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).value.toString());
+			Object o = ((Whiteboard)objects.get(""+0).value).getAttribute(keys);
 			if(keys.length >0 ){
-				return (String) ((Whiteboard)objects.get(0).value).getAttribute(keys).value;
+				return (String) ((Whiteboard)objects.get(""+0).value).getAttribute(keys).value;
 			}else{
-				return (Whiteboard)objects.get(0).value;
+				return (WhiteboardEntry)objects.get(""+0);
 			}
-		} else if (splitted.get(0).equals("subject")) {
+		} else if (splitted.size() > 0 && splitted.get(0).equals("subject")) {
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray(new String[0]);
 			// erstmal nur mit einem
 			List<WhiteboardEntry> subjects = state.getSubjects();
 			return (String) ((Whiteboard)subjects.get(0).value).getAttribute(keys).value;
 
-		} else if (splitted.get(0).equals("notValue")) {
+		} else if (splitted.size() > 0 && splitted.get(0).equals("notValue")) {
 			splitted.remove(0);
 			// String wieder zusammen setzen
 			StringBuffer buffer = new StringBuffer();

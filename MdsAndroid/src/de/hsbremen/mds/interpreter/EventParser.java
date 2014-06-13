@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import com.google.android.gms.drive.internal.o;
+
 import android.location.Location;
 import android.util.Log;
 import de.hsbremen.mds.common.valueobjects.MdsObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsQuantifier;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
@@ -111,6 +114,12 @@ public class EventParser {
 				if(result != null){
 					MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
 					currentState.setObjects(objects);
+					Log.i("Mistake", "Object Size ist " + objects.size());
+					// WB im State und beim Player speichern
+					// TODO: Erstmal nur ein Object
+					wb.setAttribute(objects.get(0), Interpreter.WB_PLAYERS,""+playerId, "object");
+					WhiteboardEntry target = wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId, "object");
+					Log.i("Mistake", "Adding Object to" + Interpreter.WB_PLAYERS + playerId + " object" + target.value);
 					return result;
 				}
 				//TODO : Error if quantifier is invalid
@@ -170,6 +179,12 @@ public class EventParser {
 				if(result != null){
 					MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
 					currentState.setObjects(objects);
+					Log.i("Mistake", "Object Size ist " + objects.size());
+					// WB im State und beim Player speichern
+					// TODO: Erstmal nur ein Object
+					wb.setAttribute(objects.get(0), Interpreter.WB_PLAYERS,""+playerId, "object");
+					Log.i("Mistake", "Adding Object to" + playerId + " Objects " +0);
+					
 					return result;
 				}
 				//TODO : Error if quantifier is invalid

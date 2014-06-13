@@ -122,13 +122,13 @@
             "doAction": {
                 "name": "showText",
                 "params": {
-                    "text": "object.text"
+                    "text": "lastState.object.text"
                 }
             },
             "startAction": {
                 "name": "useItem",
                 "params": {
-                    "target": "object"
+                    "target": "lastState.object"
                 }
             },
             "endAction": "null",
@@ -216,7 +216,7 @@
             "startAction": {
                 "name": "addToGroup",
                 "params": {
-                    "target": "object.name",
+                    "target": "self.object",
                     "group": "self.Inventory"
                 }
             },
