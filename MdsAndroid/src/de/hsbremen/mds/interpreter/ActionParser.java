@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import android.nfc.Tag;
 import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
@@ -128,6 +129,7 @@ public class ActionParser {
 					Log.i(Interpreter.LOGTAG, "AddToGroup wird ausgeführt");
 					// get target
 					WhiteboardEntry target = (WhiteboardEntry) parsedParams.get("target");
+					Log.i(Interpreter.LOGTAG, "Target found");
 					//String[] keys = { "Players", "1", "object"};
 					
 					// create copy of object
@@ -137,14 +139,30 @@ public class ActionParser {
 					try {
 						copy = new WhiteboardEntry(target.value, target.visibility);
 						// fill new Element into Whiteboard
-						Log.i("Mistake", (String) parsedParams.get("group"));
-						wb.setAttribute(copy, (String) parsedParams.get("group"), (String)((Whiteboard)target.value).get("name").value);
-						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("name").value+"]) to group [" + params.get("group").toString()+"]");
+						// get group
+						String[] groupKeys = parsedParams.get("group").toString().split("\\.");
 						
-						// immer gruppe + name
+						// immer gruppe + name für server
 						List<String> keysToValue = new Vector<String>();
-						keysToValue.add((String) parsedParams.get("group"));
-						keysToValue.add((String)((Whiteboard)target.value).get("name").value);
+						// Keys der keysToValue hinzufügen
+						for(String key : groupKeys)
+							keysToValue.add(key);
+						keysToValue.add("dummy");
+						
+						WhiteboardEntry group = wb.getAttribute(groupKeys);
+						// delete dummy if there
+						if (((Whiteboard)group.value).get("dummy") != null) {
+							Log.i(Interpreter.LOGTAG, "Deleting dummy in Inventory");
+							((Whiteboard)group.value).remove("dummy");
+							// tell the server
+							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+						} else {
+							Log.i(Interpreter.LOGTAG, "No Dummy found in Inventory");
+						}
+						// füge item der Gruppe hinzu
+						((Whiteboard)group.value).put((String)((Whiteboard)target.value).get("title").value, copy);
+						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("title").value+"]) to group [" 
+								+ parsedParams.get("group").toString()+ " + " + (String)((Whiteboard)target.value).get("title").value +"]");
 						
 						// tell the server
 						sii.onWhiteboardUpdate(keysToValue, copy);
@@ -224,11 +242,14 @@ public class ActionParser {
 			};
 		case useItem:
 			
+			Log.i("Mistake", "Executing Use Item");
 			//Vorbereitung: Item finden
 			//List<String> keysToItem = new Vector<String>(Arrays.asList((String)parsedParams.get("target")).split("\\.")));
 			// Whiteboard currentWb = (Whiteboard)parsedParams.get("target");parseActionString(wb, keysToItem, state, myId);
 			//Item, dessen useAction(s) ausgeführt werden sollen
-			final Whiteboard item = (Whiteboard)parsedParams.get("target");//(Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
+			Log.i("Mistake", parsedParams.toString());
+			final Whiteboard item = (Whiteboard)((WhiteboardEntry)parsedParams.get("target")).value;//(Whiteboard) currentWb.getAttribute(keysToItem.toArray(new String[0])).value;
+			Log.i("Mistake", "Received target");
 			final String typeString = type;
 			
 			
@@ -237,6 +258,7 @@ public class ActionParser {
 				public void execute(GuiInterface guiInterface) {
 					
 					Set<String> actions = ((Whiteboard)item.getAttribute("useAction").value).keySet();
+					Log.i("Mistake", "Executing UseAction des item");
 					//Alle useActions ausführen, dabei steht in action der aktuelle Name
 					//TODO: so wie es jetzt ist (auch wie es geparst wird) kann von jedem Typ immer nur
 					//eine Action da sein. Es können also zb. keine zwei "changeAttribute" aufrufe vorkommen
@@ -272,6 +294,7 @@ public class ActionParser {
 						}
 						
 						//Ausführbare Action erzeugen und sie danach ausführen
+						Log.i("Mistake", "Executing real Action");
 						MdsActionExecutable realAction = parseAction(typeString, new MdsAction(actionIdent, actionParams), state, wb, myId, sii);
 						realAction.execute(guiInterface);
 					}
@@ -352,7 +375,7 @@ public class ActionParser {
 				}
 			}
 			
-			if(objects == null){
+			if(objects.keySet().isEmpty()){
 				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard in state "+state.getName()+ " trying currentState...");
 				Whiteboard currentState = null;
 				try{
@@ -361,7 +384,7 @@ public class ActionParser {
 				}catch(Exception e){
 					Log.e(Interpreter.LOGTAG,"Error while getting objects from whiteboard in state ");
 				}
-				if(objects == null){
+				if(objects.keySet().isEmpty()){
 					Log.e(Interpreter.LOGTAG,"Still no luck while getting objects from whiteboard, still null");
 				}
 			}

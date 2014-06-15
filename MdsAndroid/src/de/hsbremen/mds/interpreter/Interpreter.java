@@ -186,6 +186,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			fsmManager.checkWBCondition();
 			
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","health").value);
+			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","inventory").value);
 		}
 	}
 

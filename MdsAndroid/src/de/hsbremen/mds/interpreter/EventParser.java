@@ -55,10 +55,12 @@ public class EventParser {
 		MdsObject object = (MdsObject) params.get("object");
 		// get Subject
 		MdsObject subject = (MdsObject) params.get("subject");
+		Log.i("Mistake", "Received object and subject of Event");
 		// get Object Quantifier
 		MdsQuantifier objQuanti = object.getQuantifier();
 		// get Subject Quantifier
 		MdsQuantifier subQuanti = subject.getQuantifier();
+		Log.i("Mistake", "Received quantifiers");
 		// get Radius
 		int radius;
 		try{
@@ -76,22 +78,28 @@ public class EventParser {
 		// get QuanticheckType
 		String checkType = objQuanti.getChecktype();
 		
+		Log.i("Mistake", "Checking different Conditions");
 		// -------------- alle Verschiedenen Location Events -----------//
 		if(cond.getName().equals("nearby")) {
+			Log.i("Mistake", "Condition is nearby");
 			// wenn das Subject "self" ist, im Einzelspieler immer
 			if(subject.getName().equals("self")){
+				Log.i("Mistake", "Subject is self");
 				// Locationobjekt des Spielers erzeuegen
 				double longitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "longitude").value);
 				double latitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "latitude").value);
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
+				Log.i("Mistake", "Received player Loc");
 
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
 				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
 
+				Log.i("Mistake", "Getting the real Object from WB");
 				Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
 
+				Log.i("Mistake", "Getting all Objects resulting from Nearby");
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
 				
 				Result result = null;
@@ -285,6 +293,7 @@ public class EventParser {
 			}
 			
 			// get checkType
+			Log.i("Mistake", cond.getParams().toString());
 			if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
 				if (value == compValue) return new Result(true, null, null);
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.LOWER)) {

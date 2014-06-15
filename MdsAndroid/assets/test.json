@@ -217,7 +217,7 @@
                 "name": "addToGroup",
                 "params": {
                     "target": "self.object",
-                    "group": "self.Inventory"
+                    "group": "self.inventory"
                 }
             },
             "endAction": "null",
@@ -228,7 +228,7 @@
                     "condition": {
                         "name": "condition",
                         "params": {
-                               "checkTyp": "equals",
+                               "checkType": "equals",
                                "value": "0",
                                "compValue": "0" 
                         }     

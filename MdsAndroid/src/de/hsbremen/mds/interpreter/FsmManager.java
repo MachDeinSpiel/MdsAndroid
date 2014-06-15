@@ -37,7 +37,7 @@ public class FsmManager {
 		this.wb = wb;
 		this.myID = id;
 		MdsState last = states.get(states.size() -1);
-		Log.i("Mistake", "Letzter State: " + last.getName() + " start Action: " + (last.getStartAction() == null ? "Keine Start Action" : last.getStartAction().getIdent()));
+//		Log.i("Mistake", "Letzter State: " + last.getName() + " start Action: " + (last.getStartAction() == null ? "Keine Start Action" : last.getStartAction().getIdent()));
 	}
 	
 	/**
@@ -50,6 +50,7 @@ public class FsmManager {
 				wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
 				//TODO: fix my shit up
 				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
+				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(Interpreter.WB_PLAYERS,myID).value.toString());
 				
 			}catch(InvalidWhiteboardEntryException e){
 				e.printStackTrace();
