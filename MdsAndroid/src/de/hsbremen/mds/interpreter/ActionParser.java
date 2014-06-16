@@ -171,8 +171,11 @@ public class ActionParser {
 						if(groupKeys[groupKeys.length-1].equals("inventory")) {
 							Log.i(Interpreter.LOGTAG, "Adding Item to Backpack");
 							// create item
-							MdsItem item = new MdsItem(((Whiteboard)target.value).get("title").toString(), ((Whiteboard)target.value).get("imagePath").toString(), 
-													   ((Whiteboard)target.value).get("pathKey").toString());
+							Log.i("Mistake", "Title: " +((Whiteboard)target.value).get("title").value.toString());
+							Log.i("Mistake", "Image: " + ((Whiteboard)target.value).get("imagePath").value.toString());
+							Log.i("Mistake", "pathKey: " + ((Whiteboard)target.value).get("pathKey").value.toString());
+							MdsItem item = new MdsItem(((Whiteboard)target.value).get("title").value.toString(), ((Whiteboard)target.value).get("imagePath").value.toString(), 
+													   ((Whiteboard)target.value).get("pathKey").value.toString());
 							// and tell server to add in backpack
 							guiInterface.addToBackpack(item);
 						}
