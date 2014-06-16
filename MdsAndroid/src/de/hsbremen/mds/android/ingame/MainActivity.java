@@ -322,6 +322,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void addToBackpack(MdsItem item) {
+		Log.i("Mistake", "Adding Item 2 Backpack in MainActivity");
 		FragmentBackpack f = (FragmentBackpack) swipeAdapter.getFragment("backpack");
 		f.addItem(item);
 	}

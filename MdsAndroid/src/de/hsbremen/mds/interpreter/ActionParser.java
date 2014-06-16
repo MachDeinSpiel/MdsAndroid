@@ -160,17 +160,29 @@ public class ActionParser {
 							Log.i(Interpreter.LOGTAG, "No Dummy found in Inventory");
 						}
 						// füge item der Gruppe hinzu
-						((Whiteboard)group.value).put((String)((Whiteboard)target.value).get("title").value, copy);
-						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("title").value+"]) to group [" 
-								+ parsedParams.get("group").toString()+ " + " + (String)((Whiteboard)target.value).get("title").value +"]");
+						((Whiteboard)group.value).put((String)((Whiteboard)target.value).get("pathKey").value, copy);
+						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("pathKey").value+"]) to group [" 
+								+ parsedParams.get("group").toString()+ " + " + (String)((Whiteboard)target.value).get("pathKey").value +"]");
 						
 						// tell the server
 						sii.onWhiteboardUpdate(keysToValue, copy);
+						
+						// wenn die Gruppe Inventory war, füge dem Backpack hinzu
+						if(groupKeys[groupKeys.length-1].equals("inventory")) {
+							Log.i(Interpreter.LOGTAG, "Adding Item to Backpack");
+							// create item
+							MdsItem item = new MdsItem(((Whiteboard)target.value).get("title").toString(), ((Whiteboard)target.value).get("imagePath").toString(), 
+													   ((Whiteboard)target.value).get("pathKey").toString());
+							// and tell server to add in backpack
+							guiInterface.addToBackpack(item);
+						}
+						// update Map view
+						changeMapEntities(guiInterface, wb);
+
 					} catch (InvalidWhiteboardEntryException e1) {
 						Log.e(Interpreter.LOGTAG, "Could not create Copy-WBEntry");
 						e1.printStackTrace();
 					}
-					changeMapEntities(guiInterface, wb);
 					
 				}
 			};
@@ -186,7 +198,7 @@ public class ActionParser {
 					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
 					
 					Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result+"]");
-					//TODO: server bescheid geben
+					// server bescheid geben
 					List<String> keysToValue = new Vector<String>();
 					for(String s : params.get("target").split("\\."))
 						keysToValue.add(s);
@@ -446,6 +458,7 @@ public class ActionParser {
 		return currentWb;
 	}
 	
+	// TODO: Darf natürlich nicht hart gecoded sein
 	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb) {
 		
 		ArrayList<MdsItem> mapEntities = new ArrayList<MdsItem>();
@@ -456,7 +469,7 @@ public class ActionParser {
 			Log.d(Interpreter.LOGTAG, "["+key+"] in die Liste eingefügt.");
 			// get visibility of item
 			String vis = ((Whiteboard) wb.getAttribute("Bombs").value).get(key).visibility;
-			MdsItem item = new MdsItem(key, "");
+			MdsItem item = new MdsItem(key, "", key);
 //			if(vis == "mine" || vis == "all") {
 				item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
 				item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
@@ -469,7 +482,7 @@ public class ActionParser {
 			//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
 			// get visibility of item
 			String vis = ((Whiteboard) wb.getAttribute("Medipacks").value).get(key).visibility;
-			MdsItem item = new MdsItem(key, "");
+			MdsItem item = new MdsItem(key, "", key);
 			if(vis == "mine" || vis == "all") {
 				item.setLongitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"longitude").value));
 				item.setLatitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"latitude").value));

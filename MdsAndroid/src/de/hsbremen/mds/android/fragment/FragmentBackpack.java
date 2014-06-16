@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -147,6 +148,7 @@ public class FragmentBackpack extends Fragment {
 	}
 	
 	public void addItem(MdsItem item){
+		Log.i("Mistake", "Adding Item for Real");
 		itemList.add(item);
 		onResume();
 	}
