@@ -105,8 +105,8 @@ public class FragmentBackpack extends Fragment {
 				
 				int resId = getResources().getIdentifier(currentItem, "drawable", getActivity().getPackageName());
 				
-				ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageItem);
-				imageView.setImageResource(resId);
+//				ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageItem);
+//				imageView.setImageResource(resId);
 			}
 			
 		});
@@ -137,10 +137,7 @@ public class FragmentBackpack extends Fragment {
 			
 			// Item benutzen an Interpreter schicken
 			MainActivity activity = (MainActivity) getActivity();
-//			activity.interpreterCom.useItem(itemList.get(info.position));
-			
-			activity.updateSwipeAdapter("image");
-			
+			activity.interpreterCom.useItem(itemList.get(info.position));
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);
 		}
@@ -153,21 +150,20 @@ public class FragmentBackpack extends Fragment {
 		
 		adapter.notifyDataSetChanged();
 
-		ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageItem);
-		imageView.setImageResource(R.drawable.backpack);
+//		ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageItem);
+//		imageView.setImageResource(R.drawable.backpack);
 		
 		return super.onContextItemSelected(item);
 	}
 	
 	public void addItem(MdsItem item){
-		Log.i("Mistake", "Adding Item for Real");
-		Log.i("Mistake", "Item.name: " + item.getName());
 		itemList.add(item);
-		onResume();
+		updateList();
 	}
 	
 	public void removeItem(MdsItem item){
 		itemList.remove(findItemInList(item));
+		updateList();
 	}
 	
 	private int findItemInList(MdsItem item){

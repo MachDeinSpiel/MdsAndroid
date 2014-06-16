@@ -4,48 +4,35 @@
     android:layout_height="match_parent"
     tools:context="FragmentBackpack" >
 
-        <ScrollView
-            android:id="@+id/scrollViewBackpack"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/labelBackpack"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            
-        	<LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="match_parent"
-		        android:orientation="vertical" >
+            android:layout_height="0dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/labelshape"
+            android:gravity="center"
+            android:minHeight="40dp"
+            android:text="Inventory"
+            android:textSize="25sp" />
 
-        	<TextView
-	            android:id="@+id/labelBackpack"
-	            android:layout_width="match_parent"
-	            android:layout_height="0dp"
-	            android:layout_weight="1"
-	            android:background="@drawable/labelshape"
-	            android:gravity="center"
-	            android:minHeight="40dp"
-	            android:text="Inventory"
-	            android:textSize="25sp" 
-	            android:layout_marginBottom="10dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:orientation="vertical" >
 
-	            <LinearLayout
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:orientation="vertical" >
-	
-	                <ListView
-	                    android:id="@+id/itemList"
-	                    android:layout_width="wrap_content"
-	                    android:layout_height="wrap_content"
-	                    android:layout_weight="1" >
-	                </ListView>
-	
-	                <ImageView
-	                    android:id="@+id/imageItem"
-	                    android:layout_width="match_parent"
-	                    android:layout_height="100dp"
-	                    android:layout_weight="1"
-	                    android:src="@drawable/backpack" />
-	            </LinearLayout>
-	    	</LinearLayout>
-        </ScrollView>
+            <ListView
+                android:id="@+id/itemList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </ListView>
+        </LinearLayout>
+    </LinearLayout>
 
 </FrameLayout>

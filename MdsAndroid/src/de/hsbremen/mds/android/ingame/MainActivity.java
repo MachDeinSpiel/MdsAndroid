@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	public WebServices webServ;
 	
-	private int style = 1;
+	private int style = 0;
 
 	@SuppressLint("NewApi")
 	@Override
