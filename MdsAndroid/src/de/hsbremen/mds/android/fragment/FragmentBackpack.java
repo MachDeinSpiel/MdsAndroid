@@ -37,39 +37,15 @@ public class FragmentBackpack extends Fragment {
 	private BaseAdapter adapter;
 	private ListView lv;
 	private int style;
+	private View view;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.fragment_backpack, container, false);
+		view = inflater.inflate(R.layout.fragment_backpack, container, false);
 		
-		itemAsStringList.clear();
-		for (MdsItem item : itemList) {
-			itemAsStringList.add(item.getName());
-		}
-		
-		lv = (ListView) view.findViewById(R.id.itemList);
-		
-		lv.setOnItemClickListener(new OnItemClickListener() {
-			
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int pos,
-					long id) {
-
-				String currentItem = itemList.get(pos).getImagePath();
-				
-				int resId = getResources().getIdentifier(currentItem, "drawable", getActivity().getPackageName());
-				
-				ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageItem);
-				imageView.setImageResource(resId);
-			}
-			
-		});
-		
-		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, itemAsStringList);
-		lv.setAdapter(adapter);
-		registerForContextMenu(lv);
+		updateList();
 		
 		// Style des Fragments anpassen
 		MainActivity a = (MainActivity)getActivity();
@@ -104,8 +80,44 @@ public class FragmentBackpack extends Fragment {
 		t1.setBackgroundResource(styleLabelBgr);
 	}
 	
-	
-	
+	@Override
+	public void onResume() {
+		updateList();
+		Log.i("Mistake", "Itemlist size = : " + itemList.size());
+		super.onResume();
+	}
+
+	private void updateList() {
+		itemAsStringList.clear();
+		for (MdsItem item : itemList) {
+			itemAsStringList.add(item.getName());
+		}
+		
+		lv = (ListView) view.findViewById(R.id.itemList);
+		
+		lv.setOnItemClickListener(new OnItemClickListener() {
+			
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int pos,
+					long id) {
+
+				String currentItem = itemList.get(pos).getImagePath();
+				
+				int resId = getResources().getIdentifier(currentItem, "drawable", getActivity().getPackageName());
+				
+				ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageItem);
+				imageView.setImageResource(resId);
+			}
+			
+		});
+		
+		Log.i("Mistake","Size der List in update ist: " + itemAsStringList.size());
+		
+		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, itemAsStringList);
+		lv.setAdapter(adapter);
+		registerForContextMenu(lv);
+	}
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -149,13 +161,13 @@ public class FragmentBackpack extends Fragment {
 	
 	public void addItem(MdsItem item){
 		Log.i("Mistake", "Adding Item for Real");
+		Log.i("Mistake", "Item.name: " + item.getName());
 		itemList.add(item);
 		onResume();
 	}
 	
 	public void removeItem(MdsItem item){
 		itemList.remove(findItemInList(item));
-		onResume();
 	}
 	
 	private int findItemInList(MdsItem item){
