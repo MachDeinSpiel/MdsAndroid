@@ -237,7 +237,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	public void useItem(MdsItem item) {
 		Log.i(LOGTAG, "User is using an item");
 		// get Item
-		WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, item.getPathKey());
+		WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory", item.getPathKey());
 		// get useAction
 		WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
 		for (String key : ((Whiteboard)useAction.value).keySet()) {
