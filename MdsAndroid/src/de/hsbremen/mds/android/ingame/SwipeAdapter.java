@@ -44,7 +44,7 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         activeFragmentsNumbers.add("showMap");
         
         FragmentBackpack backpackFragment = new FragmentBackpack();
-        backpackFragment.addItem(new MdsItem("bomb", "bomb"));
+//        backpackFragment.addItem(new MdsItem("bomb", "bomb"));
         activeFragmentsList.put("backpack", backpackFragment);
         activeFragmentsNumbers.add("backpack");
         

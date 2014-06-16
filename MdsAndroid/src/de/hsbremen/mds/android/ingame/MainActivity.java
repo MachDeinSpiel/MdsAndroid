@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	public WebServices webServ;
 	
-	private int style = 0;
+	private int style = 1;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -322,8 +322,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void addToBackpack(MdsItem item) {
-		FragmentBackpack f = (FragmentBackpack) swipeAdapter
-				.getFragment("backpack");
+		FragmentBackpack f = (FragmentBackpack) swipeAdapter.getFragment("backpack");
 		f.addItem(item);
 	}
 
@@ -394,5 +393,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 	public int getStyleNumber(){
 		return this.style;
+	}
+
+	@Override
+	public void removeFromBackpack(MdsItem item) {
+		// TODO Auto-generated method stub
+		
 	}
 }

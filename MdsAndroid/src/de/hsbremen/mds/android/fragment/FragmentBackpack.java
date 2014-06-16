@@ -148,6 +148,15 @@ public class FragmentBackpack extends Fragment {
 	
 	public void addItem(MdsItem item){
 		itemList.add(item);
+		onResume();
+	}
+	
+	public void removeItem(MdsItem item){
+		int itemIndex = 0;
+//		for(){
+//			
+//		}
+		itemList.remove(itemIndex);
 	}
 	
 }
