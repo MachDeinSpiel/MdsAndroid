@@ -152,11 +152,19 @@ public class FragmentBackpack extends Fragment {
 	}
 	
 	public void removeItem(MdsItem item){
+		itemList.remove(findItemInList(item));
+		onResume();
+	}
+	
+	private int findItemInList(MdsItem item){
 		int itemIndex = 0;
-//		for(){
-//			
-//		}
-		itemList.remove(itemIndex);
+		for(MdsItem i : itemList){
+			if(item.getPathKey().equals(i.getPathKey())){
+				return itemIndex;
+			}
+			itemIndex++;
+		}
+		return itemIndex;
 	}
 	
 }
