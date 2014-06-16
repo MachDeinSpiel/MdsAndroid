@@ -2,6 +2,7 @@ package de.hsbremen.mds.interpreter;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -17,6 +18,7 @@ import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition.EventType;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
@@ -231,8 +233,40 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 
 	@Override
+	// wird auf jeden Fall aus dem Backpack ausgeführt
 	public void useItem(MdsItem item) {
-		// TODO Auto-generated method stub
+		Log.i(LOGTAG, "User is using an item");
+		// get Item
+		WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, item.getPathKey());
+		// get useAction
+		WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
+		for (String key : ((Whiteboard)useAction.value).keySet()) {
+			Log.i(LOGTAG, "Executing Action: " + key + " of Item " + item.getImagePath());
+			// get Action
+			WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get(key);
+			
+			// get Params
+			HashMap<String, String> params = new HashMap<String, String>();
+			for(String actionParam : ((Whiteboard)wbAction.value).keySet()) {
+				Log.i(LOGTAG, "Adding Param " + actionParam + " to Action");
+				params.put(actionParam, (String)((Whiteboard)wbAction.value).get(actionParam).value);
+			}
+
+			// parse Action
+			MdsActionIdent ident = null;
+			if (key.equals("changeAttribute"))
+				ident = MdsActionIdent.changeAttribute;
+			else if (key.equals("removeFromGroup"))
+				ident = MdsActionIdent.removeFromGroup;
+			MdsAction action = new MdsAction(ident, params);
+			MdsState state = (MdsState)(whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value);
+			MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, myId, serverInterpreter);
+			
+			// execute Action if possible
+			if(actionExecute != null) {
+				actionExecute.execute(gui);
+			}
+		}
 		
 	}
 
