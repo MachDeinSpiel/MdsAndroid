@@ -3,6 +3,8 @@
  */
 package de.hsbremen.mds.android.login;
 
+import java.nio.channels.NotYetConnectedException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,8 +22,7 @@ import de.hsbremen.mds.android.communication.SocketService;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.mdsandroid.R;
 
-
-public class LoginActivity extends Activity implements WebServicesInterface{
+public class LoginActivity extends Activity implements WebServicesInterface {
 
 	private CharSequence user;
 	public SocketClient loginSocket;
@@ -67,13 +68,20 @@ public class LoginActivity extends Activity implements WebServicesInterface{
 		View.OnClickListener loginClick = new View.OnClickListener() {
 			public void onClick(View v) {
 
-				SocketService.createSocketService(getBaseContext(), user);
-				
-				
-	    		Intent myIntent = new Intent(LoginActivity.this, GameChooser.class);
-	    		myIntent.putExtra("username", user);
-	    		LoginActivity.this.startActivity(myIntent);
+				try {
+					SocketService.createSocketService(getBaseContext(), user);
 
+					Intent myIntent = new Intent(LoginActivity.this,
+							GameChooser.class);
+					myIntent.putExtra("username", user);
+					LoginActivity.this.startActivity(myIntent);
+
+				} catch (NotYetConnectedException ex) {
+					Toast toast = Toast.makeText(getApplicationContext(), 
+							"Server konnte nicht erreicht werden",
+							Toast.LENGTH_SHORT);
+					toast.show();
+				}
 			}
 		};
 
@@ -91,20 +99,20 @@ public class LoginActivity extends Activity implements WebServicesInterface{
 		JSONObject json;
 		try {
 			json = new JSONObject(message);
-			if(json.get("mode").equals("gamelist")){
-				
+			if (json.get("mode").equals("gamelist")) {
+
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
 	public void onWebserviceConnected() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
