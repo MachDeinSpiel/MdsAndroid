@@ -122,13 +122,13 @@
             "doAction": {
                 "name": "showText",
                 "params": {
-                    "text": "lastState.object.text"
+                    "text": "self.object.text"
                 }
             },
             "startAction": {
                 "name": "useItem",
                 "params": {
-                    "target": "lastState.object"
+                    "target": "self.object"
                 }
             },
             "endAction": "null",
