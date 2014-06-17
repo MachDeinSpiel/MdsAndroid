@@ -155,7 +155,7 @@ public class ActionParser {
 							Log.i(Interpreter.LOGTAG, "Deleting dummy in Inventory");
 							(group).remove("dummy");
 							// tell the server
-							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
 						} else {
 							Log.i(Interpreter.LOGTAG, "No Dummy found in Inventory");
 						}
@@ -206,7 +206,7 @@ public class ActionParser {
 					for(String s : params.get("target").split("\\."))
 						keysToValue.add(s);
 					try {
-						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
+						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
 					} catch (InvalidWhiteboardEntryException e) {
 						e.printStackTrace();
 					}
