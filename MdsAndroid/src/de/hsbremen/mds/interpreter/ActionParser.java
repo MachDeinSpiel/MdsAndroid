@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import android.nfc.Tag;
+import android.opengl.Visibility;
 import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
@@ -464,36 +465,60 @@ public class ActionParser {
 	// TODO: Darf natürlich nicht hart gecoded sein
 	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb) {
 		
-		ArrayList<MdsItem> mapEntities = new ArrayList<MdsItem>();
-		
-		for(String key : ((Whiteboard)wb.getAttribute("Bombs").value).keySet()){
-			//Whiteboard bomb = (Whiteboard)wb.getAttribute("Bombs",key).value;
-			//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-			Log.d(Interpreter.LOGTAG, "["+key+"] in die Liste eingefügt.");
-			// get visibility of item
-			String vis = ((Whiteboard) wb.getAttribute("Bombs").value).get(key).visibility;
-			MdsItem item = new MdsItem(key, "", key);
-//			if(vis == "mine" || vis == "all") {
-				item.setLongitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"longitude").value));
-				item.setLatitude(Double.parseDouble((String)wb.getAttribute("Bombs",key,"latitude").value));
-				mapEntities.add(item);
-//			}
-			
-		}
-		for(String key : ((Whiteboard)wb.getAttribute("Medipacks").value).keySet()){
-			//Whiteboard bomb = (Whiteboard)wb.getAttribute("Medipacks",key).value;
-			//mapEntities.add(new MdsItem((String)bomb.getAttribute("name").value, ""));
-			// get visibility of item
-			String vis = ((Whiteboard) wb.getAttribute("Medipacks").value).get(key).visibility;
-			MdsItem item = new MdsItem(key, "", key);
-			if(vis == "mine" || vis == "all") {
-				item.setLongitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"longitude").value));
-				item.setLatitude(Double.parseDouble((String)wb.getAttribute("Medipacks",key,"latitude").value));
-				mapEntities.add(item);
-			}
-		}
+		//TODO: add more visibilities
+		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, "", "all");
 		Log.i(Interpreter.LOGTAG, "Size of Entities ist: " + mapEntities.size() + ", GuiInterface: " + guiInterface);
 		guiInterface.showMap(mapEntities);	
+	}
+	
+	/**
+	 * Geht rekursiv alle Entries eines Whiteboards durch und prüft, ob dieses das Attribut "visibility"
+	 * enthält. Ist das der Fall, wird ein MdsItem angelegt und dies in die Liste eingefügt.
+	 * @param wb Whiteboard, bei dem begonnen werden soll zu prüfen
+	 * @param pathKey Key, unterdem dieses Whiteboard im Whiteboard dadrüber zu finden ist (root ist "")
+	 * @param visibility Array von Sichtbarkeiten, die ein Whiteboard haben kann, um in die Liste zu kommen
+	 * @return ArrayList von MdsItems, welche aus Whiteboards erzeugt wurden, die die verlangte Visibility haben
+	 */
+	private ArrayList<MdsItem> getEntriesAsItem(Whiteboard wb, String pathKey, String... visibility ){
+		ArrayList<MdsItem> items = new ArrayList<MdsItem>();
+		
+		//Mich (Whiteboard wb) hinzufügen?
+		boolean addMe = false;
+		if(wb.containsKey("visibility")){
+			for(String v : visibility){
+				if(((String)wb.getAttribute("visibility").value).equals(v)){
+					addMe = true;
+					break;
+				}
+			}
+		}
+		if(addMe){
+			Log.d(Interpreter.LOGTAG, "EntriesAsItem: adding to List:"+pathKey);
+			//mdsItem erzeugen
+			String title = "NoTitleAvailable";
+			String imgPath = "NoImageAvailable";
+			if(wb.containsKey("iconName")){
+				title = (String)wb.getAttribute("iconName").value;
+			}
+			if(wb.containsKey("imagePath")){
+				imgPath = (String)wb.getAttribute("imagePath").value;
+			}
+			MdsItem item = new MdsItem(title, imgPath, pathKey);
+			if(wb.containsKey("latitude") &&  wb.containsKey("longitude")){
+				item.setLatitude(Double.parseDouble((String)wb.getAttribute("latitude").value));
+				item.setLongitude(Double.parseDouble((String)wb.getAttribute("longitude").value));
+			}
+			items.add(item);
+		}
+		
+		//Rekursiv alle Whiteboards in diesem Whiteboard prüfen
+		for(String key : wb.keySet()){
+			if(wb.getAttribute(key).value instanceof Whiteboard){
+				items.addAll(getEntriesAsItem((Whiteboard)wb.getAttribute(key).value, key, visibility));
+			}
+		}
+		
+		return items;
 	}
 	
 }
