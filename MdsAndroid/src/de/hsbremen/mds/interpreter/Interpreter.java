@@ -207,8 +207,15 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		
 		if(entry.getValue().equals("delete")){
 			String elementKey = keys.remove(keys.size()-1);
+			Log.i("Mistake", "elementKey ist: " + elementKey);
 			try{
-				Whiteboard group = (Whiteboard)whiteboard.getAttribute(keys.toArray(new String[0])).value;
+				Log.i("Mistake", "Whiteboard: " +whiteboard.toString());
+				WhiteboardEntry groupEntry = whiteboard.getAttribute(keys.toArray(new String[0]));
+				if(groupEntry == null) {
+					Log.e(LOGTAG, "No Item Found to Key " + elementKey + ". Maybe it has already been removed");
+					return;
+				}
+				Whiteboard group = (Whiteboard) groupEntry.value;
 				group.remove(elementKey);
 			}catch(ClassCastException cce){
 				logKeys = "";
