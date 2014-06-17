@@ -61,8 +61,8 @@ public class InterpreterCommunicator {
 		}
 	}
 
-	public void useItem(MdsItem item) {
-		this.interpreter.useItem(item);
+	public void useItem(MdsItem item, String identifier) {
+		this.interpreter.useItem(item, identifier);
 	}
 
 	public void dropItem(MdsItem item) {

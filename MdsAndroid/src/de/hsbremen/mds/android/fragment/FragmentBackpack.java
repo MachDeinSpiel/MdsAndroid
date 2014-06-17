@@ -3,7 +3,6 @@ package de.hsbremen.mds.android.fragment;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -18,7 +17,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,7 +106,6 @@ public class FragmentBackpack extends Fragment {
 //				ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageItem);
 //				imageView.setImageResource(resId);
 			}
-			
 		});
 		
 		Log.i("Mistake","Size der List in update ist: " + itemAsStringList.size());
@@ -122,7 +119,7 @@ public class FragmentBackpack extends Fragment {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add("Benutzen");
-		menu.add("Ablegen");
+		menu.add("Entfernen");
 	}
 	
 
@@ -133,17 +130,19 @@ public class FragmentBackpack extends Fragment {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		
 		if(item.getTitle()=="Benutzen"){
-			Toast.makeText(getActivity(), itemList.get(info.position).getName()+" used!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity(), itemList.get(info.position).getName()+" benutzt!", Toast.LENGTH_LONG).show();
 			
 			// Item benutzen an Interpreter schicken
 			MainActivity activity = (MainActivity) getActivity();
-			activity.interpreterCom.useItem(itemList.get(info.position));
+			activity.interpreterCom.useItem(itemList.get(info.position), "use");
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);
 		}
 		
-		if(item.getTitle()=="Ablegen"){
-			Toast.makeText(getActivity(), "Du hast "+itemList.get(info.position).getName()+" droped!", Toast.LENGTH_LONG).show();
+		if(item.getTitle()=="Entfernen"){
+			Toast.makeText(getActivity(), "Du hast "+itemList.get(info.position).getName()+" entfernt!", Toast.LENGTH_LONG).show();
+			MainActivity activity = (MainActivity) getActivity();
+			activity.interpreterCom.useItem(itemList.get(info.position), "remove");
 			itemList.remove(info.position);
 			itemAsStringList.remove(info.position);
 		}
