@@ -234,30 +234,80 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 	@Override
 	// wird auf jeden Fall aus dem Backpack ausgeführt
-	public void useItem(MdsItem item) {
-		Log.i(LOGTAG, "User is using an item");
-		// get Item
-		WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory", item.getPathKey());
-		// get useAction
-		WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
-		for (String key : ((Whiteboard)useAction.value).keySet()) {
-			Log.i(LOGTAG, "Executing Action: " + key + " of Item " + item.getImagePath());
+	public void useItem(MdsItem item, String identifier) {
+		// use item
+		if(identifier.equals("use")) {
+			Log.i(LOGTAG, "User is using an item");
+			// get Item
+			WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory", item.getPathKey());
+			// get useAction
+			WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
+			for (String key : ((Whiteboard)useAction.value).keySet()) {
+				Log.i(LOGTAG, "Executing Action Use: " + key + " of Item " + item.getImagePath());
+				// get Action
+				WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get(key);
+				
+				// get Params
+				HashMap<String, String> params = new HashMap<String, String>();
+				for(String actionParam : ((Whiteboard)wbAction.value).keySet()) {
+					Log.i(LOGTAG, "Adding Param " + actionParam + " to Action");
+					// bei removeFrom Group muss das Inventory als Group angegeben werden
+					if (key.equals("removeFromGroup") && actionParam.equals("group"))
+						params.put("group", "self.inventory");
+					else
+						params.put(actionParam, (String)((Whiteboard)wbAction.value).get(actionParam).value);
+				}
+
+				// parse Action
+				MdsActionIdent ident = null;
+				if (key.equals("changeAttribute"))
+					ident = MdsActionIdent.changeAttribute;
+				else if (key.equals("removeFromGroup"))
+					ident = MdsActionIdent.removeFromGroup;
+				MdsAction action = new MdsAction(ident, params);
+				// TODO: Exceptions schreiben
+				if(ident == null) {
+					Log.e(LOGTAG, "No Action Ident found in Action " + key + ". Returning nothing");
+					return;
+				}
+				MdsState state = (MdsState)(whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value);
+				MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, myId, serverInterpreter);
+				
+				// execute Action if possible
+				if(actionExecute != null) {
+					actionExecute.execute(gui);
+				}
+				// Testausgabe
+				Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory").value.toString());
+				Log.i("Mistake", "Health des Spielers ist: " + whiteboard.getAttribute(WB_PLAYERS, ""+myId, "health").value);
+			}
+		// remove item
+		} else if(identifier.equals("remove")) {
+			Log.i(LOGTAG, "User is removing an item");
+			// get Item
+			WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory", item.getPathKey());
+			// get useAction
+			WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
+			Log.i(LOGTAG, "Executing Action Remove of Item " + item.getImagePath());
 			// get Action
-			WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get(key);
+			WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get("removeFromGroup");
+			if (wbAction == null) {
+				Log.e(LOGTAG, "No Action removeFromGroup Found in Item, returning nothing");
+				return;
+			}
 			
 			// get Params
 			HashMap<String, String> params = new HashMap<String, String>();
 			for(String actionParam : ((Whiteboard)wbAction.value).keySet()) {
 				Log.i(LOGTAG, "Adding Param " + actionParam + " to Action");
-				params.put(actionParam, (String)((Whiteboard)wbAction.value).get(actionParam).value);
+				if (actionParam.equals("group"))
+					params.put("group", "self.inventory");
+				else 
+					params.put(actionParam, (String)((Whiteboard)wbAction.value).get(actionParam).value);
 			}
 
 			// parse Action
-			MdsActionIdent ident = null;
-			if (key.equals("changeAttribute"))
-				ident = MdsActionIdent.changeAttribute;
-			else if (key.equals("removeFromGroup"))
-				ident = MdsActionIdent.removeFromGroup;
+			MdsActionIdent ident = MdsActionIdent.removeFromGroup;
 			MdsAction action = new MdsAction(ident, params);
 			MdsState state = (MdsState)(whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value);
 			MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, myId, serverInterpreter);
@@ -266,8 +316,10 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if(actionExecute != null) {
 				actionExecute.execute(gui);
 			}
+			// Testausgabe
+			Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory").value.toString());
 		}
-		
+				
 	}
 
 

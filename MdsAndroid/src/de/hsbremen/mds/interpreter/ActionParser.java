@@ -140,7 +140,8 @@ public class ActionParser {
 						copy = new WhiteboardEntry(target.value, target.visibility);
 						// fill new Element into Whiteboard
 						// get group
-						String[] groupKeys = parsedParams.get("group").toString().split("\\.");
+						Whiteboard group = (Whiteboard) parsedParams.get("group");
+						String[] groupKeys = params.get("group").split("\\.");
 						
 						// immer gruppe + name für server
 						List<String> keysToValue = new Vector<String>();
@@ -149,18 +150,17 @@ public class ActionParser {
 							keysToValue.add(key);
 						keysToValue.add("dummy");
 						
-						WhiteboardEntry group = wb.getAttribute(groupKeys);
 						// delete dummy if there
-						if (((Whiteboard)group.value).get("dummy") != null) {
+						if ((group).get("dummy") != null) {
 							Log.i(Interpreter.LOGTAG, "Deleting dummy in Inventory");
-							((Whiteboard)group.value).remove("dummy");
+							(group).remove("dummy");
 							// tell the server
 							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("remove","none"));
 						} else {
 							Log.i(Interpreter.LOGTAG, "No Dummy found in Inventory");
 						}
 						// füge item der Gruppe hinzu
-						((Whiteboard)group.value).put((String)((Whiteboard)target.value).get("pathKey").value, copy);
+						group.put((String)((Whiteboard)target.value).get("pathKey").value, copy);
 						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("pathKey").value+"]) to group [" 
 								+ parsedParams.get("group").toString()+ " + " + (String)((Whiteboard)target.value).get("pathKey").value +"]");
 						
@@ -200,7 +200,7 @@ public class ActionParser {
 					String[] keys = params.get("target").split("\\.");
 					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
 					
-					Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result+"]");
+					Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
 					// server bescheid geben
 					List<String> keysToValue = new Vector<String>();
 					for(String s : params.get("target").split("\\."))
@@ -348,8 +348,8 @@ public class ActionParser {
 		
 		Object tmpObj = wb;
 		// Wenn das Schlüsselwort "self vorkommt"
-		if(splitted.size() > 1 && splitted.get(0).equals("Players") &&  splitted.get(1).equals(""+playerId)) {
-			Log.i(Interpreter.LOGTAG, "Parse Self");
+		if(splitted.size() > 2 && splitted.get(0).equals("Players") &&  splitted.get(1).equals(""+playerId) && splitted.get(2).equals("object")) {
+			Log.i(Interpreter.LOGTAG, "Parse Object of Self");
 			// auf Whiteboard des Spielers setzen und "Players" + ID löschen
 			splitted.remove(0);
 			splitted.remove(0);
