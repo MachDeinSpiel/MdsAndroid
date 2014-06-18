@@ -336,7 +336,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		webServ.send(json.toString());
 	}
 
-	@Override
+//	@Override
 	public void onWebserviceConnectionClosed(int code, String reason,
 			boolean remote) {
 		// TODO Auto-generated method stub

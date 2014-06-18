@@ -288,7 +288,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		return super.onContextItemSelected(item);
 	}
 
-	@Override
+//	@Override
 	public void onWebserviceConnectionClosed(int code, String reason,
 			boolean remote) {
 		// TODO Auto-generated method stub

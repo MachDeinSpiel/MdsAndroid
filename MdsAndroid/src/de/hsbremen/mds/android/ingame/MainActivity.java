@@ -317,7 +317,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 					+ i.getLongitude());
 		}
 		mapFragment.setItemLocations(items2display);
-		mapFragment.gmapsUpdate(mapFragment.getLastLocation());
+		Location l = new Location("dummie");
+		mapFragment.gmapsUpdate(l);
 	}
 
 	@Override
