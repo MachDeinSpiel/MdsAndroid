@@ -1,7 +1,5 @@
 package de.hsbremen.mds.android.login;
 
-import java.util.logging.Handler;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,16 +10,10 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.ingame.MainActivity;
@@ -126,7 +118,8 @@ public class GameChooser extends Activity implements WebServicesInterface {
 							// json.put("id", gameIds[position]);
 							json.put("id", id);
 							json.put("name", user);
-							json.put("maxplayers", 3);
+							// TODO Maxplayers muss noch dynamisch sein
+							json.put("maxplayers", 2);
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -182,6 +175,11 @@ public class GameChooser extends Activity implements WebServicesInterface {
 				android.R.color.holo_blue_bright,
 				android.R.color.holo_orange_light,
 				android.R.color.holo_orange_light);
+		
+		String json = extras.getString("json");
+		if(json != null){
+			onWebSocketMessage(json);
+		}
 	}
 
 	@Override
@@ -315,41 +313,6 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	protected void onStop() {
 		super.onStop();
 	}
-	
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
-		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.add("Kick");
-	}
-	
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item){
-		super.onContextItemSelected(item);
-
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		
-		if(item.getTitle()=="Kick"){
-			
-			JSONObject json = null;
-
-			try {
-				json = new JSONObject();
-				json.put("mode", "gamelobby");
-				// TODO Später GameID einkommentieren
-				// json.put("id", gameIds[position]);
-				json.put("action", "kick");
-				json.put("player", info.position);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			webServ.send(json.toString());
-		}
-		
-		return super.onContextItemSelected(item);
-	}
 
 	@Override
 	public void onWebserviceConnected() {
@@ -371,5 +334,12 @@ public class GameChooser extends Activity implements WebServicesInterface {
 			e.printStackTrace();
 		}
 		webServ.send(json.toString());
+	}
+
+	@Override
+	public void onWebserviceConnectionClosed(int code, String reason,
+			boolean remote) {
+		// TODO Auto-generated method stub
+		
 	}
 }

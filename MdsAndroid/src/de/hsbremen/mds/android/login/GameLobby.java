@@ -12,11 +12,14 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -92,14 +95,16 @@ public class GameLobby extends Activity implements WebServicesInterface,
 						frag.prepareDialog(
 								playerAdapter.getPlayerName(position),
 								playerAdapter.getPlayerId(position));
-				        FragmentManager fm = getFragmentManager();
-				        frag.show(fm, "fragment_kick_player");
+						FragmentManager fm = getFragmentManager();
+						frag.show(fm, "fragment_kick_player");
 					}
 
 					public void onNothingSelected(AdapterView parentView) {
 					}
 				});
 
+		registerForContextMenu(playerList);
+		
 		username = (CharSequence) extras.get("username");
 		CharSequence game = (CharSequence) extras.get("game");
 		int players = (Integer) extras.get("players");
@@ -109,6 +114,15 @@ public class GameLobby extends Activity implements WebServicesInterface,
 
 		lblGameName.setText(game);
 		lblPlayerName.setText(username);
+
+		try {
+			JSONObject json = new JSONObject(extras.getString("json"));
+
+			playerUpdate(json.getJSONArray("players"));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Hier müssen die aktuellen Spieler und das Maximum an Spielern rein
 		lblPlayers.setText(players + "/" + maxplayers);
@@ -158,6 +172,13 @@ public class GameLobby extends Activity implements WebServicesInterface,
 				intent.putExtra("json", json.toString());
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				getApplicationContext().startActivity(intent);
+			}
+			if (json.get("mode").equals("gametemplates") || json.get("mode").equals("activegames")){
+				Intent myIntent = new Intent(GameLobby.this,
+						GameChooser.class);
+				myIntent.putExtra("username", username);
+				myIntent.putExtra("json", json.toString());
+				this.startActivity(myIntent);
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -224,6 +245,54 @@ public class GameLobby extends Activity implements WebServicesInterface,
 			}
 			webServ.send(json.toString());
 		}
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+		super.onCreateContextMenu(menu, v, menuInfo);
+		menu.add("Kick");
+	}
+	
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item){
+		super.onContextItemSelected(item);
+
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		
+		if(item.getTitle()=="Kick" && info.position != 0){
+			
+			JSONObject json = null;
+
+			try {
+				json = new JSONObject();
+				json.put("mode", "gamelobby");
+				// TODO Später GameID einkommentieren
+				// json.put("id", gameIds[position]);
+				json.put("action", "kick");
+				json.put("player", info.position);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			webServ.send(json.toString());
+		} else if(info.position == 0){
+			// TODO Toast cant kick yourself
+			Toast toast = Toast.makeText(getApplicationContext(), 
+					"Du kannst sich nicht selbst kicken",
+					Toast.LENGTH_SHORT);
+			toast.show();
+		}
+		
+		return super.onContextItemSelected(item);
+	}
+
+	@Override
+	public void onWebserviceConnectionClosed(int code, String reason,
+			boolean remote) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
