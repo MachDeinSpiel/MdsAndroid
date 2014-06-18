@@ -492,7 +492,7 @@ public class ActionParser {
 				}
 			}
 		}
-		if(addMe){
+		if(addMe && pathKey != "object"){
 			Log.d(Interpreter.LOGTAG, "EntriesAsItem: adding to List:"+pathKey);
 			//mdsItem erzeugen
 			String title = "NoTitleAvailable";
@@ -505,8 +505,13 @@ public class ActionParser {
 			}
 			MdsItem item = new MdsItem(title, imgPath, pathKey);
 			if(wb.containsKey("latitude") &&  wb.containsKey("longitude")){
-				item.setLatitude(Double.parseDouble((String)wb.getAttribute("latitude").value));
-				item.setLongitude(Double.parseDouble((String)wb.getAttribute("longitude").value));
+				try {
+					item.setName(pathKey);
+					item.setLatitude(Double.parseDouble((String)wb.getAttribute("latitude").value));
+					item.setLongitude(Double.parseDouble((String)wb.getAttribute("longitude").value));
+				} catch (NumberFormatException e1) {
+					Log.e(Interpreter.LOGTAG, "No Position set. Player might be at the nordpol");
+				}
 			}
 			items.add(item);
 		}

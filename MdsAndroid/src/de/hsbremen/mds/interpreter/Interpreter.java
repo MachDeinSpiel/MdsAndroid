@@ -211,10 +211,10 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			try{
 				Log.i("Mistake", "Whiteboard: " +whiteboard.toString());
 				WhiteboardEntry groupEntry = whiteboard.getAttribute(keys.toArray(new String[0]));
-				if(groupEntry == null) {
-					Log.e(LOGTAG, "No Item Found to Key " + elementKey + ". Maybe it has already been removed");
-					return;
-				}
+//				if(groupEntry == null) {
+//					Log.e(LOGTAG, "No Item Found to Key " + elementKey + ". Maybe it has already been removed");
+//					return;
+//				}
 				Whiteboard group = (Whiteboard) groupEntry.value;
 				group.remove(elementKey);
 			}catch(ClassCastException cce){
