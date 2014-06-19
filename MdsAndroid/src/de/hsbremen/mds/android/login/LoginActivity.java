@@ -130,7 +130,7 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 	private void registerPlayer() {
 		Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-				Uri.parse("http://mds.apertures.de/accounts/register.php"));
+				Uri.parse("http://195.37.176.178:1380/accounts/register.php"));
 		startActivity(browserIntent);
 	}
 
