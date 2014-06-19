@@ -3,9 +3,13 @@ package de.hsbremen.mds.android.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -107,7 +111,7 @@ public class FragmentInventory extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {                    	
-                toggleItemView(web[+ position], true); 
+                showItemDialog(position); 
             }
 	     });
 	        
@@ -123,55 +127,39 @@ public class FragmentInventory extends Fragment{
 		super.onViewCreated(view, savedInstanceState);
 	}
 	  
-	  private void toggleItemView(String itemName, boolean itemViewVisible){
-		  
-			LinearLayout l = (LinearLayout) getActivity().findViewById(R.id.itemView);
-			LinearLayout l2 = (LinearLayout) getActivity().findViewById(R.id.itemInfoContainer);
-			TextView name = (TextView) getActivity().findViewById(R.id.itemName);
-			ImageView image = (ImageView) getActivity().findViewById(R.id.imageView1);
-//
-//
-			if (itemViewVisible) {
-				l.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 0.5f));
-				l.setOrientation(LinearLayout.HORIZONTAL);
-				l2.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 1f));
-				name.setText(itemName);
-				image.setBackgroundResource(R.drawable.potion);
-				showActionButtons();
-			} else {
-				l.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 0f));
-				
-				l2.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 1f));
-			}
-		  
-	  }
 	  
-	  private void showActionButtons(){
-		  LinearLayout bc1 = (LinearLayout)getActivity().findViewById(R.id.buttonContainer1);
-		  LinearLayout bc2 = (LinearLayout)getActivity().findViewById(R.id.buttonContainer2);
-		  
-		  for(String b : buttonList){
-			  Button btn = new Button(getActivity());
-			  btn.setText(b);
-			  bc1.addView(btn);
-		  }
-		  
-		  Button btn = new Button(getActivity());
-		  btn.setText("back");
-		  bc2.addView(btn);
-		  btn.setOnClickListener(new View.OnClickListener() {
+	  private void showItemDialog(int position){
+			// custom dialog
+			final Dialog dialog = new Dialog(getActivity());
+			dialog.setContentView(R.layout.custom);
+			dialog.setTitle(web[+ position]);
+		 
+					// set the custom dialog components - text, image and button
+			TextView text = (TextView) dialog.findViewById(R.id.text);
+			text.setText("Dieses Item ist ein wirklich praktisches Item");
+			ImageView image = (ImageView) dialog.findViewById(R.id.image);
+			image.setImageResource(imageId[+ position]);
 			
-			@Override
-			public void onClick(View v) {
-				toggleItemView("", false);
-			}
-		});
-		  
-		  
-	  }
+			LinearLayout buttonContainer = (LinearLayout)dialog.findViewById(R.id.buttonContainer);
+			
+			for(String s : buttonList){
+				Button b = new Button(getActivity());
+				b.setText(s);
+				b.setBackgroundColor(Color.WHITE);
+				b.setLayoutParams(new ViewGroup.LayoutParams(150, 60));
+				buttonContainer.addView(b);
+			}	
+		 
+			Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonBack);
+			// if button is clicked, close the custom dialog
+			dialogButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+		 
+			dialog.show();
+		  }
 	
 }

@@ -71,6 +71,9 @@ public class GoogleMapFragment extends MapFragment {
 			map.clear();
 	
 			MarkerOptions mp = new MarkerOptions();
+			mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
+			mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
+			map.addMarker(mp);
 			
 			if(itemLocations != null){
 				for(MdsItem i : itemLocations){
@@ -81,8 +84,6 @@ public class GoogleMapFragment extends MapFragment {
 					map.addMarker(mpi);
 				}
 			}
-			
-			map.addMarker(mp);
 	
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
 			new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
