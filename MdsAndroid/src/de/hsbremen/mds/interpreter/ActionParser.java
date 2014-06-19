@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import android.nfc.Tag;
-import android.opengl.Visibility;
 import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;

@@ -5,15 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import com.google.android.gms.drive.internal.o;
-
 import android.location.Location;
 import android.util.Log;
 import de.hsbremen.mds.common.valueobjects.MdsObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsQuantifier;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
-import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 

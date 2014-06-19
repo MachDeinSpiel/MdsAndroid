@@ -82,6 +82,10 @@ public class GoogleMapFragment extends MapFragment {
 				}
 			}
 			
+			map.addMarker(mp);
+	
+			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+			new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
 			
 			if(!loc.getProvider().equals("dummie")){
 				playerlocation = loc;

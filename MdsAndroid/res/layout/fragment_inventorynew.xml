@@ -1,185 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/LinearLayout1"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/FrameLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" 
-    android:background="#FFFFFF">
-
-    <TextView
-        android:id="@+id/labelInventory"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/labelshape"
-            android:gravity="center"
-            android:text="Inventory"
-            android:textSize="25sp" />
-    
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4"
-        android:orientation="vertical" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/itemCon1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-            
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/itemCon4"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon5"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon6"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-            
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/itemCon7"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon8"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon9"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-           	
-
-        </LinearLayout>
-        
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
-
-            <Button
-                android:id="@+id/itemCon10"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon11"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                 android:layout_margin="3dp"/>
-
-            <Button
-                android:id="@+id/itemCon12"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/buttoninventory"
-                android:layout_margin="3dp"/>
-           	
-
-        </LinearLayout>
-        
-    </LinearLayout>
-
-    <View
-        android:id="@+id/view1"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#000000"/>
+    tools:context=".MainActivity" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:orientation="horizontal" 
+        android:layout_height="match_parent"
+        android:orientation="vertical" 
         android:background="#FFFFFF">
+	    <LinearLayout 
+	        android:layout_width="match_parent" 
+	        android:layout_height="0dp" 
+	        android:layout_weight="0"
+	        android:id="@+id/itemView">
+	        
+  	        <LinearLayout
+	            android:id="@+id/buttonContainer1"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:orientation="vertical" 
+	            android:layout_weight="1">
+	        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:src="@drawable/noitem"
-            android:layout_margin="3dp"/>
+	       	<LinearLayout
+	            android:id="@+id/itemInfoContainer"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:orientation="vertical" 
+	            android:layout_weight="1">
+		        <TextView
+		            android:id="@+id/itemName"
+		            android:layout_width="match_parent"
+		            android:layout_height="0dp"
+		            android:layout_weight="1"
+		            android:text="Itemtext" 
+		            android:layout_gravity="center"
+		            android:textSize="20sp"
+		        />
+		        <ImageView
+		            android:id="@+id/imageView1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="0dp"
+		            android:layout_weight="2"
+		            android:src="@drawable/red" />
 
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/buttoninventory"
-            android:layout_margin="3dp"/>
-        
+		    </LinearLayout>
+
+           <LinearLayout
+	            android:id="@+id/buttonContainer2"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="1"
+	            android:orientation="vertical" >
+	        </LinearLayout>
+
+	    </LinearLayout>
+	    
+	    <LinearLayout 
+	        android:layout_width="match_parent" 
+	        android:layout_height="0dp" 
+	        android:layout_weight="1"
+	        android:id="@+id/itemListContainer">
+	
+	    	<GridView 
+	    	    android:id="@+id/grid" 
+	    	    android:layout_width="fill_parent" 
+	    	    android:layout_height="fill_parent" 
+	    	    android:columnWidth="100dp" 
+	    	    android:gravity="center" 
+	    	    android:numColumns="auto_fit" 
+	    	    android:stretchMode="columnWidth" />
+	    </LinearLayout>
+    
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>
