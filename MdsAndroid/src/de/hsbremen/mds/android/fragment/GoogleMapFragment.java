@@ -26,6 +26,7 @@ public class GoogleMapFragment extends MapFragment {
 	private GoogleMap map;
 	private Location lastLocation;
 	private ArrayList<MdsItem> itemLocations = null;
+	private Location playerlocation;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -59,14 +60,14 @@ public class GoogleMapFragment extends MapFragment {
 		  Criteria criteria = new Criteria();
 		  criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		  String provider = lm.getBestProvider(criteria, true);
-		  Location myLocation = lm.getLastKnownLocation(provider);
-		  gmapsUpdate(myLocation);
+//		  Location myLocation = lm.getLastKnownLocation(provider);
+//		  gmapsUpdate();
 	}
 	
 
 	public void gmapsUpdate(Location loc){
 		
-		if(loc != null){
+		if(map != null){
 			map.clear();
 	
 			MarkerOptions mp = new MarkerOptions();
@@ -80,17 +81,22 @@ public class GoogleMapFragment extends MapFragment {
 					map.addMarker(mpi);
 				}
 			}
-	
-			mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
-	
-			mp.title("Player Position");
-	
-			mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
 			
-			map.addMarker(mp);
-	
-			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-			new LatLng(loc.getLatitude(), loc.getLongitude()), 16));
+			
+			if(!loc.getProvider().equals("dummie")){
+				playerlocation = loc;
+			}
+				mp.position(new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()));
+		
+				mp.title("Player Position");
+		
+				mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
+				
+				map.addMarker(mp);
+		
+				map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+				new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()), 16));
+			
 		}
 	}
 	

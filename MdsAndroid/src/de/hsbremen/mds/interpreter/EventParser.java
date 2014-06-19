@@ -86,51 +86,58 @@ public class EventParser {
 			if(subject.getName().equals("self")){
 				Log.i("Mistake", "Subject is self");
 				// Locationobjekt des Spielers erzeuegen
-				double longitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "longitude").value);
-				double latitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "latitude").value);
-				Location playerLoc = new Location("PlayerLoc");
-				playerLoc.setLatitude(latitude);
-				playerLoc.setLongitude(longitude);
-				Log.i("Mistake", "Received player Loc");
+				Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(Interpreter.WB_PLAYERS, playerId).value.toString());
+				try {
+					double longitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "longitude").value);
+					double latitude = Double.parseDouble((String) wb.getAttribute(Interpreter.WB_PLAYERS, playerId, "latitude").value);
+					Location playerLoc = new Location("PlayerLoc");
+					playerLoc.setLatitude(latitude);
+					playerLoc.setLongitude(longitude);
+					Log.i("Mistake", "Received player Loc");
 
-				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
-				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
+					//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
+					//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
 
-				Log.i("Mistake", "Getting the real Object from WB");
-				Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
+					Log.i("Mistake", "Getting the real Object from WB");
+					Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
 
-				Log.i("Mistake", "Getting all Objects resulting from Nearby");
-				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
-				
-				Result result = null;
-				// CheckType des Quantifiers identifizieren
-				if (checkType.equals(MdsCondition.EQUALS)) {
-					if (objects.size() == quanti) result = new Result(true, null, null);
-				} else if (checkType.equals(MdsQuantifier.LOWER)) {
-					if (objects.size() < quanti) result = new Result(true, null, null);
-				} else if (checkType.equals(MdsQuantifier.HIGHER)) {
-					if (objects.size() > quanti) result = new Result(true, null, null);
-				} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
-					if (objects.size() <= quanti) result = new Result(true, null, null);
-				} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
-					if (objects.size() >= quanti) result = new Result(true, null, null);
-				} else if (checkType.equals(MdsQuantifier.EXISTS)) {
-					if (objects.size() >= 1) result = new Result(true, null, null);
-				} else if (checkType.equals(MdsQuantifier.ALL)) {
-					if (objects.size() == realObject.entrySet().size()) result = new Result(true, null, null);
-				} 
-				if(result != null){
-					MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
-					currentState.setObjects(objects);
-					Log.i("Mistake", "Object Size ist " + objects.size());
-					// WB im State und beim Player speichern
-					// TODO: Erstmal nur ein Object
-					wb.setAttribute(objects.get(0), Interpreter.WB_PLAYERS,""+playerId, "object");
-					WhiteboardEntry target = wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId, "object");
-					Log.i("Mistake", "Adding Object to" + Interpreter.WB_PLAYERS + playerId + " object" + target.value);
-					return result;
+					Log.i("Mistake", "Getting all Objects resulting from Nearby");
+					List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
+					
+					Result result = null;
+					// CheckType des Quantifiers identifizieren
+					if (checkType.equals(MdsCondition.EQUALS)) {
+						if (objects.size() == quanti) result = new Result(true, null, null);
+					} else if (checkType.equals(MdsQuantifier.LOWER)) {
+						if (objects.size() < quanti) result = new Result(true, null, null);
+					} else if (checkType.equals(MdsQuantifier.HIGHER)) {
+						if (objects.size() > quanti) result = new Result(true, null, null);
+					} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
+						if (objects.size() <= quanti) result = new Result(true, null, null);
+					} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
+						if (objects.size() >= quanti) result = new Result(true, null, null);
+					} else if (checkType.equals(MdsQuantifier.EXISTS)) {
+						if (objects.size() >= 1) result = new Result(true, null, null);
+					} else if (checkType.equals(MdsQuantifier.ALL)) {
+						if (objects.size() == realObject.entrySet().size()) result = new Result(true, null, null);
+					} 
+					if(result != null){
+						MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
+						currentState.setObjects(objects);
+						Log.i("Mistake", "Object Size ist " + objects.size());
+						// WB im State und beim Player speichern
+						// TODO: Erstmal nur ein Object
+						wb.setAttribute(objects.get(0), Interpreter.WB_PLAYERS,""+playerId, "object");
+						WhiteboardEntry target = wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId, "object");
+						Log.i("Mistake", "Adding Object to" + Interpreter.WB_PLAYERS + playerId + " object" + target.value);
+						return result;
+					}
+					//TODO : Error if quantifier is invalid
+				} catch (NumberFormatException e1) {
+					Log.e(Interpreter.LOGTAG, "Position Attribute could not be parsed to double");
+					return new Result(false, null, null);
 				}
-				//TODO : Error if quantifier is invalid
+				
 			}else{
 				// TODO: Hier muss noch viel überlegt werden bei Multiplayer
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt

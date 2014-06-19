@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentImage;
+import de.hsbremen.mds.android.fragment.FragmentInventory;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMinigame;
 import de.hsbremen.mds.android.fragment.FragmentText;
@@ -43,6 +44,10 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         FragmentBackpack backpackFragment = new FragmentBackpack();
         activeFragmentsList.put("backpack", backpackFragment);
         activeFragmentsNumbers.add("backpack");
+        
+//        FragmentInventory inventoryFragment = new FragmentInventory();
+//        activeFragmentsList.put("inventory", inventoryFragment);
+//        activeFragmentsNumbers.add("inventory");
         
         //INAKTIVE FRAGMENTS
         FragmentText textFragment = new FragmentText();
