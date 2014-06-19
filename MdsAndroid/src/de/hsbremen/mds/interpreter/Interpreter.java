@@ -13,6 +13,7 @@ import de.hsbremen.mds.common.interfaces.FsmInterface;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.GameResult;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
@@ -255,7 +256,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get(key);
 				
 				// get Params
-				HashMap<String, String> params = new HashMap<String, String>();
+				HashMap<String, Object> params = new HashMap<String, Object>();
 				for(String actionParam : ((Whiteboard)wbAction.value).keySet()) {
 					Log.i(LOGTAG, "Adding Param " + actionParam + " to Action");
 					// bei removeFrom Group muss das Inventory als Group angegeben werden
@@ -304,7 +305,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			}
 			
 			// get Params
-			HashMap<String, String> params = new HashMap<String, String>();
+			HashMap<String, Object> params = new HashMap<String, Object>();
 			for(String actionParam : ((Whiteboard)wbAction.value).keySet()) {
 				Log.i(LOGTAG, "Adding Param " + actionParam + " to Action");
 				if (actionParam.equals("group"))
@@ -360,6 +361,12 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	public void onMinigameResult(int punkte, boolean gewonnen) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public void onGameResult(boolean hasWon, String identifier) {
+		actionParser.parseGameResult(whiteboard, hasWon, identifier, myId);	
 	}
 
 

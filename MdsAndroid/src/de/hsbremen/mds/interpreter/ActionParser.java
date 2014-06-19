@@ -13,6 +13,7 @@ import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.GameResult;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
@@ -50,7 +51,7 @@ public class ActionParser {
 		}
 	
 		//Parameter der Action
-		final HashMap<String, String> params = action.getParams();
+		final HashMap<String, Object> params = action.getParams();
 		final HashMap<String, Object> parsedParams = new HashMap<String, Object>();
 		
 		// Buttons heraussuchen, falls state transitions hat
@@ -71,7 +72,8 @@ public class ActionParser {
 		
 		//Jeden Parameter parsen/interpretieren
 		for(String key : params.keySet()){
-			parsedParams.put(key, parseParam(params.get(key), state, wb, myId));
+			if (params.get(key) instanceof String)
+				parsedParams.put(key, parseParam((String)params.get(key), state, wb, myId));
 		}
 		
 		/*	showVideo,
@@ -90,6 +92,8 @@ public class ActionParser {
 		case showVideo:
 			return new MdsVideoAction((String)parsedParams.get("title"), (String)parsedParams.get("url"), (String)parsedParams.get("text"), buttons);
 		case showMap:
+		case startMiniApp:
+			
 		case updateMap:
 			return new MdsActionExecutable() {
 				
@@ -142,7 +146,7 @@ public class ActionParser {
 						// fill new Element into Whiteboard
 						// get group
 						Whiteboard group = (Whiteboard) parsedParams.get("group");
-						String[] groupKeys = params.get("group").split("\\.");
+						String[] groupKeys = ((String)params.get("group")).split("\\.");
 						
 						// immer gruppe + name für server
 						List<String> keysToValue = new Vector<String>();
@@ -198,13 +202,13 @@ public class ActionParser {
 					
 					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
 					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
-					String[] keys = params.get("target").split("\\.");
+					String[] keys = ((String)params.get("target")).split("\\.");
 					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
 					
 					Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
 					// server bescheid geben
 					List<String> keysToValue = new Vector<String>();
-					for(String s : params.get("target").split("\\."))
+					for(String s : ((String)params.get("target")).split("\\."))
 						keysToValue.add(s);
 					try {
 						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
@@ -304,7 +308,7 @@ public class ActionParser {
 						
 						//Params auslesen und in action Params kopieren
 						Set<String> allParamKeys = ((Whiteboard)item.getAttribute("useAction", action).value).keySet();
-						HashMap<String,String> actionParams = new HashMap<String, String>();
+						HashMap<String,Object> actionParams = new HashMap<String, Object>();
 						for(String paramName : allParamKeys){
 							actionParams.put(paramName, (String) item.getAttribute("useAction", action, paramName).value);
 						}
@@ -441,6 +445,40 @@ public class ActionParser {
 		}
 		
 				
+	}
+	
+	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, String myId) {
+		// actions des aktuellen States nach identifier durchgucken
+		MdsState state= (MdsState)whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId, FsmManager.CURRENT_STATE).value;
+		HashMap<String, Object> actionParams = state.getStartAction().getParams();
+		// search in Params for identifier
+		for(String key : actionParams.keySet()) {
+			if(key.equals("type") && actionParams.get(key).equals(identifier)) {
+				// get Result Object
+				GameResult result = (GameResult) actionParams.get("result");
+				// get Key to the attribute that has 2 be changed
+				String attribute = (String) parseParam(result.attribute, state, whiteboard, myId);
+				if (hasWon) {
+					if(actionParams.get("setWin") != null)
+						whiteboard.get(attribute.split("//.")).value = result.setWin;
+					if(actionParams.get("addWin") != null) {
+						double value = Double.parseDouble((String)whiteboard.get(attribute.split("//.")).value);
+						value += result.addWin;
+						whiteboard.get(attribute.split("//.")).value = value;
+					}
+				} else {
+					if(actionParams.get("setLoose") != null)
+						whiteboard.get(attribute.split("//.")).value = result.setLoose;
+					if(actionParams.get("addLoose") != null) {
+						double value = Double.parseDouble((String)whiteboard.get(attribute.split("//.")).value);
+						value += result.addLoose;
+						whiteboard.get(attribute.split("//.")).value = value;
+					}
+				}
+				return;
+			}
+		}
+		// no key = identifier found
 	}
 	
 	
