@@ -1,6 +1,7 @@
 package de.hsbremen.mds.android.communication;
 
 import java.net.URI;
+import java.nio.channels.NotYetConnectedException;
 
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_17;
@@ -26,12 +27,11 @@ public class SocketService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO do something useful
 		Log.d("Socket", "Service: Gestartet");
-		connectToServer(intent.getExtras().getCharSequence("username"));
-
+		connectToServer();
 		return startId;
 	}
 
-	private void connectToServer(CharSequence user) {
+	public void connectToServer() {
 
 		Log.d("Socket", "SocketService: Connect to Server");
 		// Serverkommunikation
@@ -46,18 +46,17 @@ public class SocketService extends Service {
 		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 
-		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
-				+ user);
+		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent=" + "Android");
 		socketClient = new SocketClient(d, uri, this);
 
+		Log.d("Socket", "SocketService: Socketclient wurde gestartet...");
 		Thread t = new Thread(socketClient);
 		t.start();
 
 	}
 
-	public static void createSocketService(Context context, CharSequence user) {
+	public static void createSocketService(Context context) {
 		Intent intent = new Intent(context, SocketService.class);
-		intent.putExtra("username", user);
 		context.startService(intent);
 	}
 
@@ -67,16 +66,14 @@ public class SocketService extends Service {
 
 	public class MyBinder extends Binder {
 		SocketService getService(WebServices service) {
-			Log.d("Socket", "MyBinder: getService");
+			Log.d("Socket", "SocketService: MyBinder: getService");
 			SocketService.this.webServices = service;
 
 			if (bufferedMessage != null) {
 				webServices.onMessage(bufferedMessage);
 				bufferedMessage = null;
-				Log.d("Socket", "SocketService: Buffered Message");
+				Log.d("Socket", "SocketService: Buffered Message an Websocket gesendet");
 			}
-			Log.d("Socket",
-					"SocketService: Buffered Message sollte gesendet sein");
 
 			return SocketService.this;
 		}
@@ -93,13 +90,14 @@ public class SocketService extends Service {
 		return super.onUnbind(intent);
 	}
 
-	public void send(String s) {
+	public void send(String s) throws NotYetConnectedException{
 		try {
 			Log.d("Socket", "SocketService: Wird gesendet: " + s);
 			socketClient.getConnection().send(s);
 		} catch (NullPointerException ex) {
 			Log.d("Socket",
 					"SocketService: Noch keine Connection" + ex.getMessage());
+			throw new NotYetConnectedException();
 		}
 	}
 
@@ -111,7 +109,6 @@ public class SocketService extends Service {
 	}
 
 	public void setActivity(Activity activity) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -122,4 +119,13 @@ public class SocketService extends Service {
 			bufferedMessage = message;
 	}
 
+	public void onConnectionClosed(int code, String reason, boolean remote) {
+		// TODO Auto-generated method stub
+		webServices.onConnectionClosed(code, reason, remote);
+	}
+
+	public void onConnnectionHandshake(){
+		webServices.onConnectionHandshake();
+	}
+	
 }

@@ -389,7 +389,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void onWebserviceConnected() {
+	public void onSocketClientConnected() {
 
 	}
 	
@@ -399,6 +399,13 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void removeFromBackpack(MdsItem item) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onWebserviceConnectionClosed(int code, String reason,
+			boolean remote) {
 		// TODO Auto-generated method stub
 		
 	}

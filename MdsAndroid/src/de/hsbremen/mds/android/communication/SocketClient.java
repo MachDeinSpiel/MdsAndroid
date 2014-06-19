@@ -40,7 +40,7 @@ public class SocketClient extends WebSocketClient {
 				+ ex.getStackTrace().toString() + "]");
 		ex.printStackTrace();
 		if (ex instanceof ClassCastException) {
-			Log.d("SocketClient", "Error Details:[ ClasCastException]");
+			Log.d("Socket", "Error Details:[ ClasCastException]");
 		}
 		
 		ex.printStackTrace();
@@ -48,12 +48,14 @@ public class SocketClient extends WebSocketClient {
 
 	@Override
 	public void onOpen(ServerHandshake handshake) {
-		Log.d("Socket", "SocketClient: OnOpen");
+		Log.d("Socket", "SocketClient: OnSocketClientOpen");
+		service.onConnnectionHandshake();
 	}
 
 	@Override
 	public void onClose(int code, String reason, boolean remote) {
 		Log.d("Socket", "SocketClient: Closed: " + code + " " + reason);
+		service.onConnectionClosed(code, reason, remote);
 	}
 
 	public void onWebsocketMessageFragment(WebSocket conn, Framedata frame) {

@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" 
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    android:orientation="vertical" >
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -49,8 +49,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="100"
-                    android:hint="@string/usernameHint" 
-                    android:inputType="textVisiblePassword|textNoSuggestions">
+                    android:hint="@string/usernameHint"
+                    android:inputType="textVisiblePassword|textNoSuggestions" >
 
                     <requestFocus />
                 </EditText>
@@ -81,7 +81,6 @@
                     android:ems="10"
                     android:hint="@string/passwordHint"
                     android:inputType="textPassword" />
-
             </TableRow>
 
             <Button
@@ -95,8 +94,20 @@
                 android:text="@string/loginBtnRes"
                 android:textColor="#0086CC"
                 android:textSize="20sp" />
-
         </TableLayout>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/registerBtn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="175dp"
+        android:layout_height="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/buttonshape"
+        android:text="@string/loginBtnRegister"
+        android:textColor="#0086CC"
+        android:textSize="14sp" />
 
 </RelativeLayout>

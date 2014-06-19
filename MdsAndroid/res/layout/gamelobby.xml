@@ -76,6 +76,16 @@
             android:layout_height="fill_parent" >
 
             <Button
+                android:id="@+id/leaveBtn"
+                android:layout_width="fill_parent"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonshape"
+                android:text="@string/leave"
+                android:textColor="#0086CC"
+                android:textSize="20sp" />
+
+            <Button
                 android:id="@+id/startBtn"
                 android:layout_width="fill_parent"
                 android:layout_height="35dp"
