@@ -51,6 +51,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		setContentView(R.layout.gamelobby);
 
 		Button startBtn = (Button) findViewById(R.id.startBtn);
+		Button leaveBtn = (Button) findViewById(R.id.leaveBtn);
 		Button lblGameName = (Button) findViewById(R.id.labelGameName);
 		Button lblPlayerName = (Button) findViewById(R.id.labelPlayername);
 		lblPlayers = (Button) findViewById(R.id.labelPlayers);
@@ -59,10 +60,28 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		Bundle extras = getIntent().getExtras();
 		isInitialPlayer = extras.getBoolean("isInitial");
 
-		startBtn.setEnabled(isInitialPlayer);
 
 		Log.d("Socket", "GameLobby: IsInitialPlayer: " + isInitialPlayer);
 
+		leaveBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				JSONObject json = new JSONObject();
+				try {
+					json.put("mode", "gamelobby");
+					json.put("action", "leave");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				webServ.send(json.toString());
+				
+			}
+		});
+		
+		startBtn.setEnabled(isInitialPlayer);		
+		
 		if (isInitialPlayer) {
 			startBtn.setOnClickListener(new OnClickListener() {
 
@@ -187,7 +206,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	}
 
 	@Override
-	public void onWebserviceConnected() {
+	public void onSocketClientConnected() {
 		// TODO Auto-generated method stub
 
 	}

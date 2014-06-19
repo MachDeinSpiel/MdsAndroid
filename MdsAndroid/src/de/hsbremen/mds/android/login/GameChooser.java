@@ -308,6 +308,31 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		});
 
 	}
+	
+	
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		Log.d("Socket", "GameChooser: onResume()");
+		super.onResume();
+		getNewGameLists();
+		
+	}
+	
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		// TODO Auto-generated method stub
+		super.onNewIntent(intent);
+	}
+
+	@Override
+	public void recreate() {
+		// TODO Auto-generated method stub
+		Log.d("Socket", "GameChooser: recreate()");
+		super.recreate();
+	}
 
 	@Override
 	protected void onStop() {
@@ -315,8 +340,12 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	}
 
 	@Override
-	public void onWebserviceConnected() {
+	public void onSocketClientConnected() {
 		Log.d("Socket", "GameChooser: OnWebserviceConnected()");
+		getNewGameLists();
+	}
+	
+	private void getNewGameLists(){
 		JSONObject json = new JSONObject();
 		try {
 			json.put("mode", "gametemplates");
