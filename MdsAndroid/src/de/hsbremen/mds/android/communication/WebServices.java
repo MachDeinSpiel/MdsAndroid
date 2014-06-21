@@ -21,6 +21,7 @@ public class WebServices {
 	private void doBindSocketService(WebServicesInterface act) {
 
 		actInterface = act;
+		
 
 		Intent intent = new Intent(actInterface.getActivity().getBaseContext(),
 				SocketService.class);
@@ -30,10 +31,9 @@ public class WebServices {
 					IBinder service) {
 				// This is called when the connection with the service has been
 				// established.
+				Log.d("Socket", "WebServices: Connection zum Service hergestellt");
 				socketService = ((SocketService.MyBinder) service).getService(WebServices.this);
-				Log.d("Socket", "ServiceConnection muss vor TESTNACHRICHT");
 				socketService.setActivity(WebServices.this.actInterface.getActivity());
-				WebServices.this.onSocketConnected();
 			}
 
 			public void onServiceDisconnected(ComponentName className) {
@@ -42,7 +42,6 @@ public class WebServices {
 				socketService = null;
 			}
 		};
-
 		// Activity an Service binden
 		actInterface.getActivity().getBaseContext().bindService(intent, serviceConn,
 				Context.BIND_AUTO_CREATE);
@@ -72,7 +71,9 @@ public class WebServices {
 	}
 	
 	public void onSocketConnected(){
-		actInterface.onWebserviceConnected();
+		Log.d("Socket", "WebServices onSocketConnected");
+		socketService.connectToServer();
+		actInterface.onSocketClientConnected();
 	}
 
 	public void unbindService() {
@@ -81,4 +82,14 @@ public class WebServices {
 		//TODO Service richtig unbinden:
 //		socketService.unbindService(serviceConn);
 	}
+
+	public void onConnectionClosed(int code, String reason, boolean remote) {
+		// TODO Auto-generated method stub
+		actInterface.onWebserviceConnectionClosed(code, reason, remote);
+	}
+	
+	public void onConnectionHandshake(){
+		actInterface.onSocketClientConnected();
+	}
+
 }

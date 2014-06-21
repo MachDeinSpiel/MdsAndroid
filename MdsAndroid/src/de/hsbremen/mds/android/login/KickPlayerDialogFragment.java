@@ -1,6 +1,5 @@
 package de.hsbremen.mds.android.login;
 
-import de.hsbremen.mds.mdsandroid.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;

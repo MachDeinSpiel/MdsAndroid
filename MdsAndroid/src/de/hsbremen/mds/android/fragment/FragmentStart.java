@@ -1,18 +1,12 @@
 package de.hsbremen.mds.android.fragment;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import de.hsbremen.mds.android.ingame.MainActivity;
-import de.hsbremen.mds.common.valueobjects.MdsImage;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentStart extends Fragment {

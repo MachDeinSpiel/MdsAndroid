@@ -4,7 +4,9 @@ import android.app.Activity;
 
 public interface WebServicesInterface {
 
-	public void onWebserviceConnected();
+	public void onSocketClientConnected();
 	public Activity getActivity();
 	public void onWebSocketMessage(String message);
+	public void onWebserviceConnectionClosed(int code, String reason,
+			boolean remote);
 }

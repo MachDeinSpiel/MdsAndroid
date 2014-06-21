@@ -16,9 +16,6 @@ import org.json.simple.parser.ParseException;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
-import de.hsbremen.mds.common.interfaces.InterpreterInterface;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsGroup;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsMembers;
 
 public class ParserServer {
 	
