@@ -62,7 +62,7 @@ public class ActionParser {
 				// Alle Transitions durchgehen
 				for(int i = 0; i < trans.length; i++) {
 					if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
-						buttons.add(trans[i].getCondition().getName());
+						buttons.add(trans[i].getCondition()[0].getName());
 					}
 				}
 			}
@@ -461,7 +461,7 @@ public class ActionParser {
 						whiteboard.get(attribute.split("//.")).value = result.setWin;
 					if(actionParams.get("addWin") != null) {
 						double value = Double.parseDouble((String)whiteboard.get(attribute.split("//.")).value);
-						value += result.addWin;
+						value += result.addResult;
 						whiteboard.get(attribute.split("//.")).value = value;
 					}
 				} else {
@@ -469,7 +469,7 @@ public class ActionParser {
 						whiteboard.get(attribute.split("//.")).value = result.setLoose;
 					if(actionParams.get("addLoose") != null) {
 						double value = Double.parseDouble((String)whiteboard.get(attribute.split("//.")).value);
-						value += result.addLoose;
+						value -= result.addResult;
 						whiteboard.get(attribute.split("//.")).value = value;
 					}
 				}

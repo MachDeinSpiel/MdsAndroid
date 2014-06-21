@@ -14,10 +14,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import android.util.Log;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.GameResult;
 import de.hsbremen.mds.common.valueobjects.MdsObject;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsEvent;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsQuantifier;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
@@ -46,10 +47,12 @@ public class Parser {
 			/* ---- aus der JSON datei lesen und in Objekte speichern ---- */
 			
 			// read MdsActions
+			Log.i("Mistake", "Parser reading actions...");
 			JSONArray MdsAction = (JSONArray) jsonObject.get("action"); //lese des MdsAction arrays aus der JSON datei
 			this.allMdsActions = readActions(MdsAction);
 			
 			// read MdsStates
+			Log.i("Mistake", "Parser reading states...");
 			JSONArray MdsState = (JSONArray) jsonObject.get("states");	// lesen des MdsState arrays aus der JSON datei
 			this.allMdsStates = readStates(MdsState);
 			
@@ -339,7 +342,7 @@ public class Parser {
 			
 			Set<String> keySet = params.keySet();
 			for (String key : keySet){
-				if(!key.equals("object") || !key.equals("subject")) {
+				if(!(key.equals("object") || key.equals("subject"))) {
 					Object values = params.get(key);
 					paramsHM.put(key, values);
 				}

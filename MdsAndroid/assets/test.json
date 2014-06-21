@@ -42,74 +42,82 @@
                 {
                     "target": "trigger Item",
                     "event": "locationEvent",
-                    "condition": {
-                        "name": "nearby",
-                        "params": {
-                            "object": {
-                                "name": "Bombs",
-                                "quantifier": {
-                                    "checkType": "equals",
-                                    "value": 1
-                                }
-                            },
-                            "subject": {
-                                "name": "self",
-                                "quantifier": {
-                                    "checkType": "equals",
-                                    "value": 1
-                                }
-                            },
-                            "radius": 20
+                    "condition": [
+                        {
+                            "name": "nearby",
+                            "params": {
+                                "object": {
+                                    "name": "Bombs",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "subject": {
+                                    "name": "self",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "radius": 20
+                            }
                         }
-                    }
+                    ]
                 },
                 {
                     "target": "medipack buttons",
                     "event": "locationEvent",
-                    "condition": {
-                        "name": "nearby",
-                        "params": {
-                            "object": {
-                                "name": "Medipacks",
-                                "quantifier": {
-                                    "checkType": "equals",
-                                    "value": 1
-                                }
-                            },
-                            "subject": {
-                                "name": "self",
-                                "quantifier": {
-                                    "checkType": "equals",
-                                    "value": 1
-                                }
-                            },
-                            "radius": 20
+                    "condition": [
+                        {
+                            "name": "nearby",
+                            "params": {
+                                "object": {
+                                    "name": "Medipacks",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "subject": {
+                                    "name": "self",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "radius": 20
+                            }
                         }
-                    }
+                    ]
                 },
                 {
                     "target": "gameOver Bombs",
                     "event": "whiteboardEvent",
-                    "condition": {
-                        "name": "condition",
-                        "params": {
-                            "checkType": "equals",
-                            "value": "Bombs.length",
-                            "compValue": 0
+                    "condition": [
+                        {
+                            "name": "condition",
+                            "params": {
+                                "checkType": "equals",
+                                "value": "Bombs.length",
+                                "compValue": 0
+                            }
                         }
-                    }
+                    ]
                 },
                 {
                     "target": "gameOver Health",
                     "event": "whiteboardEvent",
-                    "condition": {
-                        "name": "condition",
-                        "params": {
-                            "checkType": "equals",
-                            "value": "self.health",
-                            "compValue": 0
+                    "condition": [
+                        {
+                            "name": "condition",
+                            "params": {
+                                "checkType": "lowequals",
+                                "value": "self.health",
+                                "compValue": 0
+                            }
                         }
-                    }
+                    ]
                 }
             ]
         },
@@ -136,12 +144,14 @@
                 {
                     "target": "move around",
                     "event": "uiEvent",
-                    "condition": {
-                        "name": "back",
-                        "params": {
-                            "action": "RELEASE"
+                    "condition": [
+                        {
+                            "name": "back",
+                            "params": {
+                                "action": "RELEASE"
+                            }
                         }
-                    }
+                    ]
                 }
             ]
         },
@@ -163,46 +173,52 @@
                 {
                     "target": "trigger Item",
                     "event": "uiEvent",
-                    "condition": {
-                        "name": "use",
-                        "params": {
-                            "action": "RELEASE"
+                    "condition": [
+                        {
+                            "name": "use",
+                            "params": {
+                                "action": "RELEASE"
+                            }
                         }
-                    }
+                    ]
                 },
                 {
                     "target": "pickup Medipack",
                     "event": "uiEvent",
-                    "condition": {
-                        "name": "pickup",
-                        "params": {
-                            "action": "RELEASE"
+                    "condition": [
+                        {
+                            "name": "pickup",
+                            "params": {
+                                "action": "RELEASE"
+                            }
                         }
-                    }
+                    ]
                 },
                 {
                     "target": "move around",
                     "event": "locationEvent",
-                    "condition": {
-                        "name": "!nearby",
-                        "params": {
-                            "object": {
-                                "name": "Medipacks",
-                                "quantifier": {
-                                    "checkType": "equals",
-                                    "value": 1
-                                }
-                            },
-                            "subject": {
-                                "name": "self",
-                                "quantifier": {
-                                    "checkType": "equals",
-                                    "value": 1
-                                }
-                            },
-                            "radius": 20
+                    "condition": [
+                        {
+                            "name": "!nearby",
+                            "params": {
+                                "object": {
+                                    "name": "Medipacks",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "subject": {
+                                    "name": "self",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "radius": 20
+                            }
                         }
-                    }
+                    ]
                 }
             ]
         },
@@ -222,17 +238,19 @@
             },
             "endAction": "null",
             "transition": [
-               {
+                {
                     "target": "move around",
                     "event": "whiteboardEvent",
-                    "condition": {
-                        "name": "condition",
-                        "params": {
-                               "checkType": "equals",
-                               "value": "0",
-                               "compValue": "0" 
-                        }     
-                    }
+                    "condition": [
+                        {
+                            "name": "condition",
+                            "params": {
+                                "checkType": "equals",
+                                "value": "0",
+                                "compValue": "0"
+                            }
+                        }
+                    ]
                 }
             ]
         },

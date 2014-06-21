@@ -16,6 +16,7 @@ import de.hsbremen.mds.common.valueobjects.GameResult;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
@@ -67,11 +68,11 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 //					if(trans[j].getTarget() != null) {
 //						Log.i("Mistake", "Transition Target: " + trans[j].getTarget().getName());
 //						if(trans[j].getCondition() != null) {
-//							Log.i("Mistake", "Condition: " + trans[j].getCondition().getName());
-//							if (trans[j].getCondition().getParams().get("object") != null)
-//								Log.i("Mistake", "Object der Condition: " + trans[j].getCondition().getParams().get("object").toString());
-//							if (trans[j].getCondition().getParams().get("subject") != null)
-//								Log.i("Mistake", "Subject der Condition: " + trans[j].getCondition().getParams().get("subject").toString());
+//							Log.i("Mistake", "Condition: " + trans[j].getCondition()[0].getName());
+//							if (trans[j].getCondition()[0].getParams().get("object") != null)
+//								Log.i("Mistake", "Object der Condition: " + trans[j].getCondition()[0].getParams().get("object").toString());
+//							if (trans[j].getCondition()[0].getParams().get("subject") != null)
+//								Log.i("Mistake", "Subject der Condition: " + trans[j].getCondition()[0].getParams().get("subject").toString());
 //						}	
 //					}
 //				}

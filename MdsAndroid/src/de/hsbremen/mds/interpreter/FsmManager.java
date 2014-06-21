@@ -138,18 +138,39 @@ public class FsmManager {
 		
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
 			EventParser.Result result;
+			EventParser.Result result2;
 			Log.i(Interpreter.LOGTAG, t.getEventType().toString());
 			
 			switch(t.getEventType()){
 			case locationEvent:
-				result = EventParser.checkLocationEvent(t.getCondition(), wb, myID);
+				result = EventParser.checkLocationEvent(t.getCondition()[0], wb, myID);
 				break;
 			case uiEvent:
 				Log.i("Mistake", "Buttonname des Ui-Events" + buttonName);
-				result = EventParser.checkUiEvent(buttonName, t.getCondition(), wb, myID);
+				result = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, myID);
 				break;
 			case whiteboardEvent:
-				result = EventParser.checkWhiteboardEvent(t.getCondition(), wb, myID);
+				result = EventParser.checkWhiteboardEvent(t.getCondition()[0], wb, myID);
+				break;
+			case uiLocationEvent:
+				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, myID);
+				result = EventParser.checkLocationEvent(t.getCondition()[1], wb, myID);
+				// if both results are fullfilled set true
+				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
+				// only location events can give objects back
+				result.objects = result2.objects;
+				break;
+			case locationWhiteboardEvent:
+				result2 = EventParser.checkLocationEvent(t.getCondition()[0], wb, myID);
+				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, myID);
+				// if both results are fullfilled set true
+				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
+				break;
+			case uiWhiteboardEvent:
+				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, myID);
+				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, myID);
+				// if both results are fullfilled set true
+				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
 				break;
 			default:
 				//TODO: Fehler abfangen
@@ -191,7 +212,7 @@ public class FsmManager {
 			for (int i = 0; i < trans.length; i++) {
 				if (trans[i].getEventType() == EventType.whiteboardEvent) {
 					Log.i(Interpreter.LOGTAG, "WhiteboardEvent");
-					EventParser.Result res = EventParser.checkWhiteboardEvent(trans[i].getCondition(), wb, myID);
+					EventParser.Result res = EventParser.checkWhiteboardEvent(trans[i].getCondition()[0], wb, myID);
 					if(res.isfullfilled){
 						Log.i(Interpreter.LOGTAG, "Event is fullfilled");
 						// TODO: Evtl keine Liste sondern ein Whiteboard eintragen
