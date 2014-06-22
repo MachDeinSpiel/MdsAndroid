@@ -8,13 +8,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
+import de.hsbremen.mds.android.fragment.FragmentGameReaction;
 import de.hsbremen.mds.android.fragment.FragmentImage;
-import de.hsbremen.mds.android.fragment.FragmentInventory;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMinigame;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
-import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 
 public class SwipeAdapter extends FragmentPagerAdapter{
@@ -63,8 +62,8 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         videoFragment.setSwipeAdapter(this);
         fragmentsPoolList.put("showVideo", videoFragment);	
         
-        FragmentMinigame minigameFragment = new FragmentMinigame();
-        fragmentsPoolList.put("showMinigame", minigameFragment);	
+        FragmentGameReaction reactionGameFragment = new FragmentGameReaction();
+        fragmentsPoolList.put("Puzzle", reactionGameFragment);	
 	}
 	
 	public void removeFragment(String fragmentName){   

@@ -37,7 +37,6 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
 
 		getMenuInflater().inflate(R.menu.login, menu);
 
@@ -57,13 +56,11 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.login);
@@ -72,6 +69,8 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 		Button registerBtn = (Button) findViewById(R.id.registerBtn);
 		final TextView usernameTxt = (TextView) findViewById(R.id.usernameText);
 		final TextView userpasswordTxt = (TextView) findViewById(R.id.passwordText);
+		usernameTxt.setText("Julian");
+		userpasswordTxt.setText("julian");
 
 		View.OnClickListener registerClick = new OnClickListener() {
 			@Override
@@ -170,7 +169,6 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 									Toast.LENGTH_LONG);
 							toast.show();
 						} catch (JSONException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
@@ -178,7 +176,6 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 				});
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -193,7 +190,6 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 			webService.send(json.toString());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotYetConnectedException ex) {
 			this.runOnUiThread(new Runnable() {
