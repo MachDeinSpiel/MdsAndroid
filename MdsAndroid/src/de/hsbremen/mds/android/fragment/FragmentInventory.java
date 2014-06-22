@@ -8,18 +8,17 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import de.hsbremen.mds.android.ingame.CustomGrid;
+import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
 
@@ -30,11 +29,12 @@ public class FragmentInventory extends Fragment{
 	private ArrayList<String> itemAsStringList = new ArrayList<String>();
 	private BaseAdapter adapter;
 	private GridView lv;
+	private int itemPosition;
 	
 	  GridView grid;
 	  List<String> buttonList = new ArrayList<String>();
 	  String[] web = {
-	        "Potion1nomaniacatatatat",
+	        "Potion1",
 	        "Potion2",
 		    "Mana1",
 		    "Mana2",
@@ -115,18 +115,12 @@ public class FragmentInventory extends Fragment{
             }
 	     });
 	        
-	     buttonList.add("Benutzen");
-	     buttonList.add("Entfernen");
+	     buttonList.add("use");
+	     buttonList.add("drop");
+	     buttonList.add("remove");
 	     
 	     return inventoryView;
-	  }
-	  
-	  @Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onViewCreated(view, savedInstanceState);
-	}
-	  
+	  }	  
 	  
 	  private void showItemDialog(int position){
 			// custom dialog
@@ -146,7 +140,20 @@ public class FragmentInventory extends Fragment{
 				Button b = new Button(getActivity());
 				b.setText(s);
 				b.setBackgroundColor(Color.WHITE);
-				b.setLayoutParams(new ViewGroup.LayoutParams(150, 60));
+				b.setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						
+						MainActivity activity = (MainActivity) getActivity();
+						activity.interpreterCom.useItem(itemList.get(itemPosition), "use");
+						
+					}
+				});
+				
+				//b.setLayoutParams(new ViewGroup.LayoutParams(150, 60));
+//				LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
+//				but_action.setLayoutParams(lp);
 				buttonContainer.addView(b);
 			}	
 		 
@@ -161,5 +168,4 @@ public class FragmentInventory extends Fragment{
 		 
 			dialog.show();
 		  }
-	
 }
