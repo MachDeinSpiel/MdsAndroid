@@ -72,6 +72,8 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 		Button registerBtn = (Button) findViewById(R.id.registerBtn);
 		final TextView usernameTxt = (TextView) findViewById(R.id.usernameText);
 		final TextView userpasswordTxt = (TextView) findViewById(R.id.passwordText);
+		usernameTxt.setText("Julian");
+		userpasswordTxt.setText("julian");
 
 		View.OnClickListener registerClick = new OnClickListener() {
 			@Override
