@@ -21,8 +21,24 @@
         {
             "ident": "addToGroup",
             "defaults": {
-                "target": "object.name",
+                "target": "self.object",
                 "group": "name"
+            }
+        },
+        {
+            "ident": "removeFromGroup",
+            "defaults": {
+                "target": "self.object",
+                "group": "name"
+            }
+        },
+        {
+            "ident": "startMiniApp",
+            "defaults": {
+                "name": "null",
+                "subject": "self",
+                "object": "null",
+                "targetAttribute": "null"
             }
         }
     ],
@@ -40,6 +56,32 @@
             "endAction": "null",
             "transition": [
                 {
+                    "target": "pickup Item",
+                    "event": "locationEvent",
+                    "condition": [
+                        {
+                            "name": "nearby",
+                            "params": {
+                                "object": {
+                                    "name": "Keys",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "subject": {
+                                    "name": "self",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "radius": 20
+                            }
+                        }
+                    ]
+                },
+                {
                     "target": "trigger Item",
                     "event": "locationEvent",
                     "condition": [
@@ -47,7 +89,7 @@
                             "name": "nearby",
                             "params": {
                                 "object": {
-                                    "name": "Bombs",
+                                    "name": "Blank",
                                     "quantifier": {
                                         "checkType": "equals",
                                         "value": 1
@@ -66,55 +108,49 @@
                     ]
                 },
                 {
-                    "target": "medipack buttons",
-                    "event": "locationEvent",
-                    "condition": [
-                        {
-                            "name": "nearby",
-                            "params": {
-                                "object": {
-                                    "name": "Medipacks",
-                                    "quantifier": {
-                                        "checkType": "equals",
-                                        "value": 1
-                                    }
-                                },
-                                "subject": {
-                                    "name": "self",
-                                    "quantifier": {
-                                        "checkType": "equals",
-                                        "value": 1
-                                    }
-                                },
-                                "radius": 20
-                            }
-                        }
-                    ]
-                },
-                {
-                    "target": "gameOver Bombs",
+                    "target": "miniApp",
                     "event": "whiteboardEvent",
                     "condition": [
                         {
                             "name": "condition",
                             "params": {
                                 "checkType": "equals",
-                                "value": "Bombs.length",
-                                "compValue": 0
+                                "value": "self.inventory.length",
+                                "compValue": 1
                             }
                         }
                     ]
                 },
                 {
-                    "target": "gameOver Health",
-                    "event": "whiteboardEvent",
+                    "target": "game Over",
+                    "event": "locationWhiteboardEvent",
                     "condition": [
+                        {
+                            "name": "nearby",
+                            "params": {
+                                "object": {
+                                    "name": "Door",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "subject": {
+                                    "name": "self",
+                                    "quantifier": {
+                                        "checkType": "equals",
+                                        "value": 1
+                                    }
+                                },
+                                "radius": 20
+                            }
+                        },
                         {
                             "name": "condition",
                             "params": {
-                                "checkType": "lowequals",
-                                "value": "self.health",
-                                "compValue": 0
+                                "checkType": "equals",
+                                "value": "self.solved",
+                                "compValue": true
                             }
                         }
                     ]
@@ -123,6 +159,47 @@
         },
         {
             "ID": "1",
+            "name": "pickup Item",
+            "parentState": "null",
+            "startState": false,
+            "finalState": false,
+            "doAction": {
+                "name": "showText",
+                "params": {
+                    "text": "Ein Gegenstand! Ist es vielleicht der Schlüssel?"
+                }
+            },
+            "startAction": {
+                "name": "addToGroup",
+                "params": {
+                    "target": "self.object",
+                    "group": "self.inventory"
+                }
+            },
+            "endAction": {
+                "name": "removeFromFroup",
+                "params": {
+                    "target": "self.object",
+                    "group": "Keys"
+                }
+            },
+            "transition": [
+                {
+                    "target": "trigger Item",
+                    "event": "uiEvent",
+                    "condition": [
+                        {
+                            "name": "benutzen",
+                            "params": {
+                                "action": "RELEASE"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "ID": "2",
             "name": "trigger Item",
             "parentState": "null",
             "startState": false,
@@ -156,98 +233,37 @@
             ]
         },
         {
-            "ID": "2",
-            "name": "medipack buttons",
-            "parentState": "null",
-            "startState": false,
-            "finalState": false,
-            "doAction": {
-                "name": "showText",
-                "params": {
-                    "text": "Das ist ein Medipack! Aufnehmen oder benutzen?"
-                }
-            },
-            "startAction": "null",
-            "endAction": "null",
-            "transition": [
-                {
-                    "target": "trigger Item",
-                    "event": "uiEvent",
-                    "condition": [
-                        {
-                            "name": "use",
-                            "params": {
-                                "action": "RELEASE"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "target": "pickup Medipack",
-                    "event": "uiEvent",
-                    "condition": [
-                        {
-                            "name": "pickup",
-                            "params": {
-                                "action": "RELEASE"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "target": "move around",
-                    "event": "locationEvent",
-                    "condition": [
-                        {
-                            "name": "!nearby",
-                            "params": {
-                                "object": {
-                                    "name": "Medipacks",
-                                    "quantifier": {
-                                        "checkType": "equals",
-                                        "value": 1
-                                    }
-                                },
-                                "subject": {
-                                    "name": "self",
-                                    "quantifier": {
-                                        "checkType": "equals",
-                                        "value": 1
-                                    }
-                                },
-                                "radius": 20
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "ID": "3",
-            "name": "pickup Medipack",
+            "name": "miniApp",
             "parentState": "null",
             "startState": false,
             "finalState": false,
             "doAction": "null",
             "startAction": {
-                "name": "addToGroup",
+                "name": "startMiniApp",
                 "params": {
-                    "target": "self.object",
-                    "group": "self.inventory"
+                    "type": "Puzzle",
+                    "subject": "self",
+                    "object": "null",
+                    "result": [
+                        {
+                            "attribute": "notValue.self.solved",
+                            "setWin": true,
+                            "setLoose": false
+                        }
+                    ]
                 }
             },
             "endAction": "null",
             "transition": [
                 {
                     "target": "move around",
-                    "event": "whiteboardEvent",
+                    "event": "uiEvent",
                     "condition": [
                         {
-                            "name": "condition",
+                            "name": "back",
                             "params": {
-                                "checkType": "equals",
-                                "value": "0",
-                                "compValue": "0"
+                                "action": "RELEASE"
                             }
                         }
                     ]
@@ -256,30 +272,14 @@
         },
         {
             "ID": "4",
-            "name": "gameOver Bombs",
+            "name": "game Over",
             "parentState": "null",
             "startState": false,
             "finalState": true,
             "doAction": {
                 "name": "showText",
                 "params": {
-                    "text": "Du hast alle Bomben erfolgreich hochgejagt!"
-                }
-            },
-            "startAction": "null",
-            "endAction": "null",
-            "transition": "null"
-        },
-        {
-            "ID": "5",
-            "name": "gameOver Health",
-            "parentState": "null",
-            "startState": false,
-            "finalState": true,
-            "doAction": {
-                "name": "showText",
-                "params": {
-                    "text": "Du hast es scheinbar nicht geschafft alle Bomben zu vernichten!"
+                    "text": "Super! Du hast die Tür geöffnet und bist entkommen!"
                 }
             },
             "startAction": "null",
