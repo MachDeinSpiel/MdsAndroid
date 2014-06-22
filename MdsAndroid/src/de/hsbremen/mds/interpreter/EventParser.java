@@ -286,9 +286,9 @@ public class EventParser {
 							temp.remove(paramsSplitted.length-1);
 							//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
 							//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
-							value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
+							compValue = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 						}else{
-							value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+							compValue = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
 						}
 					} catch (NumberFormatException nfe2) {
 						// something went wrong, Value is not a Number

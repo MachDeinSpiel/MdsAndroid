@@ -39,7 +39,9 @@ public class FsmManager {
 	 * Legt den Startzustand fest und startet den Automaten
 	 */
 	public void initiate(){
+		Log.i("Mistake", "Im Initiate des FsmManagers");
 		if(!isRunning){
+			Log.i("Mistake", "FsmManger is running");
 			try{
 				wb.setAttribute(new WhiteboardEntry("currentSt","all"), Interpreter.WB_PLAYERS,""+myID,CURRENT_STATE);
 				wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
@@ -139,7 +141,8 @@ public class FsmManager {
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
 			EventParser.Result result;
 			EventParser.Result result2;
-			Log.i(Interpreter.LOGTAG, t.getEventType().toString());
+			Log.i(Interpreter.LOGTAG, "Checking Events on state " + this.getCurrentState().getName());
+			Log.i(Interpreter.LOGTAG, "Checking Events on Transition mit Target " + t.getTarget().getName() + " Eventtype ist "+ t.getEventType().toString());
 			
 			switch(t.getEventType()){
 			case locationEvent:

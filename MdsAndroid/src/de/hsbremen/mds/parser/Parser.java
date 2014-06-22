@@ -304,6 +304,12 @@ public class Parser {
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.uiEvent);
 			else if(event.equals("whiteboardEvent"))
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.whiteboardEvent);
+			else if(event.equals("uiLocationEvent"))
+				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.uiLocationEvent);
+			else if(event.equals("locationWhiteboardEvent"))
+				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.locationWhiteboardEvent);
+			else if(event.equals("uiWhiteboardEvent"))
+				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.uiWhiteboardEvent);
 			allTrans[j].setConditions(conditionsArray);
 		}
 		return allTrans;

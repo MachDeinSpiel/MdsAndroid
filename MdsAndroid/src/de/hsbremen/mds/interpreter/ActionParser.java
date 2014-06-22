@@ -19,6 +19,7 @@ import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsAct
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsImageAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMapAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMiniAppAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsTextAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsVideoAction;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
@@ -30,6 +31,7 @@ public class ActionParser {
 	
 	public static final String ADD = "add";
 	public static final String MULTIPLY = "multiply";
+	public static final String SET = "set";
 
 	/**
 	 * Macht aus einer MdsAction eine ausführbare MdsActionExecutable, die man mit .execute() dann ausführen kann.
@@ -53,16 +55,18 @@ public class ActionParser {
 		final HashMap<String, Object> parsedParams = new HashMap<String, Object>();
 		
 		// Buttons heraussuchen, falls state transitions hat
-		MdsState buttonState = (MdsState) wb.getAttribute("Players",myId+"","currentState").value;
-		Log.i(Interpreter.LOGTAG, "Parse Action: " + action.getIdent() + " des States: " + buttonState.getName());
-		MdsTransition[] trans = buttonState.getTransitions();
 		List<String> buttons = new Vector<String>();
-		if (trans != null) {
-			if(type.equals("start") || type.equals("do")) {		
-				// Alle Transitions durchgehen
-				for(int i = 0; i < trans.length; i++) {
-					if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
-						buttons.add(trans[i].getCondition()[0].getName());
+		if (state != null) {
+			MdsState buttonState = (MdsState) wb.getAttribute("Players",myId+"","currentState").value;
+			Log.i(Interpreter.LOGTAG, "Parse Action: " + action.getIdent() + " des States: " + buttonState.getName());
+			MdsTransition[] trans = buttonState.getTransitions();
+			if (trans != null) {
+				if(type.equals("start") || type.equals("do")) {		
+					// Alle Transitions durchgehen
+					for(int i = 0; i < trans.length; i++) {
+						if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
+							buttons.add(trans[i].getCondition()[0].getName());
+						}
 					}
 				}
 			}
@@ -90,8 +94,10 @@ public class ActionParser {
 		case showVideo:
 			return new MdsVideoAction((String)parsedParams.get("title"), (String)parsedParams.get("url"), (String)parsedParams.get("text"), buttons);
 		case showMap:
+			// not called atm
 		case startMiniApp:
-			
+			Log.i(Interpreter.LOGTAG, "Executing Minigame " + parsedParams.get("type"));
+			return new MdsMiniAppAction((String)parsedParams.get("type"), null, buttons);			
 		case updateMap:
 			return new MdsActionExecutable() {
 				
@@ -151,17 +157,7 @@ public class ActionParser {
 						// Keys der keysToValue hinzufügen
 						for(String key : groupKeys)
 							keysToValue.add(key);
-						keysToValue.add("dummy");
-						
-						// delete dummy if there
-						if ((group).get("dummy") != null) {
-							Log.i(Interpreter.LOGTAG, "Deleting dummy in Inventory");
-							(group).remove("dummy");
-							// tell the server
-							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
-						} else {
-							Log.i(Interpreter.LOGTAG, "No Dummy found in Inventory");
-						}
+
 						// füge item der Gruppe hinzu
 						group.put((String)((Whiteboard)target.value).get("pathKey").value, copy);
 						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("pathKey").value+"]) to group [" 
@@ -246,10 +242,16 @@ public class ActionParser {
 						}catch(NumberFormatException nfe){
 							nfe.printStackTrace();
 						}
+					}else if(params.get("valueType").equals(SET)){
+						Log.i(Interpreter.LOGTAG, "Setting value " + keysToValue.get(keysToValue.size()-1) + " to " + parsedParams.get("value"));
+						attributeToChange = (String)parsedParams.get("value");
 					}
 					
 					try {
+						Log.i("Mistake", "Setting the value for real");
+						Log.i("Mistake", "WB Door is: " + currentWb.get("Door").value.toString());
 						currentWb.setAttributeValue(attributeToChange, keysToValue.toArray(new String[0]));
+						Log.i("Mistake", "Telling the Server");
 						sii.onWhiteboardUpdate(keysToValue, currentWb.getAttribute(keysToValue.toArray(new String[0])));
 					} catch (InvalidWhiteboardEntryException e) {
 						e.printStackTrace();
@@ -409,7 +411,6 @@ public class ActionParser {
 			Log.i(Interpreter.LOGTAG, "parseParam: objectsSize: "+objects.size());
 			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).toString());
 			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).value.toString());
-			Object o = ((Whiteboard)objects.get(""+0).value).getAttribute(keys);
 			if(keys.length >0 ){
 				return (String) ((Whiteboard)objects.get(""+0).value).getAttribute(keys).value;
 			}else{

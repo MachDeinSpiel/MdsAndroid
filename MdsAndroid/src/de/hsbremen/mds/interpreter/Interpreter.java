@@ -51,6 +51,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 		this.myId = playerId;
 		whiteboard = new Whiteboard();
+		Log.i("Mistake", "Creating Parser");
 		new Parser(this,json);	
 	}
 
@@ -78,6 +79,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 //				}
 //			}
 //		}
+		Log.i("Mistake", "Creating FsmManager");
 		this.fsmManager = new FsmManager(objectContainer.getStates(),this.whiteboard, this, myId);
 	}
 	
@@ -105,10 +107,12 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	@Override
 	public void onPositionChanged(double longitude, double latitude) {
 		if(!fsmManager.isRunning()){
-			//FSM läuft noch nicht? Raus hier!
+			Log.e("Mistake", "Fsm not running");
 			return;
 		}
 		Log.i(LOGTAG, "Neue Position von Android bekommen : [long:"+longitude+" ,|lat:"+latitude+"]");
+		
+		// tell the server
 		try {
 			whiteboard.setAttributeValue(Double.toString(longitude), WB_PLAYERS, myId, "longitude");
 		} catch (InvalidWhiteboardEntryException e) {
@@ -340,8 +344,21 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			whiteboard.setAttribute(wuo.getValue(), (String[])wuo.getKeys().toArray(new String[0]));
 			
 		}
+		Log.i(LOGTAG, "Removing Dummy Text in Inventory");
+		// remove dummy from inventory
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("name", "removeFromGroup");
+		params.put("target", WB_PLAYERS + "." + myId + "." + "inventory.dummy");
+		params.put("group", WB_PLAYERS + "." + myId + "." + "inventory");
+		MdsAction action = new MdsAction(MdsActionIdent.removeFromGroup, params);
+		MdsActionExecutable actionExec = actionParser.parseAction("dummyDelete", action, null, whiteboard, myId, serverInterpreter);
+		if (actionExec != null) {
+			Log.i(LOGTAG, "Executing Action " + action.getIdent().toString());
+			actionExec.execute(gui);
+		}
+		
 		WhiteboardEntry player = whiteboard.getAttribute("Players", myId);
-		Log.i("Mistake", "Player Health von " + myId + " beim erzeugen ist" + ((Whiteboard)player.value).get("health").value);	
+		Log.i("Mistake", "Player Health von " + myId + " beim Erzeugen ist: " + ((Whiteboard)player.value).get("health").value);
 		fsmManager.initiate();
 		
 	}
