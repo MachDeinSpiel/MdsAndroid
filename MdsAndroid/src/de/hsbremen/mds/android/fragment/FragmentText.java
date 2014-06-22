@@ -34,6 +34,12 @@ public class FragmentText extends Fragment {
 		style = a.getStyleNumber();
 		styleFragment(view);
 		
+		this.message = sA.getFragmentInformation().getText();
+		TextView t = (TextView)view.findViewById(R.id.text);
+		t.setText(this.message);
+		showButtons();
+		
+		
 		return view;
 	}
 	
@@ -66,10 +72,10 @@ public class FragmentText extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		this.message = sA.getFragmentInformation().getText();
-		TextView t = (TextView)view.findViewById(R.id.text);
-		t.setText(this.message);
-		showButtons();
+//		this.message = sA.getFragmentInformation().getText();
+//		TextView t = (TextView)view.findViewById(R.id.text);
+//		t.setText(this.message);
+//		showButtons();
 	}
 	
 

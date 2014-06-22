@@ -7,11 +7,13 @@ import java.util.List;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
+import android.view.ViewGroup;
 import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentGameReaction;
 import de.hsbremen.mds.android.fragment.FragmentImage;
+import de.hsbremen.mds.android.fragment.FragmentInventory;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
-import de.hsbremen.mds.android.fragment.FragmentMinigame;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
@@ -28,9 +30,13 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	public boolean getItemPositionStandard = true;
 	private int fragmentsCount = 0;
 	private boolean skip = false;
+	
+	private FragmentManager fm;
 
 	public SwipeAdapter(FragmentManager fm) {
+
 		super(fm);
+		this.fm = fm;
 		initFragments();
 	}
 
@@ -71,33 +77,51 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 		// Special behaviour for getItemPosition()
 		getItemPositionStandard = false;
 		
+		Fragment f = activeFragmentsList.get(fragmentName);
+        notifyDataSetChanged();
+		
         activeFragmentsList.remove(fragmentName);
         activeFragmentsNumbers.remove(fragmentName);
         
-        System.out.println("Fragment Notify für Remove");
         notifyDataSetChanged();
+        
+		fm.beginTransaction().remove(fragmentsPoolList.get(fragmentName)).commit();
         
 		// Set Behaviour for getItemPosition() to standard again
         getItemPositionStandard = true;
 	}	
 	
+	@Override
+	public void destroyItem(ViewGroup container, int position, Object object) {
+		// TODO Auto-generated method stub
+		Log.i("nextFragment", "Object " + object.getClass() + " zerstört");
+		super.destroyItem(container, position, object);
+	}
+	
 	public void addFragment(String fragmentName){
 		
 		Fragment newFragment = this.fragmentsPoolList.get(fragmentName);
+		
 		this.activeFragmentsList.put(fragmentName, newFragment);
 		this.activeFragmentsNumbers.add(fragmentName);
-		
+		getItemPositionStandard = false;
 		notifyDataSetChanged();
+		getItemPositionStandard = true;
 	}
 	
 	@Override
 	public Fragment getItem(int index) {
+		Log.i("nextFragment", "Fragment " + activeFragmentsNumbers.get(index) + " wurde mit getItem");
 		return activeFragmentsList.get(activeFragmentsNumbers.get(index));
 	}
+	
+	
 	
 	@Override
 	public int getItemPosition(Object object) {
 		
+//		Log.i("nextFragment", "getItemPosition augerufen mit fragmentsCount: " + fragmentsCount);
+//		Log.i("nextFragment", "Objectname: " + object.getClass());
 		
 		if(getItemPositionStandard){
 			fragmentsCount = 0;
@@ -113,6 +137,7 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 			return super.getItemPosition(object);
 		}else {
 			skip = false;
+//			Log.i("nextFragment", "Postion none");
 			return POSITION_NONE;
 		}
 
