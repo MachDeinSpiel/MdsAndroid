@@ -174,12 +174,14 @@ public class Parser {
 			MdsAction startAction = null, endAction = null;
 			String ident = element.get("startAction").toString();
 			if(!ident.equals("null")) {
+				Log.i("Mistkae", "Reading startAction");
 				JSONObject sAction = (JSONObject) element.get("startAction");
 				startAction = readAction(sAction);
 			}
 			
 			ident = element.get("endAction").toString();
 			if(!ident.equals("null")) {
+				Log.i("Mistkae", "Reading endAction");
 				JSONObject eAction = (JSONObject) element.get("endAction");
 				endAction = readAction(eAction);
 			}
@@ -214,7 +216,7 @@ public class Parser {
 			
 			// die param werte aus dem KeySet werden dem params HashMap übergeben
 			for (String key : keySet){
-				if(!defaultsO.get(key).equals("result")) {
+				if(!key.equals("result")) {
 					Object value = defaultsO.get(key);
 					defaults.put(key, value.toString());
 				}

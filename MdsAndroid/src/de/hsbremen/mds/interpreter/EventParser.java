@@ -229,7 +229,9 @@ public class EventParser {
 		
 		// get value and compValue
 		double value = -1;
+		String sValue = null;
 		double compValue = -2;
+		String sCompValue = null;
 		
 		try {  
 		    value = (Double)cond.getParams().get("value");  
@@ -255,10 +257,11 @@ public class EventParser {
 						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 					}else{
 						//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
-						WhiteboardEntry player = wb.getAttribute(paramsSplitted);
-						Log.i("Mistake", "params sind:" + paramsSplitted[0] + " : " + paramsSplitted[1]);
+						MdsState current = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS, ""+playerId, FsmManager.CURRENT_STATE).value;
+						sValue = (String) parseParam(cond.getParams().get("value").toString(), current, wb, playerId);
+						Log.i("Mistake", "SValue ist: " + sValue);
 						Log.i("Mistake", "WB ist: " + wb);
-						value = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+						value = Double.parseDouble(sValue);
 						Log.i("Mistake", "Value ist: " + value);
 					}
 				} catch (NumberFormatException nfe2) {
@@ -288,7 +291,13 @@ public class EventParser {
 							//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
 							compValue = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 						}else{
-							compValue = Double.parseDouble((String) wb.getAttribute(paramsSplitted).value);
+							//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
+							MdsState current = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS, ""+playerId, FsmManager.CURRENT_STATE).value;
+							sCompValue = (String) parseParam(cond.getParams().get("compValue").toString(), current, wb, playerId);
+							Log.i("Mistake", "SCompValue ist: " + sCompValue);
+							Log.i("Mistake", "WB ist: " + wb);
+							compValue = Double.parseDouble(sCompValue);
+							Log.i("Mistake", "Value ist: " + value);
 						}
 					} catch (NumberFormatException nfe2) {
 						// something went wrong, Value is not a Number
@@ -359,6 +368,121 @@ public class EventParser {
 		
 	}
 	
+	public static Object parseParam(String param, MdsState state, Whiteboard wb, String playerId){
+		
+		Log.i(Interpreter.LOGTAG,"parseParam:"+param);
+		//Ersetzungen gemäß der Spezisprache vorbereiten 
+		HashMap<String, String> replacements = new HashMap<String, String>();
+		replacements.put("self",Interpreter.WB_PLAYERS+"."+playerId);
+		
+		
+		
+		for(String toReplace : replacements.keySet()){
+			//Log.i(Interpreter.LOGTAG,"parseParam replace every occurence of ["+toReplace+"]");
+			param = param.replace(toReplace, replacements.get(toReplace));
+		}
+		Log.i(Interpreter.LOGTAG,"parseParam after replacements:"+param);
+		
+		//Einzelne Teile, die Punkten getrennt sind aufsplitten
+		List<String> splitted = new Vector<String>(Arrays.asList(param.split("\\.")));
+		
+		Log.i(Interpreter.LOGTAG,"parseParam splittedParamLength:"+splitted.size());
+		
+		Object tmpObj = wb;
+		// Wenn das Schlüsselwort "self vorkommt"
+		if(splitted.size() > 2 && splitted.get(0).equals("Players") &&  splitted.get(1).equals(""+playerId) && splitted.get(2).equals("object")) {
+			Log.i(Interpreter.LOGTAG, "Parse Object of Self");
+			// auf Whiteboard des Spielers setzen und "Players" + ID löschen
+			splitted.remove(0);
+			splitted.remove(0);
+			tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(Interpreter.WB_PLAYERS, ""+playerId).value;
+		}
+		if(splitted.size() > 0 && splitted.get(0).equals(FsmManager.CURRENT_STATE)) {
+			Log.i(Interpreter.LOGTAG, "Parse Current");
+			splitted.remove(0);
+			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(Interpreter.WB_PLAYERS,""+playerId, FsmManager.CURRENT_STATE).value;
+			
+		} else if (splitted.size() > 0 &&  splitted.get(0).equals(FsmManager.LAST_STATE)) {
+			Log.i(Interpreter.LOGTAG, "Parse Last");
+			splitted.remove(0);
+			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(Interpreter.WB_PLAYERS,""+playerId, FsmManager.LAST_STATE).value;
+		}
+		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
+		if(splitted.size() > 0 && splitted.get(0).equals("object")){
+			
+			splitted.remove(0);
+			String[] keys = (String[]) splitted.toArray(new String[0]);
+
+			Log.i("Mistake", "Object found...");
+			// TODO: erstmal nur mit einem
+			Whiteboard objects = new Whiteboard();
+			// Wenn das tmpObj ein Whiteboard ist einfach auf Objects setzen
+			if (tmpObj instanceof Whiteboard) {
+				Log.i(Interpreter.LOGTAG, "Type: Whiteboard");
+				WhiteboardEntry wbe = ((Whiteboard)tmpObj).getAttribute("object");
+				objects.put(""+0, wbe);
+				if (objects == null) Log.i(Interpreter.LOGTAG, "Objects ist null");
+				Log.i(Interpreter.LOGTAG, "Size der Objects: " + objects.size());
+			// sonst die Objects des States einfügen
+			} else if (tmpObj instanceof MdsState) {
+				Log.i(Interpreter.LOGTAG, "Type: State");
+				List<WhiteboardEntry> objectList = ((MdsState)tmpObj).getObjects();
+				for(int i = 0; i < objectList.size(); i++) {
+					objects.put(""+i, objectList.get(0));
+				}
+			}
+			
+			if(objects.keySet().isEmpty()){
+				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard in state "+state.getName()+ " trying currentState...");
+				Whiteboard currentState = null;
+				try{
+					currentState = (Whiteboard)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
+					Object o = ((Whiteboard) ((Whiteboard)currentState.get("objects").value).get(0).value).getAttribute(keys);
+				}catch(Exception e){
+					Log.e(Interpreter.LOGTAG,"Error while getting objects from whiteboard in state ");
+				}
+				if(objects.keySet().isEmpty()){
+					Log.e(Interpreter.LOGTAG,"Still no luck while getting objects from whiteboard, still null");
+				}
+			}
+			Log.i(Interpreter.LOGTAG, "parseParam: objectsSize: "+objects.size());
+			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).toString());
+			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).value.toString());
+			if(keys.length >0 ){
+				return (String) ((Whiteboard)objects.get(""+0).value).getAttribute(keys).value;
+			}else{
+				return (WhiteboardEntry)objects.get(""+0);
+			}
+		} else if (splitted.size() > 0 && splitted.get(0).equals("subject")) {
+			splitted.remove(0);
+			String[] keys = (String[]) splitted.toArray(new String[0]);
+			// erstmal nur mit einem
+			List<WhiteboardEntry> subjects = state.getSubjects();
+			return (String) ((Whiteboard)subjects.get(0).value).getAttribute(keys).value;
+
+		} else if (splitted.size() > 0 && splitted.get(0).equals("notValue")) {
+			splitted.remove(0);
+			// String wieder zusammen setzen
+			StringBuffer buffer = new StringBuffer();
+			for(String s : splitted) {                                                  
+				buffer.append(s + ".");
+			}
+			String result = buffer.toString();
+			return buffer.toString();
+		}
+		
+		//Ansonsten Daten aus dem Whiteboard holen
+		try{
+			Object o = wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
+			return  wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
+		}catch(NullPointerException e){
+			Log.d(Interpreter.LOGTAG,"Could not parse param ["+param+"], returning itself");
+			return param;
+		}
+		
+				
+	}
+
 	
 	static public class Result{
 		public boolean isfullfilled;

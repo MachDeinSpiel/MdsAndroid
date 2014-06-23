@@ -89,7 +89,7 @@
                             "name": "nearby",
                             "params": {
                                 "object": {
-                                    "name": "Blank",
+                                    "name": "Blanks",
                                     "quantifier": {
                                         "checkType": "equals",
                                         "value": 1
@@ -109,20 +109,6 @@
                 },
                 {
                     "target": "miniApp",
-                    "event": "whiteboardEvent",
-                    "condition": [
-                        {
-                            "name": "condition",
-                            "params": {
-                                "checkType": "equals",
-                                "value": "self.inventory.length",
-                                "compValue": 1
-                            }
-                        }
-                    ]
-                },
-                {
-                    "target": "game Over",
                     "event": "locationWhiteboardEvent",
                     "condition": [
                         {
@@ -149,8 +135,8 @@
                             "name": "condition",
                             "params": {
                                 "checkType": "equals",
-                                "value": "self.solved",
-                                "compValue": true
+                                "value": "self.inventory.length",
+                                "compValue": 1
                             }
                         }
                     ]
@@ -258,12 +244,28 @@
             "transition": [
                 {
                     "target": "move around",
-                    "event": "uiEvent",
+                    "event": "whiteboardEvent",
                     "condition": [
                         {
-                            "name": "back",
+                            "name": "condition",
                             "params": {
-                                "action": "RELEASE"
+                                "checkType": "equals",
+                                "value": "self.solved",
+                                "compValue": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "target": "game Over",
+                    "event": "whiteboardEvent",
+                    "condition": [
+                        {
+                            "name": "condition",
+                            "params": {
+                                "checkType": "equals",
+                                "value": "self.solved",
+                                "compValue": true
                             }
                         }
                     ]
