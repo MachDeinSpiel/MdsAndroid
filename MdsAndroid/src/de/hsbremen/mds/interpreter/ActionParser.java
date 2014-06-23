@@ -46,7 +46,6 @@ public class ActionParser {
 		
 		if(action == null){
 			//Action exisitert eigentlich gar nicht? -> GTFO!
-			//TODO: evtl schon im Interpreter prüfen, ob die Action null ist (also keine in der JSON-Datei spezifieziert ist)
 			return null;
 		}
 	
@@ -116,11 +115,10 @@ public class ActionParser {
 					
 					
 					Log.i(Interpreter.LOGTAG, "Changing Map Entities: Interface is: " + guiInterface.toString());
+					//Und Bomben und Medipacks anzeigen
 					changeMapEntities(guiInterface, wb);
 					//Map anzeigen
 					mma.execute(guiInterface);
-					//Und Bomben und Medipacks anzeigen
-					//TODO: Wenn die Visibillity klar definiert wird, entsprechende Items anzeigen
 					
 				}
 			}; 
@@ -387,7 +385,6 @@ public class ActionParser {
 		return currentWb;
 	}
 	
-	// TODO: Darf natürlich nicht hart gecoded sein
 	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb) {
 		
 		//TODO: add more visibilities

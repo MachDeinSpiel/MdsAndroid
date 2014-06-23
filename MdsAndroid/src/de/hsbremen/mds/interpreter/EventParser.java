@@ -16,27 +16,9 @@ import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
 public class EventParser {
 	
-//	// TODO: Exception no Eventtype found
-//	public static boolean checkEvent(String btnName, MdsTransition trans, Whiteboard wb, int playerId) {
-//		if (trans.getEvent().getName().equals("whiteboardEvent")) {
-//			return checkWhiteboardEvent(trans.getCondition(), wb, playerId);
-//		} else if (trans.getEvent().getName().equals("locationEvent")) {
-//			return checkLocationEvent(trans.getCondition(), wb, playerId);
-//		} else if (trans.getEvent().getName().equals("conditionEvent")) {
-//			return checkConditionEvent(trans.getCondition(), wb, playerId);
-//		} else if (trans.getEvent().getName().equals("uiEvent")) {
-//			return checkUiEvent(btnName, trans.getCondition(), wb, playerId);
-//		}
-//		// wenn keines der Eventtypen stimmt ist wohl was schief gegangen
-//		return false;
-//	}
-	
 	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, String playerId) {
 		Result result = new Result(false, null, null);
-		//TODO: vorerst rausgenommen da kein Multiplayer und wirft exception (ist whiteboardevent, es wird nach locationkram gesucht -> NullPointer)
-		//result = checkLocationEvent(condition, wb, playerId);
-		//if (result.isfullfilled)
-		//	return result;
+
 		result = checkConditionEvent(condition, wb, playerId);
 		return result;
 	}
@@ -123,13 +105,14 @@ public class EventParser {
 						currentState.setObjects(objects);
 						Log.i("Mistake", "Object Size ist " + objects.size());
 						// WB im State und beim Player speichern
-						// TODO: Erstmal nur ein Object
+						// Erstmal nur ein Object
 						wb.setAttribute(objects.get(0), Interpreter.WB_PLAYERS,""+playerId, "object");
 						WhiteboardEntry target = wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId, "object");
 						Log.i("Mistake", "Adding Object to" + Interpreter.WB_PLAYERS + playerId + " object" + target.value);
 						return result;
+					} else {
+						Log.e(Interpreter.LOGTAG, "Error in Eventparser, CheckLocationEvent, result is null");
 					}
-					//TODO : Error if quantifier is invalid
 				} catch (NumberFormatException e1) {
 					Log.e(Interpreter.LOGTAG, "Position Attribute could not be parsed to double");
 					return new Result(false, null, null);
@@ -147,8 +130,7 @@ public class EventParser {
 
 				// Location des Objekts
 				Location someLoc = new Location("somLoc");
-				// FIXME:
-				// Hier evtl eine Liste von Locations?
+
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
 				
 				MdsState currentState = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS,""+playerId,FsmManager.CURRENT_STATE).value;
@@ -193,13 +175,14 @@ public class EventParser {
 					currentState.setObjects(objects);
 					Log.i("Mistake", "Object Size ist " + objects.size());
 					// WB im State und beim Player speichern
-					// TODO: Erstmal nur ein Object
+					// Erstmal nur ein Object
 					wb.setAttribute(objects.get(0), Interpreter.WB_PLAYERS,""+playerId, "object");
 					Log.i("Mistake", "Adding Object to" + playerId + " Objects " +0);
 					
 					return result;
+				} else {
+					Log.e(Interpreter.LOGTAG, "Error in Eventparser, CheckLocationEvent, result is null");
 				}
-				//TODO : Error if quantifier is invalid
 			}else{
 				// TODO: Hier muss noch viel überlegt werden bei Multiplayer
 				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
@@ -212,7 +195,6 @@ public class EventParser {
 
 				// Location des Objekts
 				Location someLoc = new Location("somLoc");
-				// FIXME:
 				// Hier evtl eine Liste von Locations?
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
 				
@@ -223,7 +205,6 @@ public class EventParser {
 		return new Result(false, null, null);
 	}
 	
-	// TODO: ValueNotANumber Exception
 	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, String playerId) {
 		Log.i(Interpreter.LOGTAG, "CheckCondition: " + cond.getName());
 		
@@ -256,7 +237,6 @@ public class EventParser {
 						//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
 						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 					}else{
-						//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
 						MdsState current = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS, ""+playerId, FsmManager.CURRENT_STATE).value;
 						sValue = (String) parseParam(cond.getParams().get("value").toString(), current, wb, playerId);
 						Log.i("Mistake", "SValue ist: " + sValue);
@@ -291,7 +271,6 @@ public class EventParser {
 							//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
 							compValue = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 						}else{
-							//TODO: hier (und im if-block ?) object, subject, [self wurde schon] usw auflösen (parseParams? oder wie's im actionaprser gemacht wird)
 							MdsState current = (MdsState)wb.getAttribute(Interpreter.WB_PLAYERS, ""+playerId, FsmManager.CURRENT_STATE).value;
 							sCompValue = (String) parseParam(cond.getParams().get("compValue").toString(), current, wb, playerId);
 							Log.i("Mistake", "SCompValue ist: " + sCompValue);
@@ -374,6 +353,8 @@ public class EventParser {
 		//Ersetzungen gemäß der Spezisprache vorbereiten 
 		HashMap<String, String> replacements = new HashMap<String, String>();
 		replacements.put("self",Interpreter.WB_PLAYERS+"."+playerId);
+		// TODO: Own Group auflösen
+		//replacements.put("ownGroup", Interpreter.WB_PLAYERS+"."+playerId+"")
 		
 		
 		
@@ -414,7 +395,7 @@ public class EventParser {
 			String[] keys = (String[]) splitted.toArray(new String[0]);
 
 			Log.i("Mistake", "Object found...");
-			// TODO: erstmal nur mit einem
+			// erstmal nur mit einem
 			Whiteboard objects = new Whiteboard();
 			// Wenn das tmpObj ein Whiteboard ist einfach auf Objects setzen
 			if (tmpObj instanceof Whiteboard) {
