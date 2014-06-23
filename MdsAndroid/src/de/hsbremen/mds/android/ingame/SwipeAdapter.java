@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.ViewGroup;
-import de.hsbremen.mds.android.fragment.FragmentBackpack;
 import de.hsbremen.mds.android.fragment.FragmentGameReaction;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
@@ -158,7 +157,6 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 			}
 			index++;
 		}
-		System.out.println(index);
 		return index;
 	}
 

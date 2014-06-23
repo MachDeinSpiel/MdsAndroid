@@ -33,14 +33,19 @@ public class FragmentText extends Fragment {
 		MainActivity a = (MainActivity)getActivity();
 		style = a.getStyleNumber();
 		styleFragment(view);
+				
+		return view;
+	}
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
 		
 		this.message = sA.getFragmentInformation().getText();
 		TextView t = (TextView)view.findViewById(R.id.text);
 		t.setText(this.message);
 		showButtons();
 		
-		
-		return view;
+		super.onViewCreated(view, savedInstanceState);
 	}
 	
 	private void styleFragment(View view) {
@@ -80,11 +85,9 @@ public class FragmentText extends Fragment {
 	
 
 	private void showButtons() {
-		System.out.println("Shotbuttons aufgerufen");
 		LinearLayout ll = (LinearLayout)view.findViewById(R.id.buttonContainerText);
  		List<String> l = sA.getFragmentInformation().getButtons();
  		for(String s : l){
- 			System.out.println("Button adden " + s);
  			Button button = new Button(getActivity());
  			ll.addView(button);
  			button.setText(s);

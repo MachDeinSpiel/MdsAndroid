@@ -38,7 +38,7 @@ import android.widget.TextView;
 import de.hsbremen.mds.android.communication.InterpreterCommunicator;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
-import de.hsbremen.mds.android.fragment.FragmentBackpack;
+import de.hsbremen.mds.android.fragment.FragmentInventory;
 import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
@@ -106,7 +106,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		try {
 			interpreterCom.onWebsocketMessage(new JSONObject(extras.getString("json")));
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -282,7 +281,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -293,10 +291,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		try {
 			webServ.send(WhiteboardHandler.toJson(keys, entry));
 		} catch (NotYetConnectedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnknownWhiteboardTypeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -310,12 +306,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void showMap(ArrayList<MdsItem> items2display) {
-		System.out.println("ShowMap aufgerufen");
-		for (MdsItem i : items2display) {
-			System.out.println("Item: " + i.getName());
-			System.out.println("Location: " + i.getLatitude()
-					+ i.getLongitude());
-		}
 		mapFragment.setItemLocations(items2display);
 		Location l = new Location("dummie");
 		mapFragment.gmapsUpdate(l);
@@ -323,8 +313,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void addToBackpack(MdsItem item) {
-		Log.i("Mistake", "Adding Item 2 Backpack in MainActivity");
-		FragmentBackpack f = (FragmentBackpack) swipeAdapter.getFragment("backpack");
+		FragmentInventory f = (FragmentInventory) swipeAdapter.getFragment("inventory");
 		f.addItem(item);
 	}
 
@@ -362,7 +351,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 				}
 			});
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -380,10 +368,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void nextFragment(MdsInfoObject mds) {
 		
 		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
+		
 		if(!(mds.getName().equals("showMap"))){
-			swipeAdapter.addFragment(mds.getName());
 			swipeAdapter.setFragmentInformation(mds);
+			swipeAdapter.addFragment(mds.getName());
 		}
+
 		viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
 				true);
 	}
@@ -399,14 +389,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void removeFromBackpack(MdsItem item) {
-		// TODO Auto-generated method stub
-		
+		FragmentInventory f = (FragmentInventory) swipeAdapter.getFragment("inventory");
+		f.removeItem(item);
 	}
 
 	@Override
 	public void onWebserviceConnectionClosed(int code, String reason,
 			boolean remote) {
-		// TODO Auto-generated method stub
-		
 	}
 }

@@ -26,103 +26,59 @@ public class FragmentInventory extends Fragment{
 
 	private View inventoryView;
 	private ArrayList<MdsItem> itemList = new ArrayList<MdsItem>();
-	private ArrayList<String> itemAsStringList = new ArrayList<String>();
-	private BaseAdapter adapter;
-	private GridView lv;
+	private CustomGrid adapter;
 	private int itemPosition;
+	private String[] web;
+	private int[] imageId;
+	private int style;
 	
-	  GridView grid;
-	  List<String> buttonList = new ArrayList<String>();
-	  String[] web = {
-	        "Potion1",
-	        "Potion2",
-		    "Mana1",
-		    "Mana2",
-		    "Potion3",
-		    "Potion4",
-		    "Mana3",
-		    "Mana4",
-		    "Mana5",
-		    "Mana6",
-		    "Potion5",
-		    "Potion6",
-		    "Potion7",
-		    "Potion8",
-		    "Mana7",
-		    "Potion1",
-		    "Potion2",
-		    "Mana1",
-		    "Mana2",
-		    "Potion3",
-		    "Potion4",
-		    "Mana3",
-		    "Mana4",
-		    "Mana5",
-		    "Mana6",
-		    "Potion5",
-		    "Potion6",
-		    "Potion7",
-		    "Potion8",
-		    "Mana7"
-	  } ;
-	  int[] imageId = {
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.potion,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.potion,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.red,
-	      R.drawable.potion
-	  };
+	private GridView grid;
+	private List<String> buttonList = new ArrayList<String>();
 	  
 	  @Override
 	  public View onCreateView(android.view.LayoutInflater inflater, android.view.ViewGroup container, Bundle savedInstanceState) {
 	    
-		  
 		 inventoryView = inflater.inflate(R.layout.fragment_inventorynew, container, false);
-		
-		 CustomGrid adapter = new CustomGrid(getActivity(), web, imageId);
-		 grid=(GridView)inventoryView.findViewById(R.id.grid);
-	     grid.setAdapter(adapter);
-	     grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {                    	
-                showItemDialog(position); 
-            }
-	     });
-	        
+		 
+	     updateItemlist();
+	     
+	     // Clear buttonList
+	     buttonList.clear();
 	     buttonList.add("use");
 	     buttonList.add("drop");
 	     buttonList.add("remove");
 	     
+		// Style des Fragments anpassen
+		MainActivity a = (MainActivity)getActivity();
+		style = a.getStyleNumber();
+		styleFragment(inventoryView);
+	     
 	     return inventoryView;
 	  }	  
 	  
-	  private void showItemDialog(int position){
+	  private void updateItemlist() {
+		  
+		
+		web = new String[itemList.size()];
+		imageId = new int[itemList.size()];
+		for(int i = 0; i < itemList.size(); i++){
+			web[i] = itemList.get(i).getName();
+			imageId[i] = R.drawable.red;
+		}
+		
+		adapter = new CustomGrid(getActivity(), web, imageId);
+		grid=(GridView)inventoryView.findViewById(R.id.grid);
+	    grid.setAdapter(adapter);
+	    grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+           @Override
+           public void onItemClick(AdapterView<?> parent, View view,
+                                   int position, long id) {                    	
+               showItemDialog(position); 
+           }
+	     });
+	}
+
+	private void showItemDialog(int position){
 			// custom dialog
 			final Dialog dialog = new Dialog(getActivity());
 			dialog.setContentView(R.layout.custom);
@@ -136,7 +92,11 @@ public class FragmentInventory extends Fragment{
 			
 			LinearLayout buttonContainer = (LinearLayout)dialog.findViewById(R.id.buttonContainer);
 			
+			// Clear buttoncontainer
+			buttonContainer.removeAllViews();
+			
 			for(String s : buttonList){
+				
 				Button b = new Button(getActivity());
 				b.setText(s);
 				b.setBackgroundColor(Color.WHITE);
@@ -146,14 +106,15 @@ public class FragmentInventory extends Fragment{
 					public void onClick(View v) {
 						
 						MainActivity activity = (MainActivity) getActivity();
-						activity.interpreterCom.useItem(itemList.get(itemPosition), "use");
-						
+						Button b = (Button)v;
+						System.out.println("buttontext : " + b.getText().toString());
+//						activity.interpreterCom.useItem(itemList.get(itemPosition), b.getText().toString());
+						itemList.remove(itemPosition);
+						updateItemlist();
+						dialog.dismiss();
 					}
 				});
 				
-				//b.setLayoutParams(new ViewGroup.LayoutParams(150, 60));
-//				LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
-//				but_action.setLayoutParams(lp);
 				buttonContainer.addView(b);
 			}	
 		 
@@ -167,5 +128,52 @@ public class FragmentInventory extends Fragment{
 			});
 		 
 			dialog.show();
-		  }
+	}
+	
+	
+	private void styleFragment(View view) {
+		
+		TextView t1 = (TextView)view.findViewById(R.id.labelInventory);
+		
+		int styleText = 0;
+		int styleLabel = 0;
+		int styleLabelBgr = 0;
+		
+		switch(style){
+			case 0:
+				styleText = R.style.textColorDefaultBlue;
+				styleLabel = R.style.labelDefault;
+				styleLabelBgr = R.drawable.labelshape;
+				break;
+			case 1:
+				styleText = R.style.textColorDarkBlue;
+				styleLabel = R.style.labelDark;
+				styleLabelBgr = R.drawable.labelshapedark;
+				break;
+		}
+		
+		t1.setTextAppearance(getActivity(), styleLabel);
+		t1.setBackgroundResource(styleLabelBgr);
+	}
+	
+	public void addItem(MdsItem item){
+		itemList.add(item);
+		updateItemlist();
+	}
+	
+	public void removeItem(MdsItem item){
+		itemList.remove(findItemInList(item));
+		updateItemlist();
+	}
+	
+	private int findItemInList(MdsItem item){
+		int itemIndex = 0;
+		for(MdsItem i : itemList){
+			if(item.getPathKey().equals(i.getPathKey())){
+				return itemIndex;
+			}
+			itemIndex++;
+		}
+		return itemIndex;
+	}
 }
