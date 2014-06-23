@@ -46,13 +46,9 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         activeFragmentsList.put("showMap", locationFragment);
         activeFragmentsNumbers.add("showMap");
         
-        FragmentBackpack backpackFragment = new FragmentBackpack();
-        activeFragmentsList.put("backpack", backpackFragment);
-        activeFragmentsNumbers.add("backpack");
-        
-//        FragmentInventory inventoryFragment = new FragmentInventory();
-//        activeFragmentsList.put("inventory", inventoryFragment);
-//        activeFragmentsNumbers.add("inventory");
+        FragmentInventory inventoryFragment = new FragmentInventory();
+        activeFragmentsList.put("inventory", inventoryFragment);
+        activeFragmentsNumbers.add("inventory");
         
         //INAKTIVE FRAGMENTS
         FragmentText textFragment = new FragmentText();

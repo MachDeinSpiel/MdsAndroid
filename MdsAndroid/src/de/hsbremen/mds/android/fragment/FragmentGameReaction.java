@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import de.hsbremen.mds.android.ingame.MainActivity;
+import de.hsbremen.mds.android.ingame.SwipeAdapter;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentGameReaction extends Fragment{
@@ -26,6 +28,7 @@ public class FragmentGameReaction extends Fragment{
 	private TextView timer;
 	private int score;
 	private TextView scoreView;
+	private SwipeAdapter sA;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,7 +100,11 @@ public class FragmentGameReaction extends Fragment{
 		 		 }else{
 		 			 mA.interpreterCom.onGameResult(false, "Puzzle");
 		 		 }
-
+		 		 
+		 		 // After games is finished call nextFragment Text
+		 		 MdsInfoObject iO = sA.getFragmentInformation();
+		 		 iO.setName("showText");
+		 		 mA.nextFragment(iO);
 		     }
 		  }.start();
 		
@@ -183,6 +190,10 @@ public class FragmentGameReaction extends Fragment{
 			}
 		}
 		return inside;
+	}
+
+	public void setSwipeAdapter(SwipeAdapter swipeAdapter) {
+		this.sA = swipeAdapter;
 	}
 	
 }

@@ -18,7 +18,7 @@
             android:layout_weight="1"
             android:text="Score" 
             android:gravity="center"
-            android:textSize="30sp"
+            android:textSize="20sp"
             android:background="#95a5a6"/>
         
         <TextView
