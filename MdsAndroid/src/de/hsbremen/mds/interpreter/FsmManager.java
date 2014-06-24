@@ -25,6 +25,7 @@ public class FsmManager {
 	private Whiteboard wb;
 	private Interpreter interpreter; //TODO: interface
 	private boolean isRunning = false;
+	private String ownGroup;
 	
 	public FsmManager(List<MdsState> states, Whiteboard wb, Interpreter interpreter, String id){
 		this.states = states;
@@ -47,6 +48,9 @@ public class FsmManager {
 				wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
 				//TODO: fix my shit up
 				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
+				// set own group
+				ownGroup = wb.getGroup(myID);
+				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup);
 				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(Interpreter.WB_PLAYERS,myID).value.toString());
 				
 			}catch(InvalidWhiteboardEntryException e){
@@ -146,32 +150,32 @@ public class FsmManager {
 			
 			switch(t.getEventType()){
 			case locationEvent:
-				result = EventParser.checkLocationEvent(t.getCondition()[0], wb, myID);
+				result = EventParser.checkLocationEvent(t.getCondition()[0], wb, ownGroup, myID);
 				break;
 			case uiEvent:
 				Log.i("Mistake", "Buttonname des Ui-Events" + buttonName);
-				result = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, myID);
+				result = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, ownGroup, myID);
 				break;
 			case whiteboardEvent:
-				result = EventParser.checkWhiteboardEvent(t.getCondition()[0], wb, myID);
+				result = EventParser.checkWhiteboardEvent(t.getCondition()[0], wb, ownGroup, myID);
 				break;
 			case uiLocationEvent:
-				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, myID);
-				result = EventParser.checkLocationEvent(t.getCondition()[1], wb, myID);
+				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, ownGroup, myID);
+				result = EventParser.checkLocationEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
 				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
 				// only location events can give objects back
 				result.objects = result2.objects;
 				break;
 			case locationWhiteboardEvent:
-				result2 = EventParser.checkLocationEvent(t.getCondition()[0], wb, myID);
-				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, myID);
+				result2 = EventParser.checkLocationEvent(t.getCondition()[0], wb, ownGroup, myID);
+				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
 				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
 				break;
 			case uiWhiteboardEvent:
-				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, myID);
-				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, myID);
+				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, ownGroup, myID);
+				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
 				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
 				break;
@@ -215,7 +219,7 @@ public class FsmManager {
 			for (int i = 0; i < trans.length; i++) {
 				if (trans[i].getEventType() == EventType.whiteboardEvent) {
 					Log.i(Interpreter.LOGTAG, "WhiteboardEvent");
-					EventParser.Result res = EventParser.checkWhiteboardEvent(trans[i].getCondition()[0], wb, myID);
+					EventParser.Result res = EventParser.checkWhiteboardEvent(trans[i].getCondition()[0], wb, ownGroup, myID);
 					if(res.isfullfilled){
 						Log.i(Interpreter.LOGTAG, "Event is fullfilled");
 						// TODO: Evtl keine Liste sondern ein Whiteboard eintragen
@@ -237,7 +241,12 @@ public class FsmManager {
 		return isRunning;
 	}
 
+	public String getOwnGroup() {
+		return ownGroup;
+	}
 
-	
+	public void setOwnGroup(String ownGroup) {
+		this.ownGroup = ownGroup;
+	}
 
 }

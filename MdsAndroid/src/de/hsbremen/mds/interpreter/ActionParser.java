@@ -42,7 +42,7 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(String type, MdsAction action, final MdsState state, final Whiteboard wb, final String myId, final ServerInterpreterInterface sii){
+	public MdsActionExecutable parseAction(String type, MdsAction action, final MdsState state, final Whiteboard wb, final String myGroup, final String myId, final ServerInterpreterInterface sii){
 		
 		if(action == null){
 			//Action exisitert eigentlich gar nicht? -> GTFO!
@@ -74,7 +74,7 @@ public class ActionParser {
 		//Jeden Parameter parsen/interpretieren
 		for(String key : params.keySet()){
 			if (params.get(key) instanceof String)
-				parsedParams.put(key, EventParser.parseParam((String)params.get(key), state, wb, myId));
+				parsedParams.put(key, EventParser.parseParam((String)params.get(key), state, wb, myGroup, myId));
 		}
 		
 		/*	showVideo,
@@ -313,7 +313,7 @@ public class ActionParser {
 						
 						//Ausführbare Action erzeugen und sie danach ausführen
 						Log.i("Mistake", "Executing real Action");
-						MdsActionExecutable realAction = parseAction(typeString, new MdsAction(actionIdent, actionParams), state, wb, myId, sii);
+						MdsActionExecutable realAction = parseAction(typeString, new MdsAction(actionIdent, actionParams), state, wb, myGroup, myId, sii);
 						realAction.execute(guiInterface);
 					}
 					
@@ -329,7 +329,7 @@ public class ActionParser {
 		
 	}
 		
-	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, String myId) {
+	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, String playerGroup, String myId) {
 		Log.i(Interpreter.LOGTAG, "Parsing Game Result");
 		// actions des aktuellen States nach identifier durchgucken
 		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId).value.toString());
@@ -343,31 +343,26 @@ public class ActionParser {
 				// get Key to the attribute that has 2 be changed
 				
 				for(GameResult result : results) {
-					String attribute = (String) EventParser.parseParam(result.attribute, state, whiteboard, myId);
+					String[] attributes = ((String)EventParser.parseParam(result.attribute, state, whiteboard, playerGroup, myId)).split("\\.");
 					if (hasWon) {
-						if(actionParams.get("setWin") != null)
-							whiteboard.get(attribute.split("//.")).value = result.setWin;
-						if(actionParams.get("addResult") != null) {
-							double value = Double.parseDouble((String)whiteboard.get(attribute.split("//.")).value);
+						if(result.setWin != null) {
+							whiteboard.getAttribute(attributes).value = result.setWin;
+						}
+						if(result.addResult != 0) {
+							double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
 							value += result.addResult;
-							whiteboard.get(attribute.split("//.")).value = value;
+							whiteboard.getAttribute(attributes).value = value;
 						}
 					} else {
-						if(actionParams.get("setLoose") != null)
-							whiteboard.get(attribute.split("//.")).value = result.setLoose;
-						if(actionParams.get("addResult") != null) {
-							double value = Double.parseDouble((String)whiteboard.get(attribute.split("//.")).value);
+						if(result.setLoose != null)
+							whiteboard.getAttribute(attributes).value = result.setLoose;
+						if(result.addResult != 0) {
+							double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
 							value -= result.addResult;
-							whiteboard.get(attribute.split("//.")).value = value;
+							whiteboard.getAttribute(attributes).value = value;
 						}
 					}
 				}
-				Log.i(Interpreter.LOGTAG, "Checking WB-Actions after Game Result");
-				for(MdsTransition trans : state.getTransitions()) {
-					if(trans.getEventType().equals(MdsTransition.EventType.whiteboardEvent))
-						EventParser.checkConditionEvent(trans.getCondition()[0], whiteboard, myId);
-				}
-				return;
 			}
 		}
 		// no key = identifier found

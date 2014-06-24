@@ -175,9 +175,9 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if (current.getStartAction() != null) Log.i(LOGTAG, "Start Action des States: " + current.getStartAction().getIdent());
 			if (current.getEndAction() != null) Log.i(LOGTAG, "End Action des States: " + current.getEndAction().getIdent());
 			
-			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, myId, serverInterpreter);
-			MdsActionExecutable startAction = actionParser.parseAction("start", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
-			MdsActionExecutable doAction = actionParser.parseAction("do", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, myId, serverInterpreter);
+			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+			MdsActionExecutable startAction = actionParser.parseAction("start", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+			MdsActionExecutable doAction = actionParser.parseAction("do", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			
 			Log.i(LOGTAG, "Executing Action");
 			
@@ -284,7 +284,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 					return;
 				}
 				MdsState state = (MdsState)(whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value);
-				MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, myId, serverInterpreter);
+				MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 				
 				// execute Action if possible
 				if(actionExecute != null) {
@@ -323,7 +323,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			MdsActionIdent ident = MdsActionIdent.removeFromGroup;
 			MdsAction action = new MdsAction(ident, params);
 			MdsState state = (MdsState)(whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value);
-			MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, myId, serverInterpreter);
+			MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			
 			// execute Action if possible
 			if(actionExecute != null) {
@@ -355,14 +355,13 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		params.put("target", WB_PLAYERS + "." + myId + "." + "inventory.dummy");
 		params.put("group", WB_PLAYERS + "." + myId + "." + "inventory");
 		MdsAction action = new MdsAction(MdsActionIdent.removeFromGroup, params);
-		MdsActionExecutable actionExec = actionParser.parseAction("dummyDelete", action, null, whiteboard, myId, serverInterpreter);
+		MdsActionExecutable actionExec = actionParser.parseAction("dummyDelete", action, null, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 		if (actionExec != null) {
 			Log.i(LOGTAG, "Executing Action " + action.getIdent().toString());
 			actionExec.execute(gui);
 		}
 		
 		WhiteboardEntry player = whiteboard.getAttribute("Players", myId);
-		Log.i("Mistake", "Player Health von " + myId + " beim Erzeugen ist: " + ((Whiteboard)player.value).get("health").value);
 		fsmManager.initiate();
 		
 	}
@@ -385,7 +384,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	@Override
 	public void onGameResult(boolean hasWon, String identifier) {
 		Log.i(LOGTAG, "OnGameResult");
-		actionParser.parseGameResult(whiteboard, hasWon, identifier, myId);
+		actionParser.parseGameResult(whiteboard, hasWon, identifier, fsmManager.getOwnGroup(), myId);
+		fsmManager.checkWBCondition();
 	}
 
 
