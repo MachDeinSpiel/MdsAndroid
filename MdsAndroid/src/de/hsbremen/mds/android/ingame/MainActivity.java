@@ -68,6 +68,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public WebServices webServ;
 	
 	private int style = 0;
+	
+	private boolean miniGameRunning;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -367,15 +369,21 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
 		
-		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
-		
-		if(!(mds.getName().equals("showMap"))){
-			swipeAdapter.setFragmentInformation(mds);
-			swipeAdapter.addFragment(mds.getName());
+		if(!miniGameRunning){
+			System.out.println("NextFragment aufgerufen mit: " + mds.getName());
+			
+			if(mds.getName().equals("Puzzle")){
+				miniGameRunning = true;
+			}
+			
+			if(!(mds.getName().equals("showMap"))){
+				swipeAdapter.setFragmentInformation(mds);
+				swipeAdapter.addFragment(mds.getName());
+			}
+	
+			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
+					true);
 		}
-
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
-				true);
 	}
 
 	@Override
@@ -396,5 +404,10 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void onWebserviceConnectionClosed(int code, String reason,
 			boolean remote) {
+	}
+	
+	
+	public void setMiniGameRunning(boolean running){
+		this.miniGameRunning = running;
 	}
 }

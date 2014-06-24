@@ -94,16 +94,23 @@ public class FragmentGameReaction extends Fragment{
 		 		 MainActivity mA = (MainActivity)getActivity();
 		 		 
 		 		mA.updateSwipeAdapter("Puzzle");
+		 		
+		 		 //Prepare MdsInfoObject for nextFragment
+		 		 MdsInfoObject iO = sA.getFragmentInformation();
+		 		 iO.setName("showText");
 		 		 
 		 		 if(score >= MINSCORE){
 			 		 mA.interpreterCom.onGameResult(true, "Puzzle");
+			 		 iO.setText("Du hast gewonnen");
 		 		 }else{
 		 			 mA.interpreterCom.onGameResult(false, "Puzzle");
+			 		 iO.setText("Du hast verloren");
 		 		 }
 		 		 
-		 		 // After games is finished call nextFragment Text
-		 		 MdsInfoObject iO = sA.getFragmentInformation();
-		 		 iO.setName("showText");
+		 		 // release nextFragment
+		 		 mA.setMiniGameRunning(false);
+		 		 
+		 		 // Call nextFragment to show the gameResult
 		 		 mA.nextFragment(iO);
 		     }
 		  }.start();
