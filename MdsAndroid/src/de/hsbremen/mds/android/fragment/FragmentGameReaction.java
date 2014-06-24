@@ -98,6 +98,9 @@ public class FragmentGameReaction extends Fragment{
 		 		 //Prepare MdsInfoObject for nextFragment
 		 		 MdsInfoObject iO = sA.getFragmentInformation();
 		 		 iO.setName("showText");
+		 		 List<String> buttonList = new ArrayList<String>();
+		 		 buttonList.add("back");
+		 		 iO.setButtons(buttonList);
 		 		 
 		 		 if(score >= MINSCORE){
 			 		 mA.interpreterCom.onGameResult(true, "Puzzle");
