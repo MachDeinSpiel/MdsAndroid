@@ -13,14 +13,18 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.InitiateMatchResult;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
@@ -45,7 +49,6 @@ import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsGroup;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.interpreter.Interpreter;
@@ -71,6 +74,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 	private boolean miniGameResult;
 	private String miniGameName;
+	
+	private LocationManager manager; 
 
 	@SuppressLint("NewApi")
 	@Override
@@ -112,6 +117,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		
+		gpsInit();
 	}
 	
 	private void setOnPageChangedListener() {
@@ -455,5 +462,18 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 	public String getMiniGameName(){
 		return this.miniGameName;
+	}
+	
+	public void gpsInit() {
+	
+	MainActivity activity = (MainActivity) getActivity();
+
+	manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+	manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
+																		// sec
+			10, activity);
+
+
 	}
 }
