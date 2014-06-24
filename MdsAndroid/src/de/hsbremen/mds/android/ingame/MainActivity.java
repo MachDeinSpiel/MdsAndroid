@@ -34,12 +34,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
-import android.widget.TextView;
 import de.hsbremen.mds.android.communication.InterpreterCommunicator;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
-import de.hsbremen.mds.android.fragment.FragmentLocation;
 import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
 import de.hsbremen.mds.common.communication.WhiteboardHandler;
@@ -47,6 +45,7 @@ import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsGroup;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.interpreter.Interpreter;
@@ -55,7 +54,6 @@ import de.hsbremen.mds.mdsandroid.R;
 public class MainActivity extends FragmentActivity implements LocationListener,
 		GuiInterface, ServerInterpreterInterface, WebServicesInterface {
 
-	private Location location;
 	public InterpreterCommunicator interpreterCom;
 
 	private GoogleMapFragment mapFragment;
@@ -70,6 +68,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	private int style = 0;
 	
 	private boolean miniGameRunning;
+	
+	private boolean miniGameResult;
+	private String miniGameName;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -88,6 +89,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
 		viewPager.setAdapter(swipeAdapter);
+		setOnPageChangedListener();
 
 		FragmentManager fm = getFragmentManager();
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
@@ -112,6 +114,37 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		}
 	}
 	
+	private void setOnPageChangedListener() {
+		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int arg0) {
+//				LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
+//				LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
+//				if(arg0 == 0){
+//					l.setLayoutParams(new TableLayout.LayoutParams(
+//							LayoutParams.WRAP_CONTENT, 0, 4f));
+//					l2.setLayoutParams(new TableLayout.LayoutParams(
+//							LayoutParams.WRAP_CONTENT, 0, 1f));
+//				}else{
+//					l.setLayoutParams(new TableLayout.LayoutParams(
+//							LayoutParams.WRAP_CONTENT, 0, 1f));
+//					l2.setLayoutParams(new TableLayout.LayoutParams(
+//							LayoutParams.WRAP_CONTENT, 0, 4f));
+//				}
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+			}
+		});
+		
+	}
+
 	private void styleFragment(){
 		
 		FrameLayout f = (FrameLayout)findViewById(R.id.container);
@@ -171,45 +204,41 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		
 		mapFragment.gmapsUpdate(loc);
 
-		FragmentLocation f = (FragmentLocation) swipeAdapter
-				.getFragment("showMap");
-		f.updateLocationFields();
-
 		interpreterCom.locationChanged(loc);
 	}
 
-	public void showProviderDisable() {
-		TextView view = (TextView) findViewById(R.id.txtGPSVal);
-		view.setText("AUS");
-		view.setBackgroundColor(Color.RED);
-
-		FragmentLocation f = (FragmentLocation) swipeAdapter
-				.getFragment("showMap");
-		f.updateLocationFields();
-	}
-
-	public void showProviderEnable() {
-		TextView view = (TextView) findViewById(R.id.txtGPSVal);
-		view.setText("AN");
-		view.setBackgroundColor(Color.GREEN);
-
-		FragmentLocation f = (FragmentLocation) swipeAdapter
-				.getFragment("showMap");
-		if(f != null){
-			f.updateLocationFields();
-		}
-
-		interpreterCom.locationChanged(location);
-	}
+//	public void showProviderDisable() {
+//		TextView view = (TextView) findViewById(R.id.txtGPSVal);
+//		view.setText("AUS");
+//		view.setBackgroundColor(Color.RED);
+//
+//		FragmentLocation f = (FragmentLocation) swipeAdapter
+//				.getFragment("showMap");
+//		f.updateLocationFields();
+//	}
+//
+//	public void showProviderEnable() {
+//		TextView view = (TextView) findViewById(R.id.txtGPSVal);
+//		view.setText("AN");
+//		view.setBackgroundColor(Color.GREEN);
+//
+//		FragmentLocation f = (FragmentLocation) swipeAdapter
+//				.getFragment("showMap");
+//		if(f != null){
+//			f.updateLocationFields();
+//		}
+//
+//		interpreterCom.locationChanged(location);
+//	}
 
 	@Override
 	public void onProviderDisabled(String arg0) {
-		showProviderDisable();
+//		showProviderDisable();
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-		showProviderEnable();
+//		showProviderEnable();
 	}
 
 	@Override
@@ -409,5 +438,22 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 	public void setMiniGameRunning(boolean running){
 		this.miniGameRunning = running;
+	}
+	
+	public boolean getMiniGameRunning(){
+		return this.miniGameRunning;
+	}
+	
+	public void setMiniGameResult(boolean result, String name){
+		this.miniGameName = name;
+		this.miniGameResult = result;
+	}
+	
+	public boolean getMiniGameResult(){
+		return this.miniGameResult;
+	}
+	
+	public String getMiniGameName(){
+		return this.miniGameName;
 	}
 }

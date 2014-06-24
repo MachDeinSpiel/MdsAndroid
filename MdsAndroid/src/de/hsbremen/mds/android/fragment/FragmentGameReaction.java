@@ -103,15 +103,12 @@ public class FragmentGameReaction extends Fragment{
 		 		 iO.setButtons(buttonList);
 		 		 
 		 		 if(score >= MINSCORE){
-			 		 mA.interpreterCom.onGameResult(true, "Puzzle");
+			 		 mA.setMiniGameResult(true, "Puzzle");
 			 		 iO.setText("Du hast gewonnen");
 		 		 }else{
-		 			 mA.interpreterCom.onGameResult(false, "Puzzle");
+		 			 mA.setMiniGameResult(false, "Puzzle");
 			 		 iO.setText("Du hast verloren");
 		 		 }
-		 		 
-		 		 // release nextFragment
-		 		 mA.setMiniGameRunning(false);
 		 		 
 		 		 // Call nextFragment to show the gameResult
 		 		 mA.nextFragment(iO);
