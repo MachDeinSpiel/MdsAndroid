@@ -405,7 +405,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
 		
-		if(!miniGameRunning){
+
 			System.out.println("NextFragment aufgerufen mit: " + mds.getName());
 			
 			if(mds.getName().equals("Puzzle")){
@@ -419,7 +419,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
 					true);
-		}
 	}
 
 	@Override
