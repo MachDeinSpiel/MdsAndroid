@@ -119,19 +119,19 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			
 			@Override
 			public void onPageSelected(int arg0) {
-//				LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
-//				LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
-//				if(arg0 == 0){
-//					l.setLayoutParams(new TableLayout.LayoutParams(
-//							LayoutParams.WRAP_CONTENT, 0, 4f));
-//					l2.setLayoutParams(new TableLayout.LayoutParams(
-//							LayoutParams.WRAP_CONTENT, 0, 1f));
-//				}else{
-//					l.setLayoutParams(new TableLayout.LayoutParams(
-//							LayoutParams.WRAP_CONTENT, 0, 1f));
-//					l2.setLayoutParams(new TableLayout.LayoutParams(
-//							LayoutParams.WRAP_CONTENT, 0, 4f));
-//				}
+				LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
+				LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
+				if(arg0 == 0){
+					l.setLayoutParams(new TableLayout.LayoutParams(
+							LayoutParams.WRAP_CONTENT, 0, 4f));
+					l2.setLayoutParams(new TableLayout.LayoutParams(
+							LayoutParams.WRAP_CONTENT, 0, 1f));
+				}else{
+					l.setLayoutParams(new TableLayout.LayoutParams(
+							LayoutParams.WRAP_CONTENT, 0, 1f));
+					l2.setLayoutParams(new TableLayout.LayoutParams(
+							LayoutParams.WRAP_CONTENT, 0, 4f));
+				}
 			}
 			
 			@Override
