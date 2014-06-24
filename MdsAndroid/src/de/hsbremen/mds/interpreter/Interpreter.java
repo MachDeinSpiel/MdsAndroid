@@ -20,6 +20,7 @@ import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMiniAppAction;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
@@ -41,6 +42,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	private String myId;
 	private GuiInterface gui;
 	private ServerInterpreterInterface serverInterpreter;
+	
+	private boolean miniGameRunning;
 
 		
 	public Interpreter(File json, GuiInterface guiInterface, ServerInterpreterInterface serverInterpreter, String playerId){
@@ -187,7 +190,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if(doAction != null){
 				doAction.execute(gui);
 			}
-			fsmManager.checkWBCondition();
+			if (!(endAction instanceof MdsMiniAppAction || startAction instanceof MdsMiniAppAction || doAction instanceof MdsMiniAppAction))
+				fsmManager.checkWBCondition();
 			
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","health").value);
 			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","inventory").value);
@@ -380,7 +384,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 	@Override
 	public void onGameResult(boolean hasWon, String identifier) {
-		actionParser.parseGameResult(whiteboard, hasWon, identifier, myId);	
+		Log.i(LOGTAG, "OnGameResult");
+		actionParser.parseGameResult(whiteboard, hasWon, identifier, myId);
 	}
 
 

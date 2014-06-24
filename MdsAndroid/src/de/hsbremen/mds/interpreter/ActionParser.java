@@ -330,7 +330,9 @@ public class ActionParser {
 	}
 		
 	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, String myId) {
+		Log.i(Interpreter.LOGTAG, "Parsing Game Result");
 		// actions des aktuellen States nach identifier durchgucken
+		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId).value.toString());
 		MdsState state= (MdsState)whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId, FsmManager.CURRENT_STATE).value;
 		HashMap<String, Object> actionParams = state.getStartAction().getParams();
 		// search in Params for identifier
@@ -359,6 +361,11 @@ public class ActionParser {
 							whiteboard.get(attribute.split("//.")).value = value;
 						}
 					}
+				}
+				Log.i(Interpreter.LOGTAG, "Checking WB-Actions after Game Result");
+				for(MdsTransition trans : state.getTransitions()) {
+					if(trans.getEventType().equals(MdsTransition.EventType.whiteboardEvent))
+						EventParser.checkConditionEvent(trans.getCondition()[0], whiteboard, myId);
 				}
 				return;
 			}

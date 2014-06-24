@@ -286,7 +286,9 @@ public class EventParser {
 			
 			// get checkType
 			Log.i("Mistake", cond.getParams().toString());
-			if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
+			if(sValue != null || sCompValue != null) {
+				if (sValue.equals(sCompValue)) return new Result(true, null, null);
+			} else if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
 				if (value == compValue) return new Result(true, null, null);
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.LOWER)) {
 				if (value < compValue) return new Result(true, null, null);
