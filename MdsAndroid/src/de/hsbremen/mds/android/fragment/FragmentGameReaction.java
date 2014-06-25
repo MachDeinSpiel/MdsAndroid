@@ -99,7 +99,7 @@ public class FragmentGameReaction extends Fragment{
 		 		 if(score >= MINSCORE){
 			 		 mA.interpreterCom.onGameResult(true, "Puzzle");
 		 		 }else{
-		 			mA.interpreterCom.onGameResult(true, "Puzzle");
+		 			mA.interpreterCom.onGameResult(false, "Puzzle");
 		 		 }
 		     }
 		  }.start();

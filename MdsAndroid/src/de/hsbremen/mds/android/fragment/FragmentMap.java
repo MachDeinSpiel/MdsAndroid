@@ -14,7 +14,7 @@ import android.widget.TextView;
 import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
-public class FragmentLocation extends Fragment{
+public class FragmentMap extends Fragment{
 	
 	private LocationManager manager; 
     private Location location;
