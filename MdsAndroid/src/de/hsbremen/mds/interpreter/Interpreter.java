@@ -13,6 +13,7 @@ import de.hsbremen.mds.common.interfaces.GuiInterface;
 import de.hsbremen.mds.common.interfaces.InterpreterInterface;
 import de.hsbremen.mds.common.interfaces.ServerInterpreterInterface;
 import de.hsbremen.mds.common.valueobjects.GameResult;
+import de.hsbremen.mds.common.valueobjects.MdsText;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsObjectContainer;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
@@ -21,6 +22,7 @@ import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsAction.MdsActionIdent;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsActionExecutable;
 import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsMiniAppAction;
+import de.hsbremen.mds.common.valueobjects.statemachine.actions.MdsTextAction;
 import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
@@ -91,6 +93,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	@Override
 	public void onButtonClick(String buttonName) {
 		Log.i(LOGTAG, "onButtonClick ausgeführt" + buttonName);
+//		if (fsmManager.getCurrentState().getName().equals("miniApp"))
+//			// run actions on current state
 		fsmManager.checkEvents(buttonName);
 		
 	}
@@ -348,6 +352,9 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			whiteboard.setAttribute(wuo.getValue(), (String[])wuo.getKeys().toArray(new String[0]));
 			
 		}
+		
+		WhiteboardEntry player = whiteboard.getAttribute("Players", myId);
+		fsmManager.initiate();
 		Log.i(LOGTAG, "Removing Dummy Text in Inventory");
 		// remove dummy from inventory
 		HashMap<String, Object> params = new HashMap<String, Object>();
@@ -360,9 +367,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			Log.i(LOGTAG, "Executing Action " + action.getIdent().toString());
 			actionExec.execute(gui);
 		}
-		
-		WhiteboardEntry player = whiteboard.getAttribute("Players", myId);
-		fsmManager.initiate();
 		
 	}
 
@@ -385,7 +389,17 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	public void onGameResult(boolean hasWon, String identifier) {
 		Log.i(LOGTAG, "OnGameResult");
 		actionParser.parseGameResult(whiteboard, hasWon, identifier, fsmManager.getOwnGroup(), myId);
-		fsmManager.checkWBCondition();
+		String text;
+		if (hasWon)
+			text = "Super du hast das Spiel gewonnen.";
+		else
+			text = "Du hast das Spiel leider veroren";	
+		List<String> buttons = new Vector<String>();
+		buttons.add("back");
+		MdsActionExecutable action = new MdsTextAction("showText", text, buttons);
+		if (action != null)
+			action.execute(gui);
+		//fsmManager.checkWBCondition();
 	}
 
 
