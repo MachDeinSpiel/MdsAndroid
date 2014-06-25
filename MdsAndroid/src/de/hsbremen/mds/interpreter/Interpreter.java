@@ -44,9 +44,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	private String myId;
 	private GuiInterface gui;
 	private ServerInterpreterInterface serverInterpreter;
-	
-	private boolean miniGameRunning;
-
 		
 	public Interpreter(File json, GuiInterface guiInterface, ServerInterpreterInterface serverInterpreter, String playerId){
 		Log.i(LOGTAG, "Interpreter erzeugt");
@@ -121,6 +118,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		
 		// tell the server
 		try {
+			// TODO: alle Aufrufe, bei denen auf den Player geguckt werden müssen aktualisiert werden
 			whiteboard.setAttributeValue(Double.toString(longitude), WB_PLAYERS, myId, "longitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
@@ -168,33 +166,49 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 	@Override
 	public void onStateChange(String setTo) {
+		boolean isMiniGame = false;
 		if(setTo.equals(CURRENT_STATE)) {
 			Log.i(LOGTAG, "Zustand geändert");
 			Log.i(LOGTAG, "Last State" + ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getName());
-			MdsState current = (MdsState) whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value;
+			MdsState current = fsmManager.getCurrentState();
 			Log.i(LOGTAG, "Current State" + current.getName());
 			// Actions des Current states
 			
 			if (current.getDoAction() != null) Log.i(LOGTAG, "Do Action des States: " + current.getDoAction().getIdent());
-			if (current.getStartAction() != null) Log.i(LOGTAG, "Start Action des States: " + current.getStartAction().getIdent());
+			for(MdsAction startAction : current.getStartAction())  {
+				if (startAction != null) Log.i(LOGTAG, "Start Action des States: " + startAction.getIdent());
+			}
 			if (current.getEndAction() != null) Log.i(LOGTAG, "End Action des States: " + current.getEndAction().getIdent());
 			
+			// endAction of LastState
 			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
-			MdsActionExecutable startAction = actionParser.parseAction("start", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getStartAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+			Log.i(LOGTAG, "Executing Action");
+			if(endAction != null){
+				endAction.execute(gui);
+				if (endAction instanceof MdsMiniAppAction) isMiniGame = true;
+			}
+			// startActions of CurrentState
+			for(MdsAction startAction : current.getStartAction()) {
+				MdsActionExecutable startActionExec = actionParser.parseAction("start", startAction, 
+																		  ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, 
+																		   fsmManager.getOwnGroup(), myId, serverInterpreter);
+				Log.i(LOGTAG, "Executing Action");
+				if(startActionExec != null){
+					startActionExec.execute(gui);
+					if (startActionExec instanceof MdsMiniAppAction) isMiniGame = true;
+				}
+			}
+			// do Action of CurrentState
 			MdsActionExecutable doAction = actionParser.parseAction("do", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+			if (doAction instanceof MdsMiniAppAction) isMiniGame = true;
 			
 			Log.i(LOGTAG, "Executing Action");
 			
-			if(endAction != null){
-				endAction.execute(gui);
-			}
-			if(startAction != null){
-				startAction.execute(gui);
-			}
 			if(doAction != null){
 				doAction.execute(gui);
 			}
-			if (!(endAction instanceof MdsMiniAppAction || startAction instanceof MdsMiniAppAction || doAction instanceof MdsMiniAppAction))
+			// only checkWBCond if Action is not miniGame, miniGame WBconds will be checked later
+			if (!isMiniGame)
 				fsmManager.checkWBCondition();
 			
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","health").value);
@@ -353,7 +367,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			
 		}
 		
-		WhiteboardEntry player = whiteboard.getAttribute("Players", myId);
 		fsmManager.initiate();
 		Log.i(LOGTAG, "Removing Dummy Text in Inventory");
 		// remove dummy from inventory
@@ -390,6 +403,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		Log.i(LOGTAG, "OnGameResult");
 		actionParser.parseGameResult(whiteboard, hasWon, identifier, fsmManager.getOwnGroup(), myId);
 		String text;
+		Log.i("Mistake", "Der Spieler hat gewonnen: " + hasWon);
 		if (hasWon)
 			text = "Super du hast das Spiel gewonnen.";
 		else
