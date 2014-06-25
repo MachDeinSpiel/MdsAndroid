@@ -65,7 +65,6 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         
         FragmentGameReaction reactionGameFragment = new FragmentGameReaction();
         fragmentsPoolList.put("Puzzle", reactionGameFragment);	
-        reactionGameFragment.setSwipeAdapter(this);
 	}
 	
 	public void removeFragment(String fragmentName){   
