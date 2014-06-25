@@ -116,9 +116,6 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	@Override
 	public int getItemPosition(Object object) {
 		
-//		Log.i("nextFragment", "getItemPosition augerufen mit fragmentsCount: " + fragmentsCount);
-//		Log.i("nextFragment", "Objectname: " + object.getClass());
-		
 		if(getItemPositionStandard){
 			fragmentsCount = 0;
 			return super.getItemPosition(object);

@@ -109,14 +109,7 @@ public class FragmentText extends Fragment {
  					MainActivity activity = (MainActivity) getActivity();
  					activity.updateSwipeAdapter("showText");
  					String buttonText = (String)b.getText();
- 					if(buttonText.equals("back") && activity.getMiniGameRunning()){
- 				 		 // release nextFragment
- 				 		 activity.setMiniGameRunning(false);
- 				 		 activity.interpreterCom.onGameResult(activity.getMiniGameResult(), activity.getMiniGameName());
- 					}else{
- 	 					activity.interpreterCom.buttonClicked(buttonText);
- 					}
-
+ 					activity.interpreterCom.buttonClicked(buttonText);
  				}
  			});
  			

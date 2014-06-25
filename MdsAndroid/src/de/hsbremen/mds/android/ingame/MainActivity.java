@@ -13,8 +13,6 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer.InitiateMatchResult;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -69,11 +67,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public WebServices webServ;
 	
 	private int style = 0;
-	
-	private boolean miniGameRunning;
-	
-	private boolean miniGameResult;
-	private String miniGameName;
 	
 	private LocationManager manager; 
 
@@ -405,12 +398,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
 		
-
 			System.out.println("NextFragment aufgerufen mit: " + mds.getName());
-			
-			if(mds.getName().equals("Puzzle")){
-				miniGameRunning = true;
-			}
 			
 			if(!(mds.getName().equals("showMap"))){
 				swipeAdapter.setFragmentInformation(mds);
@@ -441,28 +429,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			boolean remote) {
 	}
 	
-	
-	public void setMiniGameRunning(boolean running){
-		this.miniGameRunning = running;
-	}
-	
-	public boolean getMiniGameRunning(){
-		return this.miniGameRunning;
-	}
-	
-	public void setMiniGameResult(boolean result, String name){
-		this.miniGameName = name;
-		this.miniGameResult = result;
-	}
-	
-	public boolean getMiniGameResult(){
-		return this.miniGameResult;
-	}
-	
-	public String getMiniGameName(){
-		return this.miniGameName;
-	}
-	
 	public void gpsInit() {
 	
 	MainActivity activity = (MainActivity) getActivity();
@@ -472,7 +438,5 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
 																		// sec
 			10, activity);
-
-
 	}
 }

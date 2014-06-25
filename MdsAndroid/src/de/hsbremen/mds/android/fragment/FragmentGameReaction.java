@@ -92,33 +92,21 @@ public class FragmentGameReaction extends Fragment{
 		 		 timer.setBackgroundColor(Color.GREEN);  
 		 		 
 		 		 MainActivity mA = (MainActivity)getActivity();
-		 		 
-		 		mA.updateSwipeAdapter("Puzzle");
 		 		
 		 		 //Prepare MdsInfoObject for nextFragment
-		 		 MdsInfoObject iO = sA.getFragmentInformation();
-		 		 iO.setName("showText");
-		 		 List<String> buttonList = new ArrayList<String>();
-		 		 buttonList.add("back");
-		 		 iO.setButtons(buttonList);
+			 	 mA.updateSwipeAdapter("Puzzle");
 		 		 
 		 		 if(score >= MINSCORE){
-			 		 mA.setMiniGameResult(true, "Puzzle");
-			 		 iO.setText("Du hast gewonnen");
+			 		 mA.interpreterCom.onGameResult(true, "Puzzle");
 		 		 }else{
-		 			 mA.setMiniGameResult(false, "Puzzle");
-			 		 iO.setText("Du hast verloren");
+		 			mA.interpreterCom.onGameResult(true, "Puzzle");
 		 		 }
-		 		 
-		 		 // Call nextFragment to show the gameResult
-		 		 mA.nextFragment(iO);
 		     }
 		  }.start();
 		
 	}
 
 	private void getButtons() {
-		
 		Button btn1 = (Button)getActivity().findViewById(R.id.button1);
 		buttonList.add(btn1);
 		Button btn2 = (Button)getActivity().findViewById(R.id.button2);
