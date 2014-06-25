@@ -40,7 +40,6 @@ import de.hsbremen.mds.android.communication.InterpreterCommunicator;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
-import de.hsbremen.mds.android.fragment.FragmentMonitoring;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
 import de.hsbremen.mds.common.communication.WhiteboardHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
@@ -327,12 +326,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			e.printStackTrace();
 		}
 
-	}
-
-	public void consoleEntry(String message) {
-		FragmentMonitoring f = (FragmentMonitoring) swipeAdapter
-				.getFragment("monitoring");
-		f.addConsoleEntry(message);
 	}
 
 	@Override

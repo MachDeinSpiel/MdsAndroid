@@ -16,14 +16,14 @@ import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
 public class EventParser {
 	
-	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, String playerGroup, String playerId) {
+	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, List<String> playerGroup, String playerId) {
 		Result result = new Result(false, null, null);
 
 		result = checkConditionEvent(condition, wb, playerGroup, playerId);
 		return result;
 	}
 
-	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, String playerGroup, String playerId) {
+	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, List<String> playerGroup, String playerId) {
 		
 		// ------------------ Werte holen ---------------//
 		// get Params
@@ -65,10 +65,18 @@ public class EventParser {
 			if(subject.getName().equals("self")){
 				Log.i("Mistake", "Subject is self");
 				// Locationobjekt des Spielers erzeuegen
-				Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(playerGroup, playerId).value.toString());
+				if (playerGroup.size() > 1) Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId).value.toString());
+				else Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(playerGroup.get(0), playerId).value.toString());
 				try {
-					double longitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "longitude").value);
-					double latitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "latitude").value);
+					double longitude;
+					double latitude;
+					if (playerGroup.size() > 1) {
+						longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "longitude").value);
+						latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "latitude").value);
+					} else {
+						longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "longitude").value);
+						latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "latitude").value);
+					}
 					Location playerLoc = new Location("PlayerLoc");
 					playerLoc.setLatitude(latitude);
 					playerLoc.setLongitude(longitude);
@@ -101,13 +109,23 @@ public class EventParser {
 						if (objects.size() == realObject.entrySet().size()) result = new Result(true, null, null);
 					} 
 					if(result != null){
-						MdsState currentState = (MdsState)wb.getAttribute(playerGroup,""+playerId,FsmManager.CURRENT_STATE).value;
+						MdsState currentState; 
+						if(playerGroup.size() > 1)
+							currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
+						else
+							currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
 						currentState.setObjects(objects);
 						Log.i("Mistake", "Object Size ist " + objects.size());
 						// WB im State und beim Player speichern
 						// Erstmal nur ein Object
-						wb.setAttribute(objects.get(0), playerGroup,""+playerId, "object");
-						WhiteboardEntry target = wb.getAttribute(playerGroup,""+playerId, "object");
+						WhiteboardEntry target;
+						if(playerGroup.size() > 1) {
+							wb.setAttribute(objects.get(0), playerGroup.get(0), playerGroup.get(1), ""+playerId, "object");
+							target = wb.getAttribute(playerGroup.get(0), playerGroup.get(1),""+playerId, "object");
+						} else {
+							wb.setAttribute(objects.get(0), playerGroup.get(0), ""+playerId, "object");
+							target = wb.getAttribute(playerGroup.get(0), ""+playerId, "object");
+						}
 						Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
 						return result;
 					} else {
@@ -133,15 +151,26 @@ public class EventParser {
 
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
 				
-				MdsState currentState = (MdsState)wb.getAttribute(playerGroup,""+playerId,FsmManager.CURRENT_STATE).value;
+				MdsState currentState;
+				if (playerGroup.size() > 1)
+					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
+				else 
+					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
 				currentState.setObjects(objects);
 			} 
 		}else if(cond.getName().equals("!nearby")) {
 			// wenn das Subject "self" ist, im Einzelspieler immer
 			if(subject.getName().equals("self")){
 				// Locationobjekt des Spielers erzeuegen
-				double longitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "longitude").value);
-				double latitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "latitude").value);
+				double longitude;
+				double latitude;
+				if (playerGroup.size() > 1) {
+					longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "longitude").value);
+					latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "latitude").value);
+				} else {
+					longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "longitude").value);
+					latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "latitude").value);
+				}
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
@@ -171,14 +200,24 @@ public class EventParser {
 					if (objects.size() < realObject.entrySet().size()) result = new Result(true, null, null);
 				} 
 				if(result != null){
-					MdsState currentState = (MdsState)wb.getAttribute(playerGroup,""+playerId,FsmManager.CURRENT_STATE).value;
+					MdsState currentState; 
+					if(playerGroup.size() > 1)
+						currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
+					else
+						currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
 					currentState.setObjects(objects);
 					Log.i("Mistake", "Object Size ist " + objects.size());
 					// WB im State und beim Player speichern
 					// Erstmal nur ein Object
-					wb.setAttribute(objects.get(0), playerGroup,""+playerId, "object");
-					Log.i("Mistake", "Adding Object to" + playerId + " Objects " +0);
-					
+					WhiteboardEntry target;
+					if(playerGroup.size() > 1) {
+						wb.setAttribute(objects.get(0), playerGroup.get(0), playerGroup.get(1), ""+playerId, "object");
+						target = wb.getAttribute(playerGroup.get(0), playerGroup.get(1),""+playerId, "object");
+					} else {
+						wb.setAttribute(objects.get(0), playerGroup.get(0), ""+playerId, "object");
+						target = wb.getAttribute(playerGroup.get(0), ""+playerId, "object");
+					}
+					Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
 					return result;
 				} else {
 					Log.e(Interpreter.LOGTAG, "Error in Eventparser, CheckLocationEvent, result is null");
@@ -198,14 +237,18 @@ public class EventParser {
 				// Hier evtl eine Liste von Locations?
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
 				
-				MdsState currentState = (MdsState)wb.getAttribute(playerGroup,""+playerId,FsmManager.CURRENT_STATE).value;
+				MdsState currentState;
+				if (playerGroup.size() > 1)
+					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
+				else 
+					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
 				currentState.setObjects(objects);
 			}
 		}
 		return new Result(false, null, null);
 	}
 	
-	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, String playerGroup, String playerId) {
+	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, List<String> playerGroup, String playerId) {
 		Log.i(Interpreter.LOGTAG, "CheckCondition: " + cond.getName());
 		
 		// get value and compValue
@@ -225,7 +268,10 @@ public class EventParser {
 					Log.i("Mistake", "ConditionName ist: " + cond.getName());
 					Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
 					String paramString = (String)cond.getParams().get("value");
-					paramString = paramString.replaceAll("self", playerGroup+"."+playerId);
+					if (playerGroup.size() > 1)
+						paramString = paramString.replaceAll("self", playerGroup.get(0) + "." + playerGroup.get(1) + "."+playerId);
+					else 
+						paramString = paramString.replaceAll("self", playerGroup.get(0) + "."+playerId);
 					String[] paramsSplitted = (paramString).split("\\.");
 
 					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
@@ -237,7 +283,11 @@ public class EventParser {
 						//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
 						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 					}else{
-						MdsState current = (MdsState)wb.getAttribute(playerGroup, ""+playerId, FsmManager.CURRENT_STATE).value;
+						MdsState current;
+						if (playerGroup.size() > 1)
+							current = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.CURRENT_STATE).value;
+						else 
+							current = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId, FsmManager.CURRENT_STATE).value;
 						sValue = (String) parseParam(cond.getParams().get("value").toString(), current, wb, playerGroup, playerId);
 						Log.i("Mistake", "SValue ist: " + sValue);
 						Log.i("Mistake", "WB ist: " + wb);
@@ -271,7 +321,11 @@ public class EventParser {
 							//Dann holen wir mit entrySet() alle Einträge und mit size() dann schließlich die Länge
 							compValue = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 						}else{
-							MdsState current = (MdsState)wb.getAttribute(playerGroup, ""+playerId, FsmManager.CURRENT_STATE).value;
+							MdsState current;
+							if (playerGroup.size() > 1)
+								current = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.CURRENT_STATE).value;
+							else 
+								current = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId, FsmManager.CURRENT_STATE).value;
 							sCompValue = (String) parseParam(cond.getParams().get("compValue").toString(), current, wb, playerGroup, playerId);
 							Log.i("Mistake", "SCompValue ist: " + sCompValue);
 							Log.i("Mistake", "WB ist: " + wb);
@@ -312,7 +366,7 @@ public class EventParser {
 	 * @param playerId
 	 * @return
 	 */
-	public static Result checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb, String playerGroup, String playerId) {
+	public static Result checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb) {
 		//Wenn ein uiEvent geprüft werden soll, wird es stumpf verglichen
 		return new Result((cond.getName().equals(btnName)), null, null);
 	}
@@ -349,12 +403,15 @@ public class EventParser {
 		
 	}
 	
-	public static Object parseParam(String param, MdsState state, Whiteboard wb, String playerGroup, String playerId){
+	public static Object parseParam(String param, MdsState state, Whiteboard wb, List<String> playerGroup, String playerId){
 		
 		Log.i(Interpreter.LOGTAG,"parseParam:"+param);
 		//Ersetzungen gemäß der Spezisprache vorbereiten 
 		HashMap<String, String> replacements = new HashMap<String, String>();
-		replacements.put("self",playerGroup+"."+playerId);
+		if (playerGroup.size() > 1)
+			replacements.put("self", playerGroup.get(0) + "." + playerGroup.get(1) +"."+playerId);
+		else 
+			replacements.put("self", playerGroup.get(0) +"."+playerId);
 		// TODO: Own Group auflösen
 		//replacements.put("ownGroup", playerGroup+"."+playerId+"")
 		
@@ -378,17 +435,26 @@ public class EventParser {
 			// auf Whiteboard des Spielers setzen und "Players" + ID löschen
 			splitted.remove(0);
 			splitted.remove(0);
-			tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup, ""+playerId).value;
+			if (playerGroup.size() > 1)
+				tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId).value;
+			else
+				tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId).value; 
 		}
 		if(splitted.size() > 0 && splitted.get(0).equals(FsmManager.CURRENT_STATE)) {
 			Log.i(Interpreter.LOGTAG, "Parse Current");
 			splitted.remove(0);
-			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup,""+playerId, FsmManager.CURRENT_STATE).value;
+			if(playerGroup.size() > 1)
+				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.CURRENT_STATE).value;
+			else
+				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId, FsmManager.CURRENT_STATE).value;
 			
 		} else if (splitted.size() > 0 &&  splitted.get(0).equals(FsmManager.LAST_STATE)) {
 			Log.i(Interpreter.LOGTAG, "Parse Last");
 			splitted.remove(0);
-			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup,""+playerId, FsmManager.LAST_STATE).value;
+			if(playerGroup.size() > 1)
+				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.LAST_STATE).value;
+			else
+				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId, FsmManager.LAST_STATE).value;
 		}
 		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
 		if(splitted.size() > 0 && splitted.get(0).equals("object")){
@@ -419,7 +485,10 @@ public class EventParser {
 				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard in state "+state.getName()+ " trying currentState...");
 				Whiteboard currentState = null;
 				try{
-					currentState = (Whiteboard)wb.getAttribute(playerGroup,""+playerId,FsmManager.CURRENT_STATE).value;
+					if(playerGroup.size() > 1)
+						currentState = (Whiteboard)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
+					else
+						currentState = (Whiteboard)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
 					Object o = ((Whiteboard) ((Whiteboard)currentState.get("objects").value).get(0).value).getAttribute(keys);
 				}catch(Exception e){
 					Log.e(Interpreter.LOGTAG,"Error while getting objects from whiteboard in state ");

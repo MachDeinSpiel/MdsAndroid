@@ -42,7 +42,7 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(String type, MdsAction action, final MdsState state, final Whiteboard wb, final String myGroup, final String myId, final ServerInterpreterInterface sii){
+	public MdsActionExecutable parseAction(String type, MdsAction action, final MdsState state, final Whiteboard wb, final List<String> myGroup, final String myId, final ServerInterpreterInterface sii){
 		
 		if(action == null){
 			//Action exisitert eigentlich gar nicht? -> GTFO!
@@ -329,7 +329,7 @@ public class ActionParser {
 		
 	}
 		
-	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, String playerGroup, String myId) {
+	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, List<String> playerGroup, String myId) {
 		Log.i(Interpreter.LOGTAG, "Parsing Game Result");
 		// actions des aktuellen States nach identifier durchgucken
 		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId).value.toString());

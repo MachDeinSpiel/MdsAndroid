@@ -11,6 +11,7 @@ import de.hsbremen.mds.common.whiteboard.InvalidWhiteboardEntryException;
 import de.hsbremen.mds.common.whiteboard.Whiteboard;
 import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 import de.hsbremen.mds.exceptions.NoStartStateException;
+import de.hsbremen.mds.interpreter.EventParser.Result;
 
 /**
  * @author JGWNH
@@ -25,7 +26,7 @@ public class FsmManager {
 	private Whiteboard wb;
 	private Interpreter interpreter; //TODO: interface
 	private boolean isRunning = false;
-	private String ownGroup;
+	private List<String> ownGroup;
 	
 	public FsmManager(List<MdsState> states, Whiteboard wb, Interpreter interpreter, String id){
 		this.states = states;
@@ -50,7 +51,7 @@ public class FsmManager {
 				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
 				// set own group
 				ownGroup = wb.getGroupString(myID);
-				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup);
+				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup.get(0));
 				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(Interpreter.WB_PLAYERS,myID).value.toString());
 				
 			}catch(InvalidWhiteboardEntryException e){
@@ -70,8 +71,11 @@ public class FsmManager {
 	 * den Aktuellen State aus dem Whiteboard holen
 	 * @return
 	 */
-	private MdsState getCurrentState(){
-		return (MdsState)this.wb.getAttribute(Interpreter.WB_PLAYERS ,myID, CURRENT_STATE).value;
+	public MdsState getCurrentState(){
+		if (ownGroup.size() > 1)
+			return (MdsState)this.wb.getAttribute(ownGroup.get(0), ownGroup.get(1), myID, CURRENT_STATE).value;
+		else
+			return (MdsState)this.wb.getAttribute(ownGroup.get(0), myID, CURRENT_STATE).value;
 	}
 
 	/**
@@ -154,13 +158,13 @@ public class FsmManager {
 				break;
 			case uiEvent:
 				Log.i("Mistake", "Buttonname des Ui-Events" + buttonName);
-				result = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, ownGroup, myID);
+				result = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb);
 				break;
 			case whiteboardEvent:
 				result = EventParser.checkWhiteboardEvent(t.getCondition()[0], wb, ownGroup, myID);
 				break;
 			case uiLocationEvent:
-				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, ownGroup, myID);
+				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb);
 				result = EventParser.checkLocationEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
 				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
@@ -174,7 +178,7 @@ public class FsmManager {
 				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
 				break;
 			case uiWhiteboardEvent:
-				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb, ownGroup, myID);
+				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb);
 				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
 				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
@@ -241,11 +245,11 @@ public class FsmManager {
 		return isRunning;
 	}
 
-	public String getOwnGroup() {
+	public List<String> getOwnGroup() {
 		return ownGroup;
 	}
 
-	public void setOwnGroup(String ownGroup) {
+	public void setOwnGroup(List<String> ownGroup) {
 		this.ownGroup = ownGroup;
 	}
 

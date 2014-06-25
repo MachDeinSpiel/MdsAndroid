@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import de.hsbremen.mds.android.fragment.FragmentGameReaction;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
-import de.hsbremen.mds.android.fragment.FragmentLocation;
+import de.hsbremen.mds.android.fragment.FragmentMap;
 import de.hsbremen.mds.android.fragment.FragmentText;
 import de.hsbremen.mds.android.fragment.FragmentVideo;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
@@ -41,7 +41,7 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 
 	private void initFragments() {	
         
-        FragmentLocation locationFragment = new FragmentLocation();
+        FragmentMap locationFragment = new FragmentMap();
         activeFragmentsList.put("showMap", locationFragment);
         activeFragmentsNumbers.add("showMap");
         
@@ -73,15 +73,14 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 		// Special behaviour for getItemPosition()
 		getItemPositionStandard = false;
 		
-		Fragment f = activeFragmentsList.get(fragmentName);
         notifyDataSetChanged();
 		
         activeFragmentsList.remove(fragmentName);
         activeFragmentsNumbers.remove(fragmentName);
         
-        notifyDataSetChanged();
-        
 		fm.beginTransaction().remove(fragmentsPoolList.get(fragmentName)).commit();
+		
+        notifyDataSetChanged();
         
 		// Set Behaviour for getItemPosition() to standard again
         getItemPositionStandard = true;
