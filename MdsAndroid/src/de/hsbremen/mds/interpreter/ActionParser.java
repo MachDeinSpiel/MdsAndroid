@@ -56,7 +56,7 @@ public class ActionParser {
 		// Buttons heraussuchen, falls state transitions hat
 		List<String> buttons = new Vector<String>();
 		if (state != null) {
-			MdsState buttonState = (MdsState) wb.getAttribute("Players",myId+"","currentState").value;
+			MdsState buttonState = (MdsState) wb.getAttribute("Players",myId + "","currentState").value;
 			Log.i(Interpreter.LOGTAG, "Parse Action: " + action.getIdent() + " des States: " + buttonState.getName());
 			MdsTransition[] trans = buttonState.getTransitions();
 			if (trans != null) {
@@ -247,7 +247,6 @@ public class ActionParser {
 					
 					try {
 						Log.i("Mistake", "Setting the value for real");
-						Log.i("Mistake", "WB Door is: " + currentWb.get("Door").value.toString());
 						currentWb.setAttributeValue(attributeToChange, keysToValue.toArray(new String[0]));
 						Log.i("Mistake", "Telling the Server");
 						sii.onWhiteboardUpdate(keysToValue, currentWb.getAttribute(keysToValue.toArray(new String[0])));
@@ -334,32 +333,34 @@ public class ActionParser {
 		// actions des aktuellen States nach identifier durchgucken
 		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId).value.toString());
 		MdsState state= (MdsState)whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId, FsmManager.CURRENT_STATE).value;
-		HashMap<String, Object> actionParams = state.getStartAction().getParams();
-		// search in Params for identifier
-		for(String key : actionParams.keySet()) {
-			if(key.equals("type") && actionParams.get(key).equals(identifier)) {
-				// get Result Object
-				GameResult[] results = (GameResult[]) actionParams.get("result");
-				// get Key to the attribute that has 2 be changed
-				
-				for(GameResult result : results) {
-					String[] attributes = ((String)EventParser.parseParam(result.attribute, state, whiteboard, playerGroup, myId)).split("\\.");
-					if (hasWon) {
-						if(result.setWin != null) {
-							whiteboard.getAttribute(attributes).value = result.setWin;
-						}
-						if(result.addResult != 0) {
-							double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
-							value += result.addResult;
-							whiteboard.getAttribute(attributes).value = value;
-						}
-					} else {
-						if(result.setLoose != null)
-							whiteboard.getAttribute(attributes).value = result.setLoose;
-						if(result.addResult != 0) {
-							double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
-							value -= result.addResult;
-							whiteboard.getAttribute(attributes).value = value;
+		for(MdsAction startAction : state.getStartAction()) {
+			HashMap<String, Object> actionParams = startAction.getParams();
+			// search in Params for identifier
+			for(String key : actionParams.keySet()) {
+				if(key.equals("type") && actionParams.get(key).equals(identifier)) {
+					// get Result Object
+					GameResult[] results = (GameResult[]) actionParams.get("result");
+					// get Key to the attribute that has 2 be changed
+					
+					for(GameResult result : results) {
+						String[] attributes = ((String)EventParser.parseParam(result.attribute, state, whiteboard, playerGroup, myId)).split("\\.");
+						if (hasWon) {
+							if(result.setWin != null) {
+								whiteboard.getAttribute(attributes).value = result.setWin;
+							}
+							if(result.addResult != 0) {
+								double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
+								value += result.addResult;
+								whiteboard.getAttribute(attributes).value = value;
+							}
+						} else {
+							if(result.setLoose != null)
+								whiteboard.getAttribute(attributes).value = result.setLoose;
+							if(result.addResult != 0) {
+								double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
+								value -= result.addResult;
+								whiteboard.getAttribute(attributes).value = value;
+							}
 						}
 					}
 				}
@@ -430,7 +431,7 @@ public class ActionParser {
 			MdsItem item = new MdsItem(title, imgPath, pathKey);
 			if(wb.containsKey("latitude") &&  wb.containsKey("longitude")){
 				try {
-					item.setName(pathKey);
+					//item.setName(pathKey);
 					item.setLatitude(Double.parseDouble((String)wb.getAttribute("latitude").value));
 					item.setLongitude(Double.parseDouble((String)wb.getAttribute("longitude").value));
 				} catch (NumberFormatException e1) {

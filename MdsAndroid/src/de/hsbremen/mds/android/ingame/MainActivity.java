@@ -13,6 +13,8 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.gms.maps.MapFragment;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -40,6 +42,7 @@ import de.hsbremen.mds.android.communication.InterpreterCommunicator;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
+import de.hsbremen.mds.android.fragment.FragmentMap;
 import de.hsbremen.mds.android.fragment.GoogleMapFragment;
 import de.hsbremen.mds.common.communication.WhiteboardHandler;
 import de.hsbremen.mds.common.exception.UnknownWhiteboardTypeException;
@@ -124,13 +127,13 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 					l.setLayoutParams(new TableLayout.LayoutParams(
 							LayoutParams.WRAP_CONTENT, 0, 4f));
 					l2.setLayoutParams(new TableLayout.LayoutParams(
-							LayoutParams.WRAP_CONTENT, 0, 1f));
+							LayoutParams.WRAP_CONTENT, 0, 1f));			
 				}else{
 					l.setLayoutParams(new TableLayout.LayoutParams(
 							LayoutParams.WRAP_CONTENT, 0, 1f));
 					l2.setLayoutParams(new TableLayout.LayoutParams(
 							LayoutParams.WRAP_CONTENT, 0, 4f));
-				}
+				}	
 			}
 			
 			@Override

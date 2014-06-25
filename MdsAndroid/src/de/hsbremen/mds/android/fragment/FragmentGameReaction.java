@@ -15,8 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import de.hsbremen.mds.android.ingame.MainActivity;
-import de.hsbremen.mds.android.ingame.SwipeAdapter;
-import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentGameReaction extends Fragment{
@@ -28,7 +26,6 @@ public class FragmentGameReaction extends Fragment{
 	private TextView timer;
 	private int score;
 	private TextView scoreView;
-	private SwipeAdapter sA;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,6 +93,8 @@ public class FragmentGameReaction extends Fragment{
 		 		 //Prepare MdsInfoObject for nextFragment
 			 	 mA.updateSwipeAdapter("Puzzle");
 		 		 
+			 	 int returnValue = calculateScore();
+			 	 
 		 		 if(score >= MINSCORE){
 			 		 mA.interpreterCom.onGameResult(true, "Puzzle");
 		 		 }else{
@@ -185,10 +184,23 @@ public class FragmentGameReaction extends Fragment{
 			}
 		}
 		return inside;
-	}
-
-	public void setSwipeAdapter(SwipeAdapter swipeAdapter) {
-		this.sA = swipeAdapter;
-	}
+	}	
 	
+	private int calculateScore(){
+		int score = 0;
+		
+		if(this.score == 0){
+			return -10;
+		}else if(this.score < 1){
+			return -5;
+		}else if(this.score < 3){
+			return 0;
+		}else if(this.score < 5){
+			return 5;
+		}else if(this.score >= 5){
+			return 10;
+		}
+		
+		return score;
+	}
 }

@@ -1,25 +1,23 @@
 package de.hsbremen.mds.android.fragment;
 
 
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentMap extends Fragment{
 	
-	private LocationManager manager; 
-    private Location location;
     private View mapView;
-    private int style;
+    private ProgressBar healthBar;
+    private int healthStatus = 75;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,89 +26,49 @@ public class FragmentMap extends Fragment{
 		
 		mapView = inflater.inflate(R.layout.fragment_location, container,false);
 		
-		// Style des Fragments anpassen
-		MainActivity a = (MainActivity)getActivity();
-		style = a.getStyleNumber();
-		styleFragment(mapView);
+		initUI();
+		
+		initHealthBar();
 		
 		return mapView;
 	}
 	
-	private void styleFragment(View view) {
+	private void initUI() {
+		TextView healthLabel = (TextView)mapView.findViewById(R.id.healthLabel);
+		healthLabel.setBackgroundResource(R.drawable.labelshape);
 		
-		int styleText = 0;
-		int styleLabel = 0;
-		int styleButton = 0;
-		int styleLabelBgr = 0;
+		TextView scoreLabel = (TextView)mapView.findViewById(R.id.scoreLabel);
+		scoreLabel.setBackgroundResource(R.drawable.labelshape);
 		
-		switch(style){
-			case 0:
-				styleText = R.style.textColorDefaultBlue;
-				styleLabel = R.style.labelDefault;
-				styleButton = R.drawable.buttonshape;
-				styleLabelBgr = R.drawable.labelshape;
-				break;
-			case 1:
-				styleText = R.style.textColorDarkBlue;
-				styleLabel = R.style.labelDark;
-				styleButton = R.drawable.buttonshapedark;
-				styleLabelBgr = R.drawable.labelshapedark;
-				break;
-		}
+		TextView optionalLabel = (TextView)mapView.findViewById(R.id.optionalLabel);
+		optionalLabel.setBackgroundResource(R.drawable.labelshape);
+		
+		LinearLayout healthBar = (LinearLayout)mapView.findViewById(R.id.healthBarContainer);
+		healthBar.setBackgroundResource(R.drawable.labelshape);
+		
+		TextView score = (TextView)mapView.findViewById(R.id.scoreSummary);
+		score.setBackgroundResource(R.drawable.labelshape);
+		score.setTextSize(25);
+		
+		TextView optional = (TextView)mapView.findViewById(R.id.optional);
+		optional.setBackgroundResource(R.drawable.labelshape);
+		optional.setTextSize(25);
 	}
 
-//	public void gpsInit() {
-//		
-//		MainActivity activity = (MainActivity) getActivity();
-//
-//		manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-//
-//		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
-//																			// sec
-//				10, activity);
-//
-//		boolean isNetworkEnabled = manager
-//				.isProviderEnabled(LocationManager.GPS_PROVIDER);
-//
-//		if (isNetworkEnabled) {
-//			activity.showProviderEnable();
-//		} else {
-//			activity.showProviderDisable();
-//		}
-//
-//		updateLocationFields();
-//	}
+	private void initHealthBar(){
+		healthBar = (ProgressBar) mapView.findViewById(R.id.healthBar);
+        // Start lengthy operation in a background thread
+
+        healthBar.setProgress(healthStatus);
+		
+        Drawable myIcon = getResources().getDrawable(R.drawable.healthbar);
+        healthBar.setProgressDrawable(myIcon);
+
+	}
 	
-//	public void updateLocationFields() {
-//
-//		String latitude;
-//		String longitude;
-//
-//		if(manager != null){
-//			location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//	
-//			System.out.println("Location gesetzt");
-//			
-//			if (location != null) {
-//	
-//				latitude = String.valueOf(location.getLatitude());
-//				longitude = String.valueOf(location.getLongitude());
-//	
-//			} else {
-//	
-//				latitude = "Kein Empfang!";
-//				longitude = "Kein Empfang!";
-//	
-//			}
-//	
-//			TextView latVal = (TextView) mapView.findViewById(R.id.txtLatVal);
-//			TextView longVal = (TextView) mapView.findViewById(R.id.txtLongVal);
-//	
-//			latVal.setText(latitude);
-//			longVal.setText(longitude);
-//	
-//			latVal.invalidate();
-//			longVal.invalidate();
-//		}
-//	}
+	public void setHealthbar(int maxValue, int value){
+		double onePercent = maxValue/100;
+		healthStatus = (int)(value/onePercent);
+		healthBar.setProgress(healthStatus);
+	}
 }
