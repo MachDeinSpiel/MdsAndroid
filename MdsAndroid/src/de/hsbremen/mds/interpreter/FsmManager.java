@@ -49,7 +49,7 @@ public class FsmManager {
 				//TODO: fix my shit up
 				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
 				// set own group
-				ownGroup = wb.getGroup(myID);
+				ownGroup = wb.getGroupString(myID);
 				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup);
 				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(Interpreter.WB_PLAYERS,myID).value.toString());
 				
