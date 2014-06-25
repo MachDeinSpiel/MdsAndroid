@@ -79,9 +79,9 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         activeFragmentsList.remove(fragmentName);
         activeFragmentsNumbers.remove(fragmentName);
         
-        notifyDataSetChanged();
-        
 		fm.beginTransaction().remove(fragmentsPoolList.get(fragmentName)).commit();
+		
+        notifyDataSetChanged();
         
 		// Set Behaviour for getItemPosition() to standard again
         getItemPositionStandard = true;
