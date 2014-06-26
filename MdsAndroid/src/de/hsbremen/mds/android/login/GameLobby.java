@@ -3,13 +3,12 @@
  */
 package de.hsbremen.mds.android.login;
 
+import java.io.File;
 import java.util.Vector;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.gson.JsonArray;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -51,6 +50,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	PlayerListItem playerAdapter;
 
 	private WebServices webServ;
+	private File spielejson;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 
 		Bundle extras = getIntent().getExtras();
 		isInitialPlayer = extras.getBoolean("isInitial");
+		spielejson = (File) extras.get("spielejson");
 
 		Log.d("Socket", "GameLobby: IsInitialPlayer: " + isInitialPlayer);
 
@@ -175,6 +176,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 				Intent intent = new Intent(GameLobby.this, MainActivity.class);
 				intent.putExtra("username", username);
 				intent.putExtra("json", json.toString());
+				intent.putExtra("spielejson", spielejson);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				getApplicationContext().startActivity(intent);
 				finish();

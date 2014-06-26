@@ -1,5 +1,9 @@
 package de.hsbremen.mds.android.communication;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Vector;
 
 import android.content.ComponentName;
@@ -39,9 +43,9 @@ public class WebServices {
 						.getService(WebServices.this);
 				socketService.setActivity(WebServices.this.actInterface
 						.getActivity());
-				
+
 				if (messageBuffer.size() > 0) {
-					for(String s : messageBuffer)
+					for (String s : messageBuffer)
 						socketService.send(s);
 					messageBuffer.clear();
 				}
@@ -65,6 +69,8 @@ public class WebServices {
 		return w;
 	}
 
+
+
 	public void send(final String s) {
 		if (socketService != null) {
 			Thread thread = new Thread() {
@@ -82,12 +88,13 @@ public class WebServices {
 
 	public void onMessage(final String message) {
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				actInterface.onWebSocketMessage(message);	
+				actInterface.onWebSocketMessage(message);
 			}
-		}).start();;
+		}).start();
+		;
 	}
 
 	public void closeWebServices() {
@@ -97,14 +104,14 @@ public class WebServices {
 
 	public void onSocketConnected() {
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				Log.d("Socket", "WebServices onSocketConnected");
 				socketService.connectToServer();
 				actInterface.onWebSocketConnected();
 				if (messageBuffer.size() > 0) {
-					for(String s : messageBuffer)
+					for (String s : messageBuffer)
 						socketService.send(s);
 					messageBuffer.clear();
 				}
@@ -120,24 +127,25 @@ public class WebServices {
 		// socketService.unbindService(serviceConn);
 	}
 
-	public void onConnectionClosed(final int code, final String reason, final boolean remote) {
+	public void onConnectionClosed(final int code, final String reason,
+			final boolean remote) {
 		// TODO Auto-generated method stub
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				actInterface.onWebserviceConnectionClosed(code, reason, remote);	
+				actInterface.onWebserviceConnectionClosed(code, reason, remote);
 			}
 		}).start();
-		
+
 	}
 
 	public void onConnectionHandshake() {
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				actInterface.onWebSocketConnected();	
+				actInterface.onWebSocketConnected();
 			}
 		}).start();
 	}

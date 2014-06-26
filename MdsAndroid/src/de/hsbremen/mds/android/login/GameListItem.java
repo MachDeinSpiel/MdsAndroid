@@ -17,9 +17,10 @@ public class GameListItem extends ArrayAdapter<String> {
 	private final Integer[] maxplayers;
 	private final Integer[] activePlayers;
 	private final Integer[] id;
+	private final String[] clienturl;
 
 	public GameListItem(Activity context, String[] name, String[] subtext, Integer[] imageId,
-			Integer[] maxPlayers, Integer[] players, Integer[] id) {
+			Integer[] maxPlayers, Integer[] players, Integer[] id, String[] clienturl) {
 		super(context, R.layout.gamelistitem, name);
 		this.context = context;
 		this.name = name;
@@ -28,6 +29,7 @@ public class GameListItem extends ArrayAdapter<String> {
 		this.maxplayers = maxPlayers;
 		this.activePlayers = players;
 		this.id = id;
+		this.clienturl = clienturl;
 	}
 
 	@Override
@@ -80,6 +82,10 @@ public class GameListItem extends ArrayAdapter<String> {
 
 	public Integer getId(int pos) {
 		return id[pos];
+	}
+
+	public String getClienturl(int pos) {
+		return clienturl[pos];
 	}
 	
 }

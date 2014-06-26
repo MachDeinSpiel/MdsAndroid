@@ -97,7 +97,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		styleFragment();
 		
 		// Interpreter Erstellung
-		File jsonDatei = jsonEinlesen();
+		File jsonDatei = (File) extras.get("spielejson");
+		
+		Log.d("Menu", "JSON: " + jsonDatei.toString());
 
 		// Hier wird der Interpreter erstellt und wir mitgegeben und als
 		// Interface genutzt
@@ -245,71 +247,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-	}
-
-	private File jsonEinlesen() {
-
-		ThreadPolicy tp = ThreadPolicy.LAX;
-		StrictMode.setThreadPolicy(tp);
-
-		InputStream is = null;
-
-		// InputStream is =
-		// getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/2.xml");
-		// InputStream is =
-		// getInputStreamFromUrl("http://195.37.176.178:1388/MDSS-0.1/api/appinfo/3");
-
-		// Temporäre Datei anlegen
-		File json = null;
-		try {
-			json = File.createTempFile("TourismApp", ".json");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		// Zum Testen bitte drin lassen!!
-		// Assetmanager um auf den Assetordner zuzugreifen(Json ist da drin)
-
-		AssetManager am = getAssets();
-
-		// Inputstream zum einlesen der Json
-		try {
-			is = am.open("test.json");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		try {
-			// Inputstream zum einlesen der Json
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-			// Json wird zeilenweise eingelesn uns in das File json geschrieben
-			FileWriter writer = new FileWriter(json, true);
-
-			String t = "";
-
-			while ((t = br.readLine()) != null) {
-				System.out.println(t);
-				writer.write(t);
-			}
-
-			writer.flush();
-			writer.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// Überprüfung, ob es geklappt hat
-		if (json.exists()) {
-			System.out.println("Geklappt");
-			System.out.println(json.length());
-		} else {
-			System.out.println("Nicht geklappt");
-		}
-
-		return json;
-
 	}
 
 	@Override
