@@ -20,6 +20,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
                 android:layout_weight="1"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/buttonshape_noborder"
                 android:text="Zocker123"
                 android:textColor="#FF7800"
@@ -35,7 +36,7 @@
                 android:id="@+id/labelPlayerMax"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
@@ -50,7 +51,7 @@
             android:id="@+id/tableRow2"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp" >
 
@@ -115,7 +116,6 @@
                             android:id="@+id/newGameList"
                             android:layout_width="fill_parent"
                             android:layout_height="fill_parent"
-                            android:layout_marginLeft="0dp"
                             android:layout_weight="1" >
                         </ListView>
                     </LinearLayout>
