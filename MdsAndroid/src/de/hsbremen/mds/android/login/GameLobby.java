@@ -163,36 +163,47 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	}
 
 	@Override
-	public void onWebSocketMessage(String message) {
-		JSONObject json;
-		try {
-			json = new JSONObject(message);
-			if (json.getString("mode").equals("gamelobby")) {
-				teamUpdate(json);
-				Log.d("Menu", "TeamUpdate");
+	public void onWebSocketMessage(final String message) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+
+				try {
+					JSONObject json = new JSONObject(message);
+					if (json.getString("mode").equals("gamelobby")) {
+						teamUpdate(json);
+						Log.d("Menu", "TeamUpdate");
+					}
+					if (json.getString("mode").equals("full")) {
+
+								// Fullwhiteboardupdate (Spiel wurde gestartet)
+								Intent intent = new Intent(GameLobby.this,
+										MainActivity.class);
+								intent.putExtra("username", username);
+								intent.putExtra("json", json.toString());
+								intent.putExtra("spielejson", spielejson);
+								intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								getApplicationContext().startActivity(intent);
+								finish();
+					}
+					if (json.get("mode").equals("gametemplates")
+							|| json.get("mode").equals("activegames")) {
+						Intent myIntent = new Intent(GameLobby.this,
+								GameChooser.class);
+						myIntent.putExtra("username", username);
+						myIntent.putExtra("json", json.toString());
+						GameLobby.this.startActivity(myIntent);
+						finish();
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 			}
-			if (json.getString("mode").equals("full")) {
-				// Fullwhiteboardupdate (Spiel wurde gestartet)
-				Intent intent = new Intent(GameLobby.this, MainActivity.class);
-				intent.putExtra("username", username);
-				intent.putExtra("json", json.toString());
-				intent.putExtra("spielejson", spielejson);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				getApplicationContext().startActivity(intent);
-				finish();
-			}
-			if (json.get("mode").equals("gametemplates")
-					|| json.get("mode").equals("activegames")) {
-				Intent myIntent = new Intent(GameLobby.this, GameChooser.class);
-				myIntent.putExtra("username", username);
-				myIntent.putExtra("json", json.toString());
-				GameLobby.this.startActivity(myIntent);
-				finish();
-			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		});
 
 	}
 
@@ -242,11 +253,11 @@ public class GameLobby extends Activity implements WebServicesInterface,
 				Log.d("Menu", "Delete: " + "layoutTeam" + (teamAnz + 1));
 				((ViewManager) l.getParent()).removeView(l);
 			}
-			
+
 			listTeams = new Vector<ListView>();
 			btnTeams = new Vector<Button>();
 			for (int i = 1; i <= teamAnz; i++) {
-				
+
 				// Listen von Spielern getten
 				listTeams
 						.add((ListView) findViewById(getResources()
@@ -330,9 +341,9 @@ public class GameLobby extends Activity implements WebServicesInterface,
 				team = (JSONObject) jsonArray.get(i);
 
 				btnTeams.get(i).setText(team.getString("name"));
-//				btnTeams.get(i).setText(
-//				team.getString("name") + " ("
-//								+ team.getJSONArray("players").length() + ")");
+				// btnTeams.get(i).setText(
+				// team.getString("name") + " ("
+				// + team.getJSONArray("players").length() + ")");
 				playerUpdate(team.getJSONArray("players"), listTeams.get(i));
 				numberPlayers += team.getJSONArray("players").length();
 				Log.d("Menu",

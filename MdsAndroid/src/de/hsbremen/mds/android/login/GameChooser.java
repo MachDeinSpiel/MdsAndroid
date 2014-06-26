@@ -188,16 +188,19 @@ public class GameChooser extends Activity implements WebServicesInterface {
 				});
 
 		swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+		
 		swipeLayout.setOnRefreshListener(new OnRefreshListener() {
-
+			
+			@Override
 			public void onRefresh() {
-				new android.os.Handler().postDelayed(new Runnable() {
+				new Thread(new Runnable() {
+					
 					@Override
 					public void run() {
-						swipeLayout.setRefreshing(false);
-						// onWebSocketMessage(msg);
+						getNewGameLists();
 					}
-				}, 5000);
+				}).start();
+				
 			}
 		});
 
@@ -302,6 +305,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 		try {
 			final JSONObject json = new JSONObject(message);
+			swipeLayout.setRefreshing(false);
 			if (json.getString("mode").equals("gametemplates")) {
 				onGameTemplatesUpdate(json.getJSONArray("games"));
 			} else if (json.getString("mode").equals("activegames")) {
