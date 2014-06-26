@@ -38,7 +38,7 @@
                 "name": "null",
                 "subject": "self",
                 "object": "null",
-                "targetAttribute": "null"
+                "result": "null"
             }
         }
     ],
@@ -155,13 +155,13 @@
                     "text": "Ein Gegenstand! Ist es vielleicht der Schlüssel?"
                 }
             },
-            "startAction": {
+            "startAction":  [{
                 "name": "addToGroup",
                 "params": {
                     "target": "self.object",
                     "group": "self.inventory"
                 }
-            },
+            }],
             "endAction": {
                 "name": "removeFromFroup",
                 "params": {
@@ -196,12 +196,12 @@
                     "text": "self.object.text"
                 }
             },
-            "startAction": {
+            "startAction": [{
                 "name": "useItem",
                 "params": {
                     "target": "self.object"
                 }
-            },
+            }],
             "endAction": "null",
             "transition": [
                 {
@@ -225,7 +225,7 @@
             "startState": false,
             "finalState": false,
             "doAction": "null",
-            "startAction": {
+            "startAction": [{
                 "name": "startMiniApp",
                 "params": {
                     "type": "Puzzle",
@@ -234,12 +234,13 @@
                     "result": [
                         {
                             "attribute": "notValue.self.solved",
+                            "minScore": 6,
                             "setWin": true,
                             "setLoose": false
                         }
                     ]
                 }
-            },
+            }],
             "endAction": "null",
             "transition": [
                 {
