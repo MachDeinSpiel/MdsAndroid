@@ -13,14 +13,12 @@ public class PlayerListItem extends ArrayAdapter<String> {
 	private final Activity context;
 	private final String[] playername;
 	private final Integer[] imageId;
-	private Integer[] playerId;
 
-	public PlayerListItem(Activity context, String[] playername, Integer[] imageId, Integer[] playerId) {
+	public PlayerListItem(Activity context, String[] playername, Integer[] imageId) {
 		super(context, R.layout.gamelistitem, playername);
 		this.context = context;
 		this.playername = playername;
 		this.imageId = imageId;
-		this.playerId = playerId;
 	}
 
 	@Override
@@ -36,10 +34,6 @@ public class PlayerListItem extends ArrayAdapter<String> {
 		//maxplayersLabel.setText(maxplayers);
 		
 		return rowView;
-	}
-
-	public int getPlayerId(int index) {
-		return playerId[index];
 	}
 
 	public String getPlayerName(int position) {

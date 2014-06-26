@@ -3,9 +3,13 @@
  */
 package de.hsbremen.mds.android.login;
 
+import java.util.Vector;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -18,10 +22,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableRow;
 import android.widget.Toast;
 import de.hsbremen.mds.android.communication.WebServices;
 import de.hsbremen.mds.android.communication.WebServicesInterface;
@@ -37,9 +44,10 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	CharSequence username;
 	boolean isInitialPlayer;
 	Button lblPlayers;
+	Vector<Button> btnTeams;
+	Vector<ListView> listTeams;
 	int maxplayers;
 
-	ListView playerList;
 	PlayerListItem playerAdapter;
 
 	private WebServices webServ;
@@ -53,18 +61,15 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		Button startBtn = (Button) findViewById(R.id.startBtn);
 		Button leaveBtn = (Button) findViewById(R.id.leaveBtn);
 		Button lblGameName = (Button) findViewById(R.id.labelGameName);
-		Button lblPlayerName = (Button) findViewById(R.id.labelPlayername);
 		lblPlayers = (Button) findViewById(R.id.labelPlayers);
-		playerList = (ListView) findViewById(R.id.playerList);
 
 		Bundle extras = getIntent().getExtras();
 		isInitialPlayer = extras.getBoolean("isInitial");
 
-
 		Log.d("Socket", "GameLobby: IsInitialPlayer: " + isInitialPlayer);
 
 		leaveBtn.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				JSONObject json = new JSONObject();
@@ -76,12 +81,12 @@ public class GameLobby extends Activity implements WebServicesInterface,
 					e.printStackTrace();
 				}
 				webServ.send(json.toString());
-				
+
 			}
 		});
-		
-		startBtn.setEnabled(isInitialPlayer);		
-		
+
+		startBtn.setEnabled(isInitialPlayer);
+
 		if (isInitialPlayer) {
 			startBtn.setOnClickListener(new OnClickListener() {
 
@@ -106,24 +111,6 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		// http://andhradroid.wordpress.com/2012/07/05/how-to-impleme
 		// nt-swipe-delete-operation-in-android-like-iphone/
 
-		playerList
-				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-					public void onItemSelected(AdapterView parentView,
-							View childView, int position, long id) {
-						KickPlayerDialogFragment frag = new KickPlayerDialogFragment();
-						frag.prepareDialog(
-								playerAdapter.getPlayerName(position),
-								playerAdapter.getPlayerId(position));
-						FragmentManager fm = getFragmentManager();
-						frag.show(fm, "fragment_kick_player");
-					}
-
-					public void onNothingSelected(AdapterView parentView) {
-					}
-				});
-
-		registerForContextMenu(playerList);
-		
 		username = (CharSequence) extras.get("username");
 		CharSequence game = (CharSequence) extras.get("game");
 		int players = (Integer) extras.get("players");
@@ -132,19 +119,17 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		webServ = WebServices.createWebServices(this);
 
 		lblGameName.setText(game);
-		lblPlayerName.setText(username);
+		// lblPlayerName.setText(username);
 
 		try {
 			JSONObject json = new JSONObject(extras.getString("json"));
+			initLists(json);
+			teamUpdate(json);
 
-			playerUpdate(json.getJSONArray("players"));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		// Hier müssen die aktuellen Spieler und das Maximum an Spielern rein
-		lblPlayers.setText(players + "/" + maxplayers);
 
 	}
 
@@ -182,7 +167,8 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		try {
 			json = new JSONObject(message);
 			if (json.getString("mode").equals("gamelobby")) {
-				playerUpdate(json.getJSONArray("players"));
+				teamUpdate(json);
+				Log.d("Menu", "TeamUpdate");
 			}
 			if (json.getString("mode").equals("full")) {
 				// Fullwhiteboardupdate (Spiel wurde gestartet)
@@ -191,27 +177,179 @@ public class GameLobby extends Activity implements WebServicesInterface,
 				intent.putExtra("json", json.toString());
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				getApplicationContext().startActivity(intent);
+				finish();
 			}
-			if (json.get("mode").equals("gametemplates") || json.get("mode").equals("activegames")){
-				Intent myIntent = new Intent(GameLobby.this,
-						GameChooser.class);
+			if (json.get("mode").equals("gametemplates")
+					|| json.get("mode").equals("activegames")) {
+				Intent myIntent = new Intent(GameLobby.this, GameChooser.class);
 				myIntent.putExtra("username", username);
 				myIntent.putExtra("json", json.toString());
-				this.startActivity(myIntent);
+				GameLobby.this.startActivity(myIntent);
+				finish();
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
 
 	@Override
-	public void onSocketClientConnected() {
+	public void onWebSocketConnected() {
 		// TODO Auto-generated method stub
 
 	}
 
-	private void playerUpdate(final JSONArray jsonArray) throws JSONException {
+	private void initLists(JSONObject json) {
+
+		try {
+			JSONArray arr;
+			if (!json.getBoolean("isteamgame")) {
+				arr = new JSONArray();
+				arr.put(json.getJSONArray("players"));
+			} else {
+				arr = json.getJSONArray("players");
+
+			}
+			int teamAnz = arr.length();
+			Log.d("Menu", "teamanzahl: " + teamAnz);
+			TableRow t;
+			// Löschen der Nicht benötigten Views
+			switch (teamAnz) {
+			case 1:
+			case 2:
+				t = (TableRow) findViewById(R.id.tablerowTeam2);
+				((ViewManager) t.getParent()).removeView(t);
+			case 3:
+			case 4:
+				t = (TableRow) findViewById(R.id.tablerowTeam3);
+				((ViewManager) t.getParent()).removeView(t);
+			case 5:
+			case 6:
+				t = (TableRow) findViewById(R.id.tablerowTeam4);
+				((ViewManager) t.getParent()).removeView(t);
+			}
+
+			Log.d("Menu", "teamanz: " + teamAnz);
+
+			if (teamAnz % 2 != 0) {
+				// Listen von Spielern getten
+				LinearLayout l = ((LinearLayout) findViewById(getResources()
+						.getIdentifier("layoutTeam" + (Integer) (teamAnz + 1),
+								"id", getPackageName())));
+				Log.d("Menu", "Delete: " + "layoutTeam" + (teamAnz + 1));
+				((ViewManager) l.getParent()).removeView(l);
+			}
+			
+			listTeams = new Vector<ListView>();
+			btnTeams = new Vector<Button>();
+			for (int i = 1; i <= teamAnz; i++) {
+				
+				// Listen von Spielern getten
+				listTeams
+						.add((ListView) findViewById(getResources()
+								.getIdentifier("playerList" + i, "id",
+										getPackageName())));
+
+				// listTeams.add(i, (ListView) findViewById(R.id.playerList1));
+
+				listTeams.get(i - 1).toString();
+
+				if (isInitialPlayer) {
+
+					listTeams.get(i - 1).setOnItemSelectedListener(
+							new AdapterView.OnItemSelectedListener() {
+								public void onItemSelected(
+										AdapterView parentView, View childView,
+										int position, long id) {
+									KickPlayerDialogFragment frag = new KickPlayerDialogFragment();
+									frag.prepareDialog(playerAdapter
+											.getPlayerName(position));
+									FragmentManager fm = getFragmentManager();
+									frag.show(fm, "fragment_kick_player");
+								}
+
+								public void onNothingSelected(
+										AdapterView parentView) {
+								}
+							});
+
+					registerForContextMenu(listTeams.get(i - 1));
+				}
+
+				this.btnTeams.add((Button) findViewById(getResources()
+						.getIdentifier("labelTeamname" + i, "id",
+								getPackageName())));
+
+				// Bei Teams = 1 gibts nur 1 Team -> dh. Keine Teams
+				if (teamAnz > 1) {
+					btnTeams.get(i - 1).setOnClickListener(
+							new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									changeTeam(v.getId());
+								}
+							});
+				}
+
+			}
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	protected void changeTeam(int btnId) {
+
+		for (Button b : btnTeams) {
+			if (btnId == b.getId()) {
+				JSONObject json = new JSONObject();
+				try {
+					json.put("mode", "gamelobby");
+					json.put("action", "changeteam");
+					json.put("team", b.getText().toString());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				webServ.send(json.toString());
+			}
+		}
+	}
+
+	private void teamUpdate(JSONObject json) throws JSONException {
+		JSONArray jsonArray = json.getJSONArray("players");
+		JSONObject team;
+		int numberPlayers = 0;
+		if (json.getBoolean("isteamgame")) {
+			for (int i = 0; i < jsonArray.length(); i++) {
+				team = (JSONObject) jsonArray.get(i);
+
+				btnTeams.get(i).setText(team.getString("name"));
+//				btnTeams.get(i).setText(
+//				team.getString("name") + " ("
+//								+ team.getJSONArray("players").length() + ")");
+				playerUpdate(team.getJSONArray("players"), listTeams.get(i));
+				numberPlayers += team.getJSONArray("players").length();
+				Log.d("Menu",
+						"Gamelobby: Teamupdate wurde ausgeführt. ArrayLength: "
+								+ jsonArray.length());
+			}
+		} else {
+			btnTeams.get(0).setText(username);
+			playerUpdate(jsonArray, listTeams.get(0));
+			numberPlayers = jsonArray.length();
+		}
+
+		// Hier müssen die aktuellen Spieler und das Maximum an Spielern rein
+		lblPlayers.setText(numberPlayers + "/" + maxplayers);
+	}
+
+	private void playerUpdate(JSONArray jsonArray, ListView playerList)
+			throws JSONException {
+
 		JSONObject jsonObj = null;
 
 		String[] playerNames;
@@ -228,66 +366,57 @@ public class GameLobby extends Activity implements WebServicesInterface,
 			jsonObj = jsonArray.getJSONObject(i);
 
 			playerNames[i] = jsonObj.getString("name");
-			playerIds[i] = jsonObj.getInt("id");
 			playerImages[i] = R.drawable.player;
 
 		}
 
 		playerAdapter = new PlayerListItem(GameLobby.this, playerNames,
-				playerImages, playerIds);
+				playerImages);
 
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				playerList.setAdapter(playerAdapter);
+		playerList.setAdapter(playerAdapter);
 
-				// Hier müssen die aktuellen Spieler und das Maximum an Spielern
-				// rein
-				lblPlayers.setText(jsonArray.length() + "/" + maxplayers);
-
-			}
-		});
+		// Hier müssen die aktuellen Spieler und das Maximum an Spielern
+		// rein
+		lblPlayers.setText(jsonArray.length() + "/" + maxplayers);
 
 	}
 
 	@Override
-	public void onKickPlayerResult(boolean isKick, int playerId) {
+	public void onKickPlayerResult(boolean isKick, String playername) {
 		if (isKick) {
 			JSONObject json = new JSONObject();
 			try {
 				json.put("mode", "gamelobby");
 				json.put("action", "kick");
-				json.put("player", playerId);
+				json.put("player", playername);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			webServ.send(json.toString());
 		}
 	}
-	
+
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add("Kick");
 	}
-	
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item){
+	public boolean onContextItemSelected(MenuItem item) {
 		super.onContextItemSelected(item);
 
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		
-		if(item.getTitle()=="Kick" && info.position != 0){
-			
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+
+		if (item.getTitle() == "Kick" && info.position != 0) {
+
 			JSONObject json = null;
 
 			try {
 				json = new JSONObject();
 				json.put("mode", "gamelobby");
-				// TODO Später GameID einkommentieren
-				// json.put("id", gameIds[position]);
 				json.put("action", "kick");
 				json.put("player", info.position);
 			} catch (JSONException e) {
@@ -296,22 +425,20 @@ public class GameLobby extends Activity implements WebServicesInterface,
 			}
 
 			webServ.send(json.toString());
-		} else if(info.position == 0){
+		} else if (info.position == 0) {
 			// TODO Toast cant kick yourself
-			Toast toast = Toast.makeText(getApplicationContext(), 
-					"Du kannst sich nicht selbst kicken",
-					Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(getApplicationContext(),
+					"Du kannst dich nicht selbst kicken", Toast.LENGTH_SHORT);
 			toast.show();
 		}
-		
+
 		return super.onContextItemSelected(item);
 	}
 
-//	@Override
+	// @Override
 	public void onWebserviceConnectionClosed(int code, String reason,
 			boolean remote) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 }

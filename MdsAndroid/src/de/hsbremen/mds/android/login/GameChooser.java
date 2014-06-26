@@ -57,6 +57,8 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		activeGamesList = (ListView) findViewById(R.id.gameList);
 
 		gametemplatesList = (ListView) findViewById(R.id.newGameList);
+		
+		
 
 		activeGamesList
 				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -223,12 +225,14 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		JSONObject jsonObj = null;
 
 		String[] gameNames;
+		String[] gamePlayerNames;
 		Integer[] gameImages;
 		Integer[] gameIds;
 		Integer[] players;
 		Integer[] maxplayers;
-		
+
 		gameNames = new String[jsonArray.length()];
+		gamePlayerNames = new String[jsonArray.length()];
 		gameImages = new Integer[jsonArray.length()];
 		gameIds = new Integer[jsonArray.length()];
 		players = new Integer[jsonArray.length()];
@@ -238,14 +242,13 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			jsonObj = jsonArray.getJSONObject(i);
-			if (jsonObj.getInt("maxplayers") == 0) {
-
-				gameNames[i] = jsonObj.getString("name");
-
-			} else {
-				gameNames[i] = jsonObj.getString("name");
+			if (jsonObj.getInt("maxplayers") != 0) {
+			
 				maxplayers[i] = jsonObj.getInt("maxplayers");
 			}
+
+			gameNames[i] = jsonObj.getString("name");
+			gamePlayerNames[i] = "Players: " + jsonObj.getString("players");
 			
 			players[i] = jsonObj.getInt("activeplayers");
 			gameIds[i] = jsonObj.getInt("id");
@@ -253,7 +256,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 		}
 		
-		activeGamesAdapter = new GameListItem(this, gameNames, gameImages, maxplayers, players, gameIds);
+		activeGamesAdapter = new GameListItem(this, gameNames, gamePlayerNames, gameImages, maxplayers, players, gameIds);
 
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -268,12 +271,14 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		JSONObject jsonObj = null;
 
 		String[] gameNames;
+		String[] gameSubinformation;
 		Integer[] gameImages;
 		Integer[] gameIds;
 		Integer[] players;
 		Integer[] maxplayers;
-		
+
 		gameNames = new String[jsonArray.length()];
+		gameSubinformation = new String[jsonArray.length()];
 		gameImages = new Integer[jsonArray.length()];
 		gameIds = new Integer[jsonArray.length()];
 		players = new Integer[jsonArray.length()];
@@ -283,22 +288,19 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			jsonObj = jsonArray.getJSONObject(i);
-			if (jsonObj.getInt("maxplayers") == 0) {
-
-				gameNames[i] = jsonObj.getString("name");
-
-			} else {
-				gameNames[i] = jsonObj.getString("name");
+			if (jsonObj.getInt("maxplayers") != 0) {
 				maxplayers[i] = jsonObj.getInt("maxplayers");
 			}
-			
+
+			gameNames[i] = jsonObj.getString("name");
 			gameIds[i] = jsonObj.getInt("id");
+			gameSubinformation[i] = "Author: " + jsonObj.getString("author");
 
 			gameImages[i] = R.drawable.bomb;
 
 		}
 		
-		gametemplatesAdapter = new GameListItem(this, gameNames, gameImages, maxplayers, players, gameIds);
+		gametemplatesAdapter = new GameListItem(this, gameNames, gameSubinformation, gameImages, maxplayers, players, gameIds);
 
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -313,11 +315,9 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		Log.d("Socket", "GameChooser: onResume()");
 		super.onResume();
 		getNewGameLists();
-		
 	}
 	
 
@@ -340,7 +340,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	}
 
 	@Override
-	public void onSocketClientConnected() {
+	public void onWebSocketConnected() {
 		Log.d("Socket", "GameChooser: OnWebserviceConnected()");
 		getNewGameLists();
 	}
