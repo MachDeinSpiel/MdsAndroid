@@ -404,11 +404,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
 					true);
 	}
-
-	@Override
-	public void onSocketClientConnected() {
-
-	}
 	
 	public int getStyleNumber(){
 		return this.style;
@@ -434,5 +429,10 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
 																		// sec
 			10, activity);
+	}
+
+	@Override
+	public void onWebSocketConnected() {
+		
 	}
 }

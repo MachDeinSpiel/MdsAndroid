@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -171,24 +172,25 @@ public class Parser {
 				doMdsAction = readAction(doMdsActionObject);
 			}
 			
-			MdsAction startAction = null, endAction = null;
+			List<MdsAction> startActions = new ArrayList<MdsAction>();
+			MdsAction endAction = null;
 			String ident = element.get("startAction").toString();
 			if(!ident.equals("null")) {
-				Log.i("Mistkae", "Reading startAction");
-				JSONObject sAction = (JSONObject) element.get("startAction");
-				startAction = readAction(sAction);
+				JSONArray sAction = (JSONArray) element.get("startAction");
+				for(int j = 0; j < sAction.size(); j++) {
+					JSONObject startAction = (JSONObject) sAction.get(j);
+					startActions.add(readAction(startAction));
+				}
+				
 			}
 			
 			ident = element.get("endAction").toString();
 			if(!ident.equals("null")) {
-				Log.i("Mistkae", "Reading endAction");
 				JSONObject eAction = (JSONObject) element.get("endAction");
 				endAction = readAction(eAction);
 			}
 			
-			allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startMdsState, finalMdsState);
-			allMdsStates[i].setStartAction(startAction);
-			allMdsStates[i].setEndAction(endAction);
+			allMdsStates[i] = new MdsState(id, name, parentState, doMdsAction, startActions, endAction, startMdsState, finalMdsState);
 		}
 		this.allMdsStates = allMdsStates;
 		for(int i = 0; i < MdsState.size(); i++) {

@@ -93,6 +93,7 @@ public class EventParser {
 					
 					Result result = null;
 					// CheckType des Quantifiers identifizieren
+					// TODO: vlt gar kein Result mehr gebraucht? Einfach boolean
 					if (checkType.equals(MdsCondition.EQUALS)) {
 						if (objects.size() == quanti) result = new Result(true, null, null);
 					} else if (checkType.equals(MdsQuantifier.LOWER)) {
@@ -114,6 +115,7 @@ public class EventParser {
 							currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
 						else
 							currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
+						// glaube ich nicht mehr genutzt
 						currentState.setObjects(objects);
 						Log.i("Mistake", "Object Size ist " + objects.size());
 						// WB im State und beim Player speichern
@@ -403,6 +405,16 @@ public class EventParser {
 		
 	}
 	
+	// TODO: Hier muss es irgendwie möglich sein, dass ownGroup.enemy vernünftig geparst werden können, sodass das gewollte Team zurück gegeben wird
+	/**
+	 * Parst einen Action String so, dass er für den weiteren Prozess verwendbar ist
+	 * @param param - param to be parsed
+	 * @param state - current State the machine is in
+	 * @param wb - the whiteboard the elements are in
+	 * @param playerGroup - Keys to the group of the player
+	 * @param playerId - ID of the player
+	 * @return - Whiteboard, WhiteboardEntry or parsed string
+	 */
 	public static Object parseParam(String param, MdsState state, Whiteboard wb, List<String> playerGroup, String playerId){
 		
 		Log.i(Interpreter.LOGTAG,"parseParam:"+param);
@@ -413,7 +425,10 @@ public class EventParser {
 		else 
 			replacements.put("self", playerGroup.get(0) +"."+playerId);
 		// TODO: Own Group auflösen
-		//replacements.put("ownGroup", playerGroup+"."+playerId+"")
+		if (playerGroup.size() > 1)
+			replacements.put("ownGroup", playerGroup.get(0) + "." + playerGroup.get(1) + "." + playerId+"");
+		else
+			replacements.put("ownGroup", playerGroup.get(0) + "." + playerId+"");
 		
 		
 		
@@ -440,6 +455,7 @@ public class EventParser {
 			else
 				tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId).value; 
 		}
+		// wenn object in current state
 		if(splitted.size() > 0 && splitted.get(0).equals(FsmManager.CURRENT_STATE)) {
 			Log.i(Interpreter.LOGTAG, "Parse Current");
 			splitted.remove(0);
@@ -447,7 +463,7 @@ public class EventParser {
 				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.CURRENT_STATE).value;
 			else
 				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId, FsmManager.CURRENT_STATE).value;
-			
+		// wenn object in last state	
 		} else if (splitted.size() > 0 &&  splitted.get(0).equals(FsmManager.LAST_STATE)) {
 			Log.i(Interpreter.LOGTAG, "Parse Last");
 			splitted.remove(0);
@@ -482,6 +498,7 @@ public class EventParser {
 			}
 			
 			if(objects.keySet().isEmpty()){
+				// probably empty code
 				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard in state "+state.getName()+ " trying currentState...");
 				Whiteboard currentState = null;
 				try{
@@ -547,22 +564,5 @@ public class EventParser {
 			objects = obj;
 		}
 	}
-	
-//	private static double distanceInMeter(double p1long, double p1lat, double p2long, double p2lat){
-//		//Code von https://stackoverflow.com/questions/3715521/how-can-i-calculate-the-distance-between-two-gps-points-in-java
-//		double d2r = Math.PI / 180;
-//		double distance = 0;
-//		double dlong = (p2long - p1long) * d2r;
-//		double dlat = (p2lat - p1lat) * d2r;
-//		double a =
-//				Math.pow(Math.sin(dlat / 2.0), 2)
-//	            + Math.cos(p1lat * d2r)
-//	            * Math.cos(p2lat * d2r)
-//	            * Math.pow(Math.sin(dlong / 2.0), 2);
-//	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//	    double d = 6367 * c;
-//
-//	    return d;
-//	}
 	
 }

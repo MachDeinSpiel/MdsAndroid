@@ -12,16 +12,18 @@ import de.hsbremen.mds.mdsandroid.R;
 public class GameListItem extends ArrayAdapter<String> {
 	private final Activity context;
 	private final String[] name;
+	private final String[] subtext;
 	private final Integer[] imageId;
 	private final Integer[] maxplayers;
 	private final Integer[] activePlayers;
 	private final Integer[] id;
 
-	public GameListItem(Activity context, String[] name, Integer[] imageId,
+	public GameListItem(Activity context, String[] name, String[] subtext, Integer[] imageId,
 			Integer[] maxPlayers, Integer[] players, Integer[] id) {
 		super(context, R.layout.gamelistitem, name);
 		this.context = context;
 		this.name = name;
+		this.subtext = subtext;
 		this.imageId = imageId;
 		this.maxplayers = maxPlayers;
 		this.activePlayers = players;
@@ -33,8 +35,10 @@ public class GameListItem extends ArrayAdapter<String> {
 		LayoutInflater inflater = context.getLayoutInflater();
 		View rowView = inflater.inflate(R.layout.gamelistitem, null, true);
 		TextView txtTitle = (TextView) rowView.findViewById(R.id.gameText);
+		TextView txtSubTitle = (TextView) rowView.findViewById(R.id.gameSubtext);
 		ImageView imageView = (ImageView) rowView.findViewById(R.id.gameIcon);
 		txtTitle.setText(name[position]);
+		txtSubTitle.setText(subtext[position]);
 		imageView.setImageResource(imageId[position]);
 
 		TextView maxPlayers = (TextView) rowView
@@ -60,6 +64,10 @@ public class GameListItem extends ArrayAdapter<String> {
 
 	public String getName(int pos) {
 		return name[pos];
+	}
+	
+	public String getSubtext(int pos) {
+		return subtext[pos];
 	}
 
 	public Integer getMaxplayers(int pos) {

@@ -18,6 +18,8 @@ public class FragmentMap extends Fragment{
     private View mapView;
     private ProgressBar healthBar;
     private int healthStatus = 75;
+    private int scoreStatus = 0;
+    private int optionalStatus = 0;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,10 +51,12 @@ public class FragmentMap extends Fragment{
 		TextView score = (TextView)mapView.findViewById(R.id.scoreSummary);
 		score.setBackgroundResource(R.drawable.labelshape);
 		score.setTextSize(25);
+		//score.setText(scoreStatus);
 		
 		TextView optional = (TextView)mapView.findViewById(R.id.optional);
 		optional.setBackgroundResource(R.drawable.labelshape);
 		optional.setTextSize(25);
+		//optional.setText(optionalStatus);
 	}
 
 	private void initHealthBar(){
@@ -69,6 +73,30 @@ public class FragmentMap extends Fragment{
 	public void setHealthbar(int maxValue, int value){
 		double onePercent = maxValue/100;
 		healthStatus = (int)(value/onePercent);
-		healthBar.setProgress(healthStatus);
+		if(healthBar != null){
+			healthBar.setProgress(healthStatus);
+		}else{
+			Log.i("fragment", "healthBar war beim Setzen null");
+		}
+	}
+	
+	public void setScore(int value){
+		this.scoreStatus = value;
+		TextView score = (TextView)mapView.findViewById(R.id.scoreSummary);
+		if(score != null){
+			score.setText(scoreStatus);
+		}else{
+			Log.i("fragment", "Scorefeld war beim Setzen null");
+		}
+	}
+	
+	public void setOptional(int value){
+		this.optionalStatus = value;
+		TextView optional = (TextView)mapView.findViewById(R.id.optional);
+		if(optional != null){
+			optional.setText(optionalStatus);
+		}else{
+			Log.i("fragment", "Optionalfeld war beim Setzen null");
+		}
 	}
 }

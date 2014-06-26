@@ -45,12 +45,18 @@ public class FsmManager {
 		if(!isRunning){
 			Log.i("Mistake", "FsmManger is running");
 			try{
-				wb.setAttribute(new WhiteboardEntry("currentSt","all"), Interpreter.WB_PLAYERS,""+myID,CURRENT_STATE);
-				wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
-				//TODO: fix my shit up
-				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null, null, false, false);
 				// set own group
 				ownGroup = wb.getGroupString(myID);
+				if(ownGroup.size() > 1) {
+					wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup.get(0), ownGroup.get(1), ""+myID, CURRENT_STATE);
+					wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
+				} else {
+					wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup.get(0), ""+myID,CURRENT_STATE);
+					wb.setAttribute(new WhiteboardEntry("lastSt","all"), ownGroup.get(0),""+myID,LAST_STATE);
+				}
+				//TODO: fix my shit up
+				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null , null, null, null, false, false);
+
 				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup.get(0));
 				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(Interpreter.WB_PLAYERS,myID).value.toString());
 				
@@ -100,8 +106,10 @@ public class FsmManager {
 //					e.printStackTrace();
 //				}
 //			}
-			wb.getAttribute(Interpreter.WB_PLAYERS,myID,setTo).value = current;
-			
+			if(ownGroup.size() > 1)
+				wb.getAttribute(ownGroup.get(0), ownGroup.get(1), ""+myID, setTo).value = current;
+			else 
+				wb.getAttribute(ownGroup.get(0), ""+myID, setTo).value = current;
 		
 			this.onstateChanged(current, setTo);
 		} else {

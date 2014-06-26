@@ -1,5 +1,7 @@
 package de.hsbremen.mds.android.communication;
 
+import java.util.Vector;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ public class WebServices {
 	// SocketService (beinhaltet Websocket)
 	private ServiceConnection serviceConn;
 	private SocketService socketService;
+	private Vector<String> messageBuffer = new Vector<String>();
 
 	/**
 	 * Bind Service: SocketService to MainActivity
@@ -36,6 +39,12 @@ public class WebServices {
 						.getService(WebServices.this);
 				socketService.setActivity(WebServices.this.actInterface
 						.getActivity());
+				
+				if (messageBuffer.size() > 0) {
+					for(String s : messageBuffer)
+						socketService.send(s);
+					messageBuffer.clear();
+				}
 			}
 
 			public void onServiceDisconnected(ComponentName className) {
@@ -58,20 +67,27 @@ public class WebServices {
 
 	public void send(final String s) {
 		if (socketService != null) {
-			Thread thread = new Thread()
-			{
-			    @Override
-			    public void run() {
-			        WebServices.this.socketService.send(s);
-			    }
+			Thread thread = new Thread() {
+				@Override
+				public void run() {
+					WebServices.this.socketService.send(s);
+				}
 			};
 			thread.start();
-		} else
+		} else {
 			Log.d("Socket", "WebServices: SocketService ist null");
+			messageBuffer.add(s);
+		}
 	}
 
-	public void onMessage(String message) {
-		actInterface.onWebSocketMessage(message);
+	public void onMessage(final String message) {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				actInterface.onWebSocketMessage(message);	
+			}
+		}).start();;
 	}
 
 	public void closeWebServices() {
@@ -80,9 +96,21 @@ public class WebServices {
 	}
 
 	public void onSocketConnected() {
-		Log.d("Socket", "WebServices onSocketConnected");
-		socketService.connectToServer();
-		actInterface.onSocketClientConnected();
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				Log.d("Socket", "WebServices onSocketConnected");
+				socketService.connectToServer();
+				actInterface.onWebSocketConnected();
+				if (messageBuffer.size() > 0) {
+					for(String s : messageBuffer)
+						socketService.send(s);
+					messageBuffer.clear();
+				}
+			}
+		}).start();
+
 	}
 
 	public void unbindService() {
@@ -92,13 +120,26 @@ public class WebServices {
 		// socketService.unbindService(serviceConn);
 	}
 
-	public void onConnectionClosed(int code, String reason, boolean remote) {
+	public void onConnectionClosed(final int code, final String reason, final boolean remote) {
 		// TODO Auto-generated method stub
-		actInterface.onWebserviceConnectionClosed(code, reason, remote);
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				actInterface.onWebserviceConnectionClosed(code, reason, remote);	
+			}
+		}).start();
+		
 	}
 
 	public void onConnectionHandshake() {
-		actInterface.onSocketClientConnected();
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				actInterface.onWebSocketConnected();	
+			}
+		}).start();
 	}
 
 }

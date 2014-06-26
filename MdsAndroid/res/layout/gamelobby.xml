@@ -3,98 +3,358 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_margin="10dp" >
+
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_margin="10dp" >
-        
-        <TableRow
-            android:id="@+id/tableRow3"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginBottom="5dp" >
+        android:layout_marginBottom="5dp" >
 
-            <Button
-                android:id="@+id/labelGameName"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/buttonshape"
-                android:text="@string/_spiel_"
-                android:textColor="#FF7800"
-                android:textSize="15sp" />
+        <Button
+            android:id="@+id/labelGameName"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonshape"
+            android:text="@string/_spiel_"
+            android:textColor="#FF7800"
+            android:textSize="15sp" />
 
-            <Button
-                android:id="@+id/labelPlayers"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_weight="3.5"
-                android:background="@drawable/buttonshape"
-                android:text="@string/_1_10"
-                android:textColor="#FF7800"
-                android:textSize="15sp" />
+        <Button
+            android:id="@+id/labelPlayers"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="3.5"
+            android:background="@drawable/buttonshape"
+            android:text="@string/_1_10"
+            android:textColor="#FF7800"
+            android:textSize="15sp" />
+    </TableRow>
 
-        </TableRow>
+    <TableRow
+        android:id="@+id/tablerowTeam1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1" >
 
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
-
-            <Button
-                android:id="@+id/labelPlayername"
-                android:layout_width="fill_parent"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                android:background="@drawable/buttonshape"
-                android:gravity="center"
-                android:text="@string/_playername_"
-                android:textColor="#0086CC"
-                android:textSize="15sp" />
-
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow2"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginBottom="10dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_weight="1" >
-            
-            <ListView
-                android:id="@+id/playerList"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1" >
 
-            </ListView>
+            <LinearLayout 
+        		android:id="@+id/layoutTeam1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-        </TableRow>
+                <Button
+                    android:id="@+id/labelTeamname1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname1_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
 
-        <TableRow
-            android:id="@+id/tableRow5"
+                <ListView
+                    android:id="@+id/playerList1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+
+            <LinearLayout 
+        		android:id="@+id/layoutTeam2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/labelTeamname2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname2_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
+
+                <ListView
+                    android:id="@+id/playerList2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+        </LinearLayout>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tablerowTeam2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1" >
+
+        <LinearLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <LinearLayout 
+        		android:id="@+id/layoutTeam3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/labelTeamname3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname3_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
+
+                <ListView
+                    android:id="@+id/playerList3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+
+            <LinearLayout
+                 
+        		android:id="@+id/layoutTeam4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/labelTeamname4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname4_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
+
+                <ListView
+                    android:id="@+id/playerList4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+        </LinearLayout>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tablerowTeam3"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <LinearLayout 
+        		android:id="@+id/layoutTeam5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/labelTeamname5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname5_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
+
+                <ListView
+                    android:id="@+id/playerList5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+
+            <LinearLayout 
+        		android:id="@+id/layoutTeam6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/labelTeamname6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname6_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
+
+                <ListView
+                    android:id="@+id/playerList6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+        </LinearLayout>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tablerowTeam4"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <LinearLayout 
+        		android:id="@+id/layoutTeam7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/labelTeamname7"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname7_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
+
+                <ListView
+                    android:id="@+id/playerList7"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+
+            <LinearLayout 
+        		android:id="@+id/layoutTeam8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/labelTeamname8"
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape"
+                    android:gravity="center"
+                    android:text="@string/_teamname8_"
+                    android:textColor="#0086CC"
+                    android:textSize="15sp" />
+
+                <ListView
+                    android:id="@+id/playerList8"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="4" >
+                </ListView>
+            </LinearLayout>
+        </LinearLayout>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow5"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <Button
+            android:id="@+id/leaveBtn"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonshape"
+            android:text="@string/leave"
+            android:textColor="#0086CC"
+            android:textSize="20sp" />
 
-            <Button
-                android:id="@+id/leaveBtn"
-                android:layout_width="fill_parent"
-                android:layout_height="35dp"
-                android:layout_weight="1"
-                android:background="@drawable/buttonshape"
-                android:text="@string/leave"
-                android:textColor="#0086CC"
-                android:textSize="20sp" />
+        <Button
+            android:id="@+id/startBtn"
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonshape"
+            android:text="@string/start"
+            android:textColor="#0086CC"
+            android:textSize="20sp" />
+    </TableRow>
 
-            <Button
-                android:id="@+id/startBtn"
-                android:layout_width="fill_parent"
-                android:layout_height="35dp"
-                android:layout_weight="1"
-                android:background="@drawable/buttonshape"
-                android:text="@string/start"
-                android:textColor="#0086CC"
-                android:textSize="20sp" />
-            
-        </TableRow>
-
-    </TableLayout>
+</TableLayout>

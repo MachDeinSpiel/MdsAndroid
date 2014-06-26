@@ -13,6 +13,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,17 +42,6 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 		getMenuInflater().inflate(R.menu.login, menu);
 
 		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.helpItem:
-			Toast.makeText(this, "Hilfe...", Toast.LENGTH_SHORT).show();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
 	}
 
 	@Override
@@ -86,7 +76,7 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 				try {
 
 					LoginActivity.this.startLoadingScreen();
-					
+
 					SocketService.createSocketService(getBaseContext());
 					LoginActivity.this.webService = WebServices
 							.createWebServices(LoginActivity.this);
@@ -118,8 +108,23 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 		progress.show();
 	}
 
-	protected void stopLoadingScreen() {
-		progress.dismiss();
+	protected void stopLoadingScreen(final String message, final boolean success) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				progress.setTitle(message);
+				progress.setIcon(R.drawable.bomb);
+				progress.setIconAttribute(RESULT_OK);
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				progress.dismiss();
+				
+			}
+		}).start();
 	}
 
 	@Override
@@ -140,12 +145,12 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 			final JSONObject json = new JSONObject(message);
 			if (json.get("mode").equals("gametemplates")) {
 
-				
 				this.runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
-						LoginActivity.this.stopLoadingScreen();
+						LoginActivity.this
+								.stopLoadingScreen("Login successfull", true);
 
 						Intent myIntent = new Intent(LoginActivity.this,
 								GameChooser.class);
@@ -156,18 +161,14 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 					}
 				});
 			}
-			if(json.getString("mode").equals("error")){
+			if (json.getString("mode").equals("error")) {
 				this.runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
-						stopLoadingScreen();
-						Toast toast;
 						try {
-							toast = Toast.makeText(getApplicationContext(),
-									json.getString("message"),
-									Toast.LENGTH_LONG);
-							toast.show();
+							stopLoadingScreen(json.getString("message"), false);
+
 						} catch (JSONException e) {
 							e.printStackTrace();
 						}
@@ -181,7 +182,7 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 	}
 
 	@Override
-	public void onSocketClientConnected() {
+	public void onWebSocketConnected() {
 		try {
 			JSONObject json = new JSONObject();
 			json.put("mode", "login");
@@ -196,11 +197,7 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 				@Override
 				public void run() {
-					progress.dismiss();
-					Toast toast = Toast.makeText(getApplicationContext(),
-							"Server konnte nicht erreicht werden",
-							Toast.LENGTH_LONG);
-					toast.show();
+					stopLoadingScreen("Server konnte nicht erreicht werden", false);
 
 				}
 			});
@@ -215,12 +212,9 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 			@Override
 			public void run() {
-				LoginActivity.this.stopLoadingScreen();
+				LoginActivity.this
+						.stopLoadingScreen("Server konnte nicht erreicht werden", false);
 
-				Toast toast = Toast.makeText(getApplicationContext(),
-						"Server konnte nicht erreicht werden",
-						Toast.LENGTH_LONG);
-				toast.show();
 			}
 		});
 

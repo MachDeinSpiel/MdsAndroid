@@ -9,15 +9,13 @@ import android.os.Bundle;
 public class KickPlayerDialogFragment extends DialogFragment {
 	
 	private String username;
-	private int playerId;
 	
 	public KickPlayerDialogFragment() {
 		super();
 	}
 	
-	public void prepareDialog(String name, int id){
+	public void prepareDialog(String name){
 		username = name;
-		playerId = id;
 	}
 	
     @Override
@@ -28,13 +26,13 @@ public class KickPlayerDialogFragment extends DialogFragment {
                .setPositiveButton("Kick", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        KickPlayerListener activity = (KickPlayerListener) getActivity();
-                       activity.onKickPlayerResult(true, playerId);
+                       activity.onKickPlayerResult(true, username);
                    }
                })
                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        KickPlayerListener activity = (KickPlayerListener) getActivity();
-                       activity.onKickPlayerResult(false, playerId);
+                       activity.onKickPlayerResult(false, username);
                    }
                });
         // Create the AlertDialog object and return it

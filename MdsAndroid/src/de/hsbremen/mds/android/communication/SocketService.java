@@ -2,6 +2,7 @@ package de.hsbremen.mds.android.communication;
 
 import java.net.URI;
 import java.nio.channels.NotYetConnectedException;
+import java.util.ArrayList;
 
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_17;
@@ -21,7 +22,7 @@ public class SocketService extends Service {
 	// Websocket:
 	private SocketClient socketClient;
 	private WebServices webServices;
-	private String bufferedMessage;
+	private ArrayList<String> bufferedMessages = new ArrayList<String>();
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -38,15 +39,15 @@ public class SocketService extends Service {
 		Draft d = new Draft_17();
 
 		String PROTOKOLL_WS = "ws://";
-		String serverIp = "195.37.176.178";
-		String PORT_WS = ":1387";
-//		String serverIp = "192.168.2.110";
-//		String PORT_WS = ":8887";
+		// String serverIp = "195.37.176.178";
+		// String PORT_WS = ":1387";
+		String serverIp = "192.168.2.110";
+		String PORT_WS = ":8887";
 
-		
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 
-		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent=" + "Android");
+		URI uri = URI.create(serverlocation + "/runCase?case=" + 1 + "&agent="
+				+ "Android");
 		socketClient = new SocketClient(d, uri, this);
 
 		Log.d("Socket", "SocketService: Socketclient wurde gestartet...");
@@ -69,11 +70,15 @@ public class SocketService extends Service {
 			Log.d("Socket", "SocketService: MyBinder: getService");
 			SocketService.this.webServices = service;
 
-			if (bufferedMessage != null) {
-				webServices.onMessage(bufferedMessage);
-				bufferedMessage = null;
-				Log.d("Socket", "SocketService: Buffered Message an Websocket gesendet");
+			if (bufferedMessages.size() > 0) {
+				for (int i = 0; i < bufferedMessages.size(); i++) {
+					webServices.onMessage(bufferedMessages.get(i));
+					
+					Log.d("Socket",
+							"SocketService: Buffered Message an Websocket gesendet");
+				}
 			}
+			bufferedMessages.clear();
 
 			return SocketService.this;
 		}
@@ -90,7 +95,7 @@ public class SocketService extends Service {
 		return super.onUnbind(intent);
 	}
 
-	public void send(String s) throws NotYetConnectedException{
+	public void send(String s) throws NotYetConnectedException {
 		try {
 			Log.d("Socket", "SocketService: Wird gesendet: " + s);
 			socketClient.getConnection().send(s);
@@ -116,7 +121,7 @@ public class SocketService extends Service {
 		if (this.webServices != null)
 			webServices.onMessage(message);
 		else
-			bufferedMessage = message;
+			bufferedMessages.add(message);
 	}
 
 	public void onConnectionClosed(int code, String reason, boolean remote) {
@@ -124,8 +129,8 @@ public class SocketService extends Service {
 		webServices.onConnectionClosed(code, reason, remote);
 	}
 
-	public void onConnnectionHandshake(){
+	public void onConnnectionHandshake() {
 		webServices.onConnectionHandshake();
 	}
-	
+
 }
