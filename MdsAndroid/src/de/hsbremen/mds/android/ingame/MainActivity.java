@@ -1,11 +1,6 @@
 package de.hsbremen.mds.android.ingame;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,21 +8,16 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.maps.MapFragment;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.os.StrictMode.ThreadPolicy;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -183,23 +173,23 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
 
-		LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
-		LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
-
-		if (item.getItemId() == R.id.toggleMap) {
-
-			if (l.getHeight() > l2.getHeight()) {
-				l.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 1.5f));
-				l2.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 3.5f));
-			} else {
-				l.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 3.5f));
-				l2.setLayoutParams(new TableLayout.LayoutParams(
-						LayoutParams.WRAP_CONTENT, 0, 1.5f));
-			}
-		}
+//		LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
+//		LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
+//
+//		if (item.getItemId() == R.id.toggleMap) {
+//
+//			if (l.getHeight() > l2.getHeight()) {
+//				l.setLayoutParams(new TableLayout.LayoutParams(
+//						LayoutParams.WRAP_CONTENT, 0, 1.5f));
+//				l2.setLayoutParams(new TableLayout.LayoutParams(
+//						LayoutParams.WRAP_CONTENT, 0, 3.5f));
+//			} else {
+//				l.setLayoutParams(new TableLayout.LayoutParams(
+//						LayoutParams.WRAP_CONTENT, 0, 3.5f));
+//				l2.setLayoutParams(new TableLayout.LayoutParams(
+//						LayoutParams.WRAP_CONTENT, 0, 1.5f));
+//			}
+//		}
 		return true;
 	}
 

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@android:id/background">
@@ -34,10 +35,10 @@
             <shape>
                 <corners android:radius="5dip" />
                 <gradient
-                        android:startColor="#ff00ff00"
-                        android:centerColor="#ff009900"
+                        android:startColor="#ffffd300"
+                        android:centerColor="#ffffb600"
                         android:centerY="0.75"
-                        android:endColor="#ff00ff00"
+                        android:endColor="#ffffcb00"
                         android:angle="270"
                 />
             </shape>
