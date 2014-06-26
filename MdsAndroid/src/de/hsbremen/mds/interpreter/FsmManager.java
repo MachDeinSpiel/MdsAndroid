@@ -155,8 +155,8 @@ public class FsmManager {
 		//TODO buttonName irgendwo anders herbekommen
 		
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
-			EventParser.Result result;
-			EventParser.Result result2;
+			boolean result;
+			boolean result2;
 			Log.i(Interpreter.LOGTAG, "Checking Events on state " + this.getCurrentState().getName());
 			Log.i(Interpreter.LOGTAG, "Checking Events on Transition mit Target " + t.getTarget().getName() + " Eventtype ist "+ t.getEventType().toString());
 			
@@ -175,36 +175,29 @@ public class FsmManager {
 				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb);
 				result = EventParser.checkLocationEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
-				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
+				result = (result && result2) ? true : false;
 				// only location events can give objects back
-				result.objects = result2.objects;
 				break;
 			case locationWhiteboardEvent:
 				result2 = EventParser.checkLocationEvent(t.getCondition()[0], wb, ownGroup, myID);
 				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
-				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
+				result = (result && result2) ? true : false;
 				break;
 			case uiWhiteboardEvent:
 				result2 = EventParser.checkUiEvent(buttonName, t.getCondition()[0], wb);
 				result = EventParser.checkWhiteboardEvent(t.getCondition()[1], wb, ownGroup, myID);
 				// if both results are fullfilled set true
-				result.isfullfilled = (result.isfullfilled && result2.isfullfilled) ? true : false;
+				result = (result && result2) ? true : false;
 				break;
 			default:
 				//TODO: Fehler abfangen
-				result = new EventParser.Result(false, null, null);
+				result = false;
 				break;
 			}
 				
-			if(result.isfullfilled){
+			if(result){
 				
-
-				// TODO: Evtl keine Liste sondern ein Whiteboard eintragen
-				if(result.subjects != null)
-					this.getCurrentState().setSubjects(result.subjects);
-				if(result.objects != null)
-					this.getCurrentState().setObjects(result.objects);
 				this.setState(getCurrentState(), LAST_STATE);
 				this.setState(t.getTarget(), CURRENT_STATE);
 
@@ -231,14 +224,10 @@ public class FsmManager {
 			for (int i = 0; i < trans.length; i++) {
 				if (trans[i].getEventType() == EventType.whiteboardEvent) {
 					Log.i(Interpreter.LOGTAG, "WhiteboardEvent");
-					EventParser.Result res = EventParser.checkWhiteboardEvent(trans[i].getCondition()[0], wb, ownGroup, myID);
-					if(res.isfullfilled){
+					boolean res = EventParser.checkWhiteboardEvent(trans[i].getCondition()[0], wb, ownGroup, myID);
+					if(res){
 						Log.i(Interpreter.LOGTAG, "Event is fullfilled");
-						// TODO: Evtl keine Liste sondern ein Whiteboard eintragen
-						if(res.subjects != null)
-							this.getCurrentState().setSubjects(res.subjects);
-						if(res.objects != null)
-							this.getCurrentState().setObjects(res.objects);
+
 						this.setState(getCurrentState(), LAST_STATE);
 						this.setState(trans[i].getTarget(), CURRENT_STATE);
 

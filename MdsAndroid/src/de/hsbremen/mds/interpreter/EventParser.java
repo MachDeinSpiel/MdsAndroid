@@ -16,14 +16,11 @@ import de.hsbremen.mds.common.whiteboard.WhiteboardEntry;
 
 public class EventParser {
 	
-	public static Result checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, List<String> playerGroup, String playerId) {
-		Result result = new Result(false, null, null);
-
-		result = checkConditionEvent(condition, wb, playerGroup, playerId);
-		return result;
+	public static boolean checkWhiteboardEvent(MdsCondition condition,Whiteboard wb, List<String> playerGroup, String playerId) {
+		return checkConditionEvent(condition, wb, playerGroup, playerId);
 	}
 
-	public static Result checkLocationEvent(MdsCondition cond, Whiteboard wb, List<String> playerGroup, String playerId) {
+	public static boolean checkLocationEvent(MdsCondition cond, Whiteboard wb, List<String> playerGroup, String playerId) {
 		
 		// ------------------ Werte holen ---------------//
 		// get Params
@@ -65,18 +62,10 @@ public class EventParser {
 			if(subject.getName().equals("self")){
 				Log.i("Mistake", "Subject is self");
 				// Locationobjekt des Spielers erzeuegen
-				if (playerGroup.size() > 1) Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId).value.toString());
-				else Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(playerGroup.get(0), playerId).value.toString());
+				Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(playerGroup, playerId).value.toString());
 				try {
-					double longitude;
-					double latitude;
-					if (playerGroup.size() > 1) {
-						longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "longitude").value);
-						latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "latitude").value);
-					} else {
-						longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "longitude").value);
-						latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "latitude").value);
-					}
+					double longitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "longitude").value);
+					double latitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "latitude").value);
 					Location playerLoc = new Location("PlayerLoc");
 					playerLoc.setLatitude(latitude);
 					playerLoc.setLongitude(longitude);
@@ -91,43 +80,34 @@ public class EventParser {
 					Log.i("Mistake", "Getting all Objects resulting from Nearby");
 					List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
 					
-					Result result = null;
+					boolean result = false;
 					// CheckType des Quantifiers identifizieren
-					// TODO: vlt gar kein Result mehr gebraucht? Einfach boolean
 					if (checkType.equals(MdsCondition.EQUALS)) {
-						if (objects.size() == quanti) result = new Result(true, null, null);
+						if (objects.size() == quanti) result = true;
 					} else if (checkType.equals(MdsQuantifier.LOWER)) {
-						if (objects.size() < quanti) result = new Result(true, null, null);
+						if (objects.size() < quanti) result = true;
 					} else if (checkType.equals(MdsQuantifier.HIGHER)) {
-						if (objects.size() > quanti) result = new Result(true, null, null);
+						if (objects.size() > quanti) result = true;
 					} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
-						if (objects.size() <= quanti) result = new Result(true, null, null);
+						if (objects.size() <= quanti) result = true;
 					} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
-						if (objects.size() >= quanti) result = new Result(true, null, null);
+						if (objects.size() >= quanti) result = true;
 					} else if (checkType.equals(MdsQuantifier.EXISTS)) {
-						if (objects.size() >= 1) result = new Result(true, null, null);
+						if (objects.size() >= 1) result = true;
 					} else if (checkType.equals(MdsQuantifier.ALL)) {
-						if (objects.size() == realObject.entrySet().size()) result = new Result(true, null, null);
+						if (objects.size() == realObject.entrySet().size()) result = true;
 					} 
-					if(result != null){
+					if(result){
 						MdsState currentState; 
-						if(playerGroup.size() > 1)
-							currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
-						else
-							currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
+						currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
 						// glaube ich nicht mehr genutzt
 						currentState.setObjects(objects);
 						Log.i("Mistake", "Object Size ist " + objects.size());
 						// WB im State und beim Player speichern
-						// Erstmal nur ein Object
+						// Setting Object, Erstmal nur ein Object
 						WhiteboardEntry target;
-						if(playerGroup.size() > 1) {
-							wb.setAttribute(objects.get(0), playerGroup.get(0), playerGroup.get(1), ""+playerId, "object");
-							target = wb.getAttribute(playerGroup.get(0), playerGroup.get(1),""+playerId, "object");
-						} else {
-							wb.setAttribute(objects.get(0), playerGroup.get(0), ""+playerId, "object");
-							target = wb.getAttribute(playerGroup.get(0), ""+playerId, "object");
-						}
+						wb.setAttribute(objects.get(0),playerGroup, ""+playerId, "object");
+						target = wb.getAttribute(playerGroup,""+playerId, "object");
 						Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
 						return result;
 					} else {
@@ -135,7 +115,7 @@ public class EventParser {
 					}
 				} catch (NumberFormatException e1) {
 					Log.e(Interpreter.LOGTAG, "Position Attribute could not be parsed to double");
-					return new Result(false, null, null);
+					return false;
 				}
 				
 			}else{
@@ -154,25 +134,15 @@ public class EventParser {
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
 				
 				MdsState currentState;
-				if (playerGroup.size() > 1)
-					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
-				else 
-					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
+				currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
 				currentState.setObjects(objects);
 			} 
 		}else if(cond.getName().equals("!nearby")) {
 			// wenn das Subject "self" ist, im Einzelspieler immer
 			if(subject.getName().equals("self")){
 				// Locationobjekt des Spielers erzeuegen
-				double longitude;
-				double latitude;
-				if (playerGroup.size() > 1) {
-					longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "longitude").value);
-					latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerGroup.get(1), playerId, "latitude").value);
-				} else {
-					longitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "longitude").value);
-					latitude = Double.parseDouble((String) wb.getAttribute(playerGroup.get(0), playerId, "latitude").value);
-				}
+				double longitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "longitude").value);
+				double latitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "latitude").value);
 				Location playerLoc = new Location("PlayerLoc");
 				playerLoc.setLatitude(latitude);
 				playerLoc.setLongitude(longitude);
@@ -184,41 +154,33 @@ public class EventParser {
 
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
 				
-				Result result = null;
+				boolean result = false;
 				// CheckType des Quantifiers identifizieren
 				if (checkType.equals(MdsCondition.EQUALS)) {
-					if (objects.size() != quanti) result = new Result(true, null, null);
+					if (objects.size() != quanti) result = true;
 				} else if (checkType.equals(MdsQuantifier.LOWER)) {
-					if (objects.size() >= quanti) result = new Result(true, null, null);
+					if (objects.size() >= quanti) result = true;
 				} else if (checkType.equals(MdsQuantifier.HIGHER)) {
-					if (objects.size() <= quanti) result = new Result(true, null, null);
+					if (objects.size() <= quanti) result = true;
 				} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
-					if (objects.size() > quanti) result = new Result(true, null, null);
+					if (objects.size() > quanti) result = true;
 				} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
-					if (objects.size() < quanti) result = new Result(true, null, null);
+					if (objects.size() < quanti) result = true;
 				} else if (checkType.equals(MdsQuantifier.EXISTS)) {
-					if (objects.size() < 1) result = new Result(true, null, null);
+					if (objects.size() < 1) result = true;
 				} else if (checkType.equals(MdsQuantifier.ALL)) {
-					if (objects.size() < realObject.entrySet().size()) result = new Result(true, null, null);
+					if (objects.size() < realObject.entrySet().size()) result = true;
 				} 
-				if(result != null){
+				if(result){
 					MdsState currentState; 
-					if(playerGroup.size() > 1)
-						currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
-					else
-						currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
+					currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
 					currentState.setObjects(objects);
 					Log.i("Mistake", "Object Size ist " + objects.size());
 					// WB im State und beim Player speichern
 					// Erstmal nur ein Object
 					WhiteboardEntry target;
-					if(playerGroup.size() > 1) {
-						wb.setAttribute(objects.get(0), playerGroup.get(0), playerGroup.get(1), ""+playerId, "object");
-						target = wb.getAttribute(playerGroup.get(0), playerGroup.get(1),""+playerId, "object");
-					} else {
-						wb.setAttribute(objects.get(0), playerGroup.get(0), ""+playerId, "object");
-						target = wb.getAttribute(playerGroup.get(0), ""+playerId, "object");
-					}
+					wb.setAttribute(objects.get(0), playerGroup, ""+playerId, "object");
+					target = wb.getAttribute(playerGroup,""+playerId, "object");
 					Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
 					return result;
 				} else {
@@ -240,17 +202,14 @@ public class EventParser {
 				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
 				
 				MdsState currentState;
-				if (playerGroup.size() > 1)
-					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
-				else 
-					currentState = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
+				currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
 				currentState.setObjects(objects);
 			}
 		}
-		return new Result(false, null, null);
+		return false;
 	}
 	
-	public static Result checkConditionEvent(MdsCondition cond, Whiteboard wb, List<String> playerGroup, String playerId) {
+	public static boolean checkConditionEvent(MdsCondition cond, Whiteboard wb, List<String> playerGroup, String playerId) {
 		Log.i(Interpreter.LOGTAG, "CheckCondition: " + cond.getName());
 		
 		// get value and compValue
@@ -270,11 +229,7 @@ public class EventParser {
 					Log.i("Mistake", "ConditionName ist: " + cond.getName());
 					Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
 					String paramString = (String)cond.getParams().get("value");
-					if (playerGroup.size() > 1)
-						paramString = paramString.replaceAll("self", playerGroup.get(0) + "." + playerGroup.get(1) + "."+playerId);
-					else 
-						paramString = paramString.replaceAll("self", playerGroup.get(0) + "."+playerId);
-					String[] paramsSplitted = (paramString).split("\\.");
+					String[] paramsSplitted = ((String)parseParam(paramString, null, wb, playerGroup, playerId)).split("\\.");
 
 					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 						//Wenn die Länge abgefragt werden soll
@@ -286,10 +241,7 @@ public class EventParser {
 						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 					}else{
 						MdsState current;
-						if (playerGroup.size() > 1)
-							current = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.CURRENT_STATE).value;
-						else 
-							current = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId, FsmManager.CURRENT_STATE).value;
+						current = (MdsState)wb.getAttribute(playerGroup, ""+playerId, FsmManager.CURRENT_STATE).value;
 						sValue = (String) parseParam(cond.getParams().get("value").toString(), current, wb, playerGroup, playerId);
 						Log.i("Mistake", "SValue ist: " + sValue);
 						Log.i("Mistake", "WB ist: " + wb);
@@ -324,10 +276,7 @@ public class EventParser {
 							compValue = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 						}else{
 							MdsState current;
-							if (playerGroup.size() > 1)
-								current = (MdsState)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.CURRENT_STATE).value;
-							else 
-								current = (MdsState)wb.getAttribute(playerGroup.get(0), ""+playerId, FsmManager.CURRENT_STATE).value;
+							current = (MdsState)wb.getAttribute(playerGroup, ""+playerId, FsmManager.CURRENT_STATE).value;
 							sCompValue = (String) parseParam(cond.getParams().get("compValue").toString(), current, wb, playerGroup, playerId);
 							Log.i("Mistake", "SCompValue ist: " + sCompValue);
 							Log.i("Mistake", "WB ist: " + wb);
@@ -343,23 +292,23 @@ public class EventParser {
 			// get checkType
 			Log.i("Mistake", cond.getParams().toString());
 			if(sValue != null || sCompValue != null) {
-				if (sValue.equals(sCompValue)) return new Result(true, null, null);
+				if (sValue.equals(sCompValue)) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
-				if (value == compValue) return new Result(true, null, null);
+				if (value == compValue) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.LOWER)) {
-				if (value < compValue) return new Result(true, null, null);
+				if (value < compValue) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.HIGHER)) {
-				if (value > compValue) return new Result(true, null, null);
+				if (value > compValue) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.LOWEQUALS)) {
-				if (value <= compValue) return new Result(true, null, null);
+				if (value <= compValue) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.HIGHEQUALS)) {
-				if (value >= compValue) return new Result(true, null, null);
+				if (value >= compValue) return true;
 			} 
 		}
 			
-		return new Result(false, null, null);
+		return false;
 	}
-	
+
 	/**
 	 * Wir vergleichen hier den ButtonNamen, der von Android mitgegeben wird, mit dem EventNamen
 	 * @param btnName
@@ -368,9 +317,9 @@ public class EventParser {
 	 * @param playerId
 	 * @return
 	 */
-	public static Result checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb) {
+	public static boolean checkUiEvent(String btnName, MdsCondition cond, Whiteboard wb) {
 		//Wenn ein uiEvent geprüft werden soll, wird es stumpf verglichen
-		return new Result((cond.getName().equals(btnName)), null, null);
+		return cond.getName().equals(btnName);
 	}
 	
 	/**
@@ -405,7 +354,6 @@ public class EventParser {
 		
 	}
 	
-	// TODO: Hier muss es irgendwie möglich sein, dass ownGroup.enemy vernünftig geparst werden können, sodass das gewollte Team zurück gegeben wird
 	/**
 	 * Parst einen Action String so, dass er für den weiteren Prozess verwendbar ist
 	 * @param param - param to be parsed
@@ -420,17 +368,7 @@ public class EventParser {
 		Log.i(Interpreter.LOGTAG,"parseParam:"+param);
 		//Ersetzungen gemäß der Spezisprache vorbereiten 
 		HashMap<String, String> replacements = new HashMap<String, String>();
-		if (playerGroup.size() > 1)
-			replacements.put("self", playerGroup.get(0) + "." + playerGroup.get(1) +"."+playerId);
-		else 
-			replacements.put("self", playerGroup.get(0) +"."+playerId);
-		// TODO: Own Group auflösen
-		if (playerGroup.size() > 1)
-			replacements.put("ownGroup", playerGroup.get(0) + "." + playerGroup.get(1) + "." + playerId+"");
-		else
-			replacements.put("ownGroup", playerGroup.get(0) + "." + playerId+"");
-		
-		
+		replacements.put("self", parseSelf(playerGroup, playerId));		
 		
 		for(String toReplace : replacements.keySet()){
 			//Log.i(Interpreter.LOGTAG,"parseParam replace every occurence of ["+toReplace+"]");
@@ -444,33 +382,24 @@ public class EventParser {
 		Log.i(Interpreter.LOGTAG,"parseParam splittedParamLength:"+splitted.size());
 		
 		Object tmpObj = wb;
+		/* ---------------- Getting objects from different sources --------------------------*/
 		// Wenn das Schlüsselwort "self vorkommt"
 		if(splitted.size() > 2 && splitted.get(0).equals("Players") &&  splitted.get(1).equals(""+playerId) && splitted.get(2).equals("object")) {
 			Log.i(Interpreter.LOGTAG, "Parse Object of Self");
 			// auf Whiteboard des Spielers setzen und "Players" + ID löschen
 			splitted.remove(0);
 			splitted.remove(0);
-			if (playerGroup.size() > 1)
-				tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId).value;
-			else
-				tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId).value; 
+			tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup, ""+playerId).value;
 		}
 		// wenn object in current state
 		if(splitted.size() > 0 && splitted.get(0).equals(FsmManager.CURRENT_STATE)) {
 			Log.i(Interpreter.LOGTAG, "Parse Current");
 			splitted.remove(0);
-			if(playerGroup.size() > 1)
-				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.CURRENT_STATE).value;
-			else
-				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId, FsmManager.CURRENT_STATE).value;
-		// wenn object in last state	
+			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup, ""+playerId, FsmManager.CURRENT_STATE).value;
 		} else if (splitted.size() > 0 &&  splitted.get(0).equals(FsmManager.LAST_STATE)) {
 			Log.i(Interpreter.LOGTAG, "Parse Last");
 			splitted.remove(0);
-			if(playerGroup.size() > 1)
-				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId, FsmManager.LAST_STATE).value;
-			else
-				tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup.get(0), ""+playerId, FsmManager.LAST_STATE).value;
+			tmpObj = (MdsState) ((Whiteboard)tmpObj).getAttribute(playerGroup, ""+playerId, FsmManager.LAST_STATE).value;
 		}
 		//Wenn das Schlüsselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
 		if(splitted.size() > 0 && splitted.get(0).equals("object")){
@@ -522,13 +451,14 @@ public class EventParser {
 			}else{
 				return (WhiteboardEntry)objects.get(""+0);
 			}
+		/* ------------------------------- Getting Subjects -------------------------------*/
 		} else if (splitted.size() > 0 && splitted.get(0).equals("subject")) {
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray(new String[0]);
 			// erstmal nur mit einem
 			List<WhiteboardEntry> subjects = state.getSubjects();
 			return (String) ((Whiteboard)subjects.get(0).value).getAttribute(keys).value;
-
+		/* ------------------------------- Only Path -------------------------------*/
 		} else if (splitted.size() > 0 && splitted.get(0).equals("notValue")) {
 			splitted.remove(0);
 			// String wieder zusammen setzen
@@ -538,6 +468,21 @@ public class EventParser {
 			}
 			String result = buffer.toString();
 			return buffer.toString();
+		/* --------------------------everything with OwnGroup -------------------------------*/
+		} else if (splitted.size() > 0 && splitted.get(0).equals("ownGroup")) {
+			// get whiteboard of own group and remove the key
+			splitted.remove(0);
+			WhiteboardEntry ownGroup = wb.getAttribute(playerGroup);
+		
+			if(splitted.size() > 0 && splitted.get(0).equals("enemy")) {
+				// get path to enemy
+				String pathToEnemy = (String)((Whiteboard)ownGroup.value).get("enemy").value;
+				// return enemy from wb
+				return wb.getAttribute(pathToEnemy.split("\\."));
+			// else return the value
+			} else {
+				return ((Whiteboard)ownGroup.value).get(splitted);
+			}
 		}
 		
 		//Ansonsten Daten aus dem Whiteboard holen
@@ -553,6 +498,21 @@ public class EventParser {
 	}
 
 	
+	private static String parseOwnGroup(List<String> playerGroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String parseSelf(List<String> playerGroup, String playerId) {
+		String result = playerGroup.get(0);
+		for(int i = 1; i < playerGroup.size(); i++) {
+			result += "." + playerGroup.get(i);
+		}
+		result += "." + playerId;
+		return result;
+	}
+
+
 	static public class Result{
 		public boolean isfullfilled;
 		public List<WhiteboardEntry> subjects;
