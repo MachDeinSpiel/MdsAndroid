@@ -17,15 +17,16 @@ public class FragmentMap extends Fragment{
 	
     private View mapView;
     private ProgressBar healthBar;
-    private int healthStatus = 75;
+    private int maxHealth = 1000;
+    private int currentHealth = 900;
     private int scoreStatus = 0;
     private int optionalStatus = 0;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
 		
+		// Inflate the layout for this fragment
 		mapView = inflater.inflate(R.layout.fragment_location, container,false);
 		
 		initUI();
@@ -36,6 +37,7 @@ public class FragmentMap extends Fragment{
 	}
 	
 	private void initUI() {
+		// Set UI-Frame
 		TextView healthLabel = (TextView)mapView.findViewById(R.id.healthLabel);
 		healthLabel.setBackgroundResource(R.drawable.labelshape);
 		
@@ -45,46 +47,66 @@ public class FragmentMap extends Fragment{
 		TextView optionalLabel = (TextView)mapView.findViewById(R.id.optionalLabel);
 		optionalLabel.setBackgroundResource(R.drawable.labelshape);
 		
-		LinearLayout healthBar = (LinearLayout)mapView.findViewById(R.id.healthBarContainer);
-		healthBar.setBackgroundResource(R.drawable.labelshape);
+		LinearLayout healthBarCon = (LinearLayout)mapView.findViewById(R.id.healthBarContainer);
+		healthBarCon.setBackgroundResource(R.drawable.labelshape);
 		
+		// set HealthBar
+		healthBar = (ProgressBar) mapView.findViewById(R.id.healthBar);
+        Drawable barStyle = getResources().getDrawable(R.drawable.healthbar);
+        healthBar.setProgressDrawable(barStyle);
+        setHealthbar(maxHealth, currentHealth);
+		
+        // set Score
 		TextView score = (TextView)mapView.findViewById(R.id.scoreSummary);
 		score.setBackgroundResource(R.drawable.labelshape);
 		score.setTextSize(25);
-		//score.setText(scoreStatus);
+		setScore(0);
 		
+		// set Optional
 		TextView optional = (TextView)mapView.findViewById(R.id.optional);
 		optional.setBackgroundResource(R.drawable.labelshape);
 		optional.setTextSize(25);
-		//optional.setText(optionalStatus);
+		setOptional(0);
 	}
 
 	private void initHealthBar(){
-		healthBar = (ProgressBar) mapView.findViewById(R.id.healthBar);
-        // Start lengthy operation in a background thread
 
-        healthBar.setProgress(healthStatus);
-		
-        Drawable myIcon = getResources().getDrawable(R.drawable.healthbar);
-        healthBar.setProgressDrawable(myIcon);
 
 	}
 	
 	public void setHealthbar(int maxValue, int value){
+		// Calculate Healtbar value
 		double onePercent = maxValue/100;
-		healthStatus = (int)(value/onePercent);
+		int healthStatus = (int)(value/onePercent);
+		
 		if(healthBar != null){
+			// Set Healthbar Color
+			if(healthStatus >=75){
+		        Drawable barStyle = getResources().getDrawable(R.drawable.healthbar);
+		        healthBar.setProgressDrawable(barStyle);
+			}else if(healthStatus >= 25){
+		        Drawable barStyle = getResources().getDrawable(R.drawable.healthbaryellow);
+		        healthBar.setProgressDrawable(barStyle);
+			}else{
+		        Drawable barStyle = getResources().getDrawable(R.drawable.healthbarred);
+		        healthBar.setProgressDrawable(barStyle);
+			}
+			// Set Value of Healtbar
 			healthBar.setProgress(healthStatus);
 		}else{
 			Log.i("fragment", "healthBar war beim Setzen null");
 		}
+		
+		TextView healthNumber = (TextView)mapView.findViewById(R.id.healthNumber);
+		String t = currentHealth + "/" + maxHealth;
+		healthNumber.setText(t);
 	}
 	
 	public void setScore(int value){
 		this.scoreStatus = value;
-		TextView score = (TextView)mapView.findViewById(R.id.scoreSummary);
-		if(score != null){
-			score.setText(scoreStatus);
+		TextView scoreSummary = (TextView)mapView.findViewById(R.id.scoreSummary);
+		if(scoreSummary != null){
+			scoreSummary.setText(Integer.toString(scoreStatus));
 		}else{
 			Log.i("fragment", "Scorefeld war beim Setzen null");
 		}
@@ -94,9 +116,17 @@ public class FragmentMap extends Fragment{
 		this.optionalStatus = value;
 		TextView optional = (TextView)mapView.findViewById(R.id.optional);
 		if(optional != null){
-			optional.setText(optionalStatus);
+			optional.setText(Integer.toString(optionalStatus));
 		}else{
 			Log.i("fragment", "Optionalfeld war beim Setzen null");
 		}
+	}
+	
+	@Override
+	public void onResume() {
+		setHealthbar(maxHealth, currentHealth);
+		setScore(scoreStatus);
+		setOptional(optionalStatus);
+		super.onResume();
 	}
 }
