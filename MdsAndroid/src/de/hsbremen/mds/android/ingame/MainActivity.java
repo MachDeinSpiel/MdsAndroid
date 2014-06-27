@@ -201,38 +201,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		interpreterCom.locationChanged(loc);
 	}
 
-//	public void showProviderDisable() {
-//		TextView view = (TextView) findViewById(R.id.txtGPSVal);
-//		view.setText("AUS");
-//		view.setBackgroundColor(Color.RED);
-//
-//		FragmentLocation f = (FragmentLocation) swipeAdapter
-//				.getFragment("showMap");
-//		f.updateLocationFields();
-//	}
-//
-//	public void showProviderEnable() {
-//		TextView view = (TextView) findViewById(R.id.txtGPSVal);
-//		view.setText("AN");
-//		view.setBackgroundColor(Color.GREEN);
-//
-//		FragmentLocation f = (FragmentLocation) swipeAdapter
-//				.getFragment("showMap");
-//		if(f != null){
-//			f.updateLocationFields();
-//		}
-//
-//		interpreterCom.locationChanged(location);
-//	}
-
 	@Override
 	public void onProviderDisabled(String arg0) {
-//		showProviderDisable();
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-//		showProviderEnable();
 	}
 
 	@Override
@@ -320,6 +294,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
+		if(!(mds.getName().equals("showMap"))){
 		
 			System.out.println("NextFragment aufgerufen mit: " + mds.getName());
 			
@@ -330,6 +305,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()),
 					true);
+			
+			
+		}
 	}
 	
 	public int getStyleNumber(){
@@ -349,13 +327,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 	public void gpsInit() {
 	
-	MainActivity activity = (MainActivity) getActivity();
-
-	manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-	manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, // 1
-																		// sec
-			10, activity);
+		MainActivity activity = (MainActivity) getActivity();
+	
+		manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+	
+		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, activity);
 	}
 
 	@Override

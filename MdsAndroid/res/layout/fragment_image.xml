@@ -4,47 +4,36 @@
     android:layout_height="match_parent"
     tools:context="FragmentImage" >
 
-    <!-- TODO: Update blank fragment layout -->
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_margin="10dp"
+          android:orientation="vertical" >
 
-    <ScrollView
-        android:id="@+id/scrollViewImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+          <ImageView
+              android:id="@+id/picImageFragment"
+              android:layout_width="match_parent"
+              android:layout_weight="2"
+              android:layout_height="0dp"
+              android:src="@drawable/ic_launcher"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+          <TextView
+              android:id="@+id/textImageFragment"
+              android:layout_width="match_parent"
+              android:layout_height="0dp"
+              android:layout_weight="0.5"
+              android:text="Description" 
+              android:gravity="center"
+              android:textSize="13sp"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center"
-                android:text="Bild" />
+          <LinearLayout
+              android:id="@+id/buttonContainerImage"
+              android:layout_width="match_parent"
+              android:layout_height="0dp"
+              android:layout_weight="1"
+              android:orientation="vertical" >
+          </LinearLayout>
 
-            <ImageView
-                android:id="@+id/placeholderImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="60dp"
-                android:contentDescription="Bild"
-                android:src="@drawable/ic_launcher"
-                android:textSize="16dp" />
-
-            <Button
-                android:id="@+id/btnReturnImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Return"
-                android:visibility="invisible" />
-
-            <Button
-                android:id="@+id/btnCloseAppImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Close App" />
-        </LinearLayout>
-    </ScrollView>
+      </LinearLayout>
 
 </FrameLayout>

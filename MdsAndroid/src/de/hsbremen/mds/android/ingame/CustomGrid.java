@@ -1,39 +1,40 @@
 package de.hsbremen.mds.android.ingame;
+import java.util.ArrayList;
+
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
 public class CustomGrid extends BaseAdapter{
     private Context mContext;
-    private final String[] web;
-    private final int[] Imageid;
-      public CustomGrid(Context c,String[] web,int[] Imageid ) {
+    private ArrayList<MdsItem> itemList;
+    private ImageLoader imageLoader;
+    
+      public CustomGrid(Context c, ArrayList<MdsItem> itemList) {
           mContext = c;
-          this.Imageid = Imageid;
-          this.web = web;
+          this.itemList = itemList;
+          this.imageLoader = new ImageLoader();
       }
     @Override
     public int getCount() {
-      // TODO Auto-generated method stub
-      return web.length;
+      return itemList.size();
     }
     @Override
     public Object getItem(int position) {
-      // TODO Auto-generated method stub
       return null;
     }
     @Override
     public long getItemId(int position) {
-      // TODO Auto-generated method stub
       return 0;
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-      // TODO Auto-generated method stub
       View grid;
       LayoutInflater inflater = (LayoutInflater) mContext
         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -42,8 +43,9 @@ public class CustomGrid extends BaseAdapter{
         grid = inflater.inflate(R.layout.grid_single, null);
             TextView textView = (TextView) grid.findViewById(R.id.grid_text);
             ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
-            textView.setText(web[position]);
-            imageView.setImageResource(Imageid[position]);
+            textView.setText(itemList.get(position).getName());
+            Bitmap b = imageLoader.getBitmapFromURL(itemList.get(position).getImagePath());
+            imageView.setImageBitmap(b);
           } else {
             grid = (View) convertView;
           }

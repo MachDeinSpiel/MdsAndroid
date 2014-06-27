@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Dialog;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import de.hsbremen.mds.android.ingame.CustomGrid;
+import de.hsbremen.mds.android.ingame.ImageLoader;
 import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
@@ -26,17 +28,18 @@ public class FragmentInventory extends Fragment{
 	private ArrayList<MdsItem> itemList = new ArrayList<MdsItem>();
 	private CustomGrid adapter;
 	private int itemPosition;
-	private String[] web;
-	private int[] imageId;
 	private int style;
 	
 	private GridView grid;
 	private List<String> buttonList = new ArrayList<String>();
+	private ImageLoader imageLoader;
 	  
 	  @Override
 	  public View onCreateView(android.view.LayoutInflater inflater, android.view.ViewGroup container, Bundle savedInstanceState) {
 	    
 		 inventoryView = inflater.inflate(R.layout.fragment_inventorynew, container, false);
+		 
+		 imageLoader = new ImageLoader();
 		 
 	     updateItemlist();
 	     
@@ -50,21 +53,14 @@ public class FragmentInventory extends Fragment{
 		MainActivity a = (MainActivity)getActivity();
 		style = a.getStyleNumber();
 		styleFragment(inventoryView);
+		
 	     
 	     return inventoryView;
 	  }	  
 	  
 	  private void updateItemlist() {
-		  
 		
-		web = new String[itemList.size()];
-		imageId = new int[itemList.size()];
-		for(int i = 0; i < itemList.size(); i++){
-			web[i] = itemList.get(i).getName();
-			imageId[i] = R.drawable.red;
-		}
-		
-		adapter = new CustomGrid(getActivity(), web, imageId);
+		adapter = new CustomGrid(getActivity(), itemList);
 		grid=(GridView)inventoryView.findViewById(R.id.grid);
 	    grid.setAdapter(adapter);
 	    grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -80,14 +76,14 @@ public class FragmentInventory extends Fragment{
 			// custom dialog
 			final Dialog dialog = new Dialog(getActivity());
 			dialog.setContentView(R.layout.custom);
-			dialog.setTitle(web[+ position]);
+			dialog.setTitle(itemList.get(position).getName());
 		 
-					// set the custom dialog components - text, image and button
+			// set the custom dialog components - text, image and button
 			TextView text = (TextView) dialog.findViewById(R.id.text);
-			text.setText("Dieses Item ist ein wirklich praktisches Item");
+			text.setText("Item: " + itemList.get(position).getName() + "\n" + " Hier sind folgende Aktionen möglich:");
 			ImageView image = (ImageView) dialog.findViewById(R.id.image);
-			image.setImageResource(imageId[+ position]);
-			
+			Bitmap icon = imageLoader.getBitmapFromURL(itemList.get(position).getImagePath());
+			image.setImageBitmap(icon);
 			LinearLayout buttonContainer = (LinearLayout)dialog.findViewById(R.id.buttonContainer);
 			
 			// Clear buttoncontainer
@@ -97,7 +93,7 @@ public class FragmentInventory extends Fragment{
 				
 				Button b = new Button(getActivity());
 				b.setText(s);
-				b.setBackgroundColor(Color.WHITE);
+				b.setBackgroundResource(R.drawable.buttonshape_dialog);
 				b.setOnClickListener(new View.OnClickListener() {
 					
 					@Override
@@ -117,6 +113,7 @@ public class FragmentInventory extends Fragment{
 			}	
 		 
 			Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonBack);
+			dialogButton.setBackgroundResource(R.drawable.buttonshape);
 			// if button is clicked, close the custom dialog
 			dialogButton.setOnClickListener(new OnClickListener() {
 				@Override

@@ -1,5 +1,7 @@
 package de.hsbremen.mds.android.fragment;
 
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,8 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import de.hsbremen.mds.android.ingame.ImageLoader;
 import de.hsbremen.mds.android.ingame.MainActivity;
 import de.hsbremen.mds.android.ingame.SwipeAdapter;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsInfoObject;
 import de.hsbremen.mds.mdsandroid.R;
 
 /**
@@ -19,61 +25,73 @@ import de.hsbremen.mds.mdsandroid.R;
 @SuppressLint("ValidFragment")
 public class FragmentImage extends Fragment {
 
-	private String imagePath = "";
 	private SwipeAdapter sA;
+	private MdsInfoObject mds;
+	private View imageView;
+	private ImageLoader imageLoader;
+	private int style = 0;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View view = setImage(inflater.inflate(R.layout.fragment_image, container, false) , this.imagePath);
+		imageLoader = new ImageLoader();
 		
-		Button btn = (Button) view.findViewById(R.id.btnReturnImage);
+		imageView = inflater.inflate(R.layout.fragment_image, container, false);
 		
-		btn.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				MainActivity activity = (MainActivity) getActivity();
-				Button returnBtn = (Button) activity.findViewById(R.id.btnReturnImage);
-				returnBtn.setVisibility(Button.GONE);
-				activity.updateSwipeAdapter("showImage");
-				activity.interpreterCom.buttonClicked("back");
-			}
-		});
-		
-		Button btn2 = (Button) view.findViewById(R.id.btnCloseAppImage);
-		
-		btn2.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				MainActivity activity = (MainActivity) getActivity();
-				activity.updateSwipeAdapter("image");
-			}
-		});
-		
-        return view;
+        return imageView;
 	}
 	
 	@Override
-	public void onResume() {
-		super.onResume();
-		// TODO: hier kann der View bearbeitet werden(sA.getFragmentInformation())
-		Button b = (Button)getActivity().findViewById(R.id.btnReturnImage);
-		b.setVisibility(1);
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		updateImageView();
+		super.onViewCreated(view, savedInstanceState);
 	}
 	
-	public View setImage(View view, String url){
-
-        ImageView imageView = (ImageView) view.findViewById(R.id.placeholderImage);
-        imageView.setImageResource(R.drawable.bremenroland);
-		
-		return view;
+	public void updateImageView(){
+		mds = sA.getFragmentInformation();
+		// Set Image
+		ImageView img = (ImageView)imageView.findViewById(R.id.picImageFragment);
+		img.setImageBitmap(imageLoader.getBitmapFromURL(mds.getUrl()));
+		// Set Text
+		TextView text = (TextView)imageView.findViewById(R.id.textImageFragment);
+		text.setText(mds.getText());
+		// Set Buttons
+		showButtons();
 	}
+	
+	private void showButtons() {
+		LinearLayout ll = (LinearLayout)imageView.findViewById(R.id.buttonContainerImage);
+ 		List<String> l = sA.getFragmentInformation().getButtons();
+ 		for(String s : l){
+ 			Button button = new Button(getActivity());
+ 			ll.addView(button);
+ 			button.setText(s);
+ 			
+ 			switch(style){
+ 				case 0:
+ 					button.setBackgroundResource(R.drawable.buttonshape);
+ 					break;
+ 				case 1:
+ 					button.setBackgroundResource(R.drawable.buttonshapedark);
+ 					break;
+ 			}
+ 			
+ 			button.setOnClickListener(new View.OnClickListener() {
+ 				
+ 				@Override
+ 				public void onClick(View v) {
+ 					Button b = (Button)v;
+ 					MainActivity activity = (MainActivity) getActivity();
+ 					activity.updateSwipeAdapter("showImage");
+ 					String buttonText = (String)b.getText();
+ 					activity.interpreterCom.buttonClicked(buttonText);
+ 				}
+ 			});
+ 		}
+ 	}
 
 	public void setSwipeAdapter(SwipeAdapter swipeAdapter) {
-		// TODO Auto-generated method stub
 		this.sA = swipeAdapter;
 	}
 	

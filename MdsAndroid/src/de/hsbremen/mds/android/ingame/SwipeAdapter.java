@@ -52,7 +52,6 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         //INAKTIVE FRAGMENTS
         FragmentText textFragment = new FragmentText();
         textFragment.setSwipeAdapter(this);
-        textFragment.setMessage("Es wurde noch kein Ziel erreicht");
         fragmentsPoolList.put("showText", textFragment);
         
         FragmentImage imageFragment = new FragmentImage();
@@ -87,7 +86,6 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	
 	@Override
 	public void destroyItem(ViewGroup container, int position, Object object) {
-		// TODO Auto-generated method stub
 		Log.i("nextFragment", "Object " + object.getClass() + " zerstört");
 		super.destroyItem(container, position, object);
 	}
@@ -108,8 +106,6 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 		Log.i("nextFragment", "Fragment " + activeFragmentsNumbers.get(index) + " wurde mit getItem");
 		return activeFragmentsList.get(activeFragmentsNumbers.get(index));
 	}
-	
-	
 	
 	@Override
 	public int getItemPosition(Object object) {

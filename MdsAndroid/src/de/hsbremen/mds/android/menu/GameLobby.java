@@ -171,7 +171,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 				// TODO Auto-generated method stub
 
 				try {
-					JSONObject json = new JSONObject(message);
+					final JSONObject json = new JSONObject(message);
 					if (json.getString("mode").equals("gamelobby")) {
 						teamUpdate(json);
 						Log.d("Menu", "TeamUpdate");
@@ -202,10 +202,16 @@ public class GameLobby extends Activity implements WebServicesInterface,
 
 							@Override
 							public void run() {
-								Toast toast = Toast.makeText(
-										getApplicationContext(), message,
-										Toast.LENGTH_LONG);
-								toast.show();
+								Toast toast;
+								try {
+									toast = Toast.makeText(
+											getApplicationContext(), json.getString("message"),
+											Toast.LENGTH_LONG);
+									toast.show();
+								} catch (JSONException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 
 							}
 						});
