@@ -182,20 +182,19 @@ public class FragmentGameReaction extends Fragment{
 	}	
 	
 	private int calculateScore(){
-		int returnScore = 0;
 		
 		if(this.score == 0){
-			return -10;
-		}else if(this.score < 1){
-			return -5;
-		}else if(this.score < 3){
 			return 0;
+		}else if(this.score < 1){
+			return 1;
+		}else if(this.score < 3){
+			return 4;
 		}else if(this.score < 5){
-			return 5;
+			return 7;
 		}else if(this.score >= 5){
 			return 10;
 		}
 		
-		return returnScore;
+		return 0;
 	}
 }
