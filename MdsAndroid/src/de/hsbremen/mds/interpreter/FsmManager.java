@@ -49,16 +49,16 @@ public class FsmManager {
 				ownGroup = wb.getGroupString(myID);
 				if(ownGroup.size() > 1) {
 					wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup.get(0), ownGroup.get(1), ""+myID, CURRENT_STATE);
-					wb.setAttribute(new WhiteboardEntry("lastSt","all"), Interpreter.WB_PLAYERS,""+myID,LAST_STATE);
+					wb.setAttribute(new WhiteboardEntry("lastSt","all"), ownGroup,""+myID,LAST_STATE);
 				} else {
 					wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup.get(0), ""+myID,CURRENT_STATE);
 					wb.setAttribute(new WhiteboardEntry("lastSt","all"), ownGroup.get(0),""+myID,LAST_STATE);
 				}
 				//TODO: fix my shit up
-				wb.getAttribute(Interpreter.WB_PLAYERS,myID,LAST_STATE).value = new MdsState(-1, "", null , null, null, null, false, false);
+				wb.getAttribute(ownGroup, myID, LAST_STATE).value = new MdsState(-1, "", null , null, null, null, false, false);
 
 				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup.get(0));
-				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(Interpreter.WB_PLAYERS,myID).value.toString());
+				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(ownGroup,myID).value.toString());
 				
 			}catch(InvalidWhiteboardEntryException e){
 				e.printStackTrace();
@@ -99,9 +99,9 @@ public class FsmManager {
 			//nur Strings und Whiteboards, hier wird (falls noch nicht da) erst ein leerer string gesetzt
 			//und dann mit einem MdsState überschrieben (muhahahah *evil face*)
 			
-//			if(wb.getAttribute(Interpreter.WB_PLAYERS,myID,setTo) == null){
+//			if(wb.getAttribute(ownGroup,myID,setTo) == null){
 //				try {
-//					wb.setAttribute(new WhiteboardEntry("", "all"), Interpreter.WB_PLAYERS,myID,setTo);
+//					wb.setAttribute(new WhiteboardEntry("", "all"), ownGroup,myID,setTo);
 //				} catch (InvalidWhiteboardEntryException e) {
 //					e.printStackTrace();
 //				}
@@ -215,7 +215,7 @@ public class FsmManager {
 	 */
 	public void checkWBCondition() {
 		// check WB Cond in state
-		MdsState state = (MdsState) wb.getAttribute(Interpreter.WB_PLAYERS ,myID+"","currentState").value;
+		MdsState state = (MdsState) wb.getAttribute(ownGroup ,myID+"","currentState").value;
 		Log.i(Interpreter.LOGTAG, "checking Events again on " + state.getName());
 		MdsTransition[] trans = state.getTransitions();
 		// Only start if trans is not null

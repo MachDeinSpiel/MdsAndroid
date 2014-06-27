@@ -56,7 +56,7 @@ public class ActionParser {
 		// Buttons heraussuchen, falls state transitions hat
 		List<String> buttons = new Vector<String>();
 		if (state != null) {
-			MdsState buttonState = (MdsState) wb.getAttribute("Players",myId + "","currentState").value;
+			MdsState buttonState = (MdsState) wb.getAttribute(myGroup, myId + "","currentState").value;
 			Log.i(Interpreter.LOGTAG, "Parse Action: " + action.getIdent() + " des States: " + buttonState.getName());
 			MdsTransition[] trans = buttonState.getTransitions();
 			if (trans != null) {
@@ -105,8 +105,8 @@ public class ActionParser {
 					//Map anzeigen
 					double lat,lon;
 					try{
-						lat  = Double.parseDouble((String)wb.getAttribute(Interpreter.WB_PLAYERS,""+myId, "latitude").value);
-						lon  = Double.parseDouble((String)wb.getAttribute(Interpreter.WB_PLAYERS,""+myId, "longitude").value);
+						lat  = Double.parseDouble((String)wb.getAttribute(myGroup,""+myId, "latitude").value);
+						lon  = Double.parseDouble((String)wb.getAttribute(myGroup,""+myId, "longitude").value);
 					}catch(Exception e){
 						lat = 0;
 						lon = 0;
@@ -137,7 +137,6 @@ public class ActionParser {
 					// get target
 					WhiteboardEntry target = (WhiteboardEntry) parsedParams.get("target");
 					Log.i(Interpreter.LOGTAG, "Target found");
-					//String[] keys = { "Players", "1", "object"};
 					
 					// create copy of object
 					if(target == null) Log.e(Interpreter.LOGTAG, "Target Null");
@@ -219,7 +218,7 @@ public class ActionParser {
 				public void execute(GuiInterface guiInterface) {
 					//Welches Attribut soll geändert werden?
 					List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("attribute")).split("\\.")));
-					Whiteboard currentWb = parseActionString(wb, keysToValue, state, myId);
+					Whiteboard currentWb = parseActionString(wb, keysToValue, myGroup,state, myId);
 					
 					String attributeToChange;
 					try{
@@ -331,8 +330,8 @@ public class ActionParser {
 	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, List<String> playerGroup, String myId) {
 		Log.i(Interpreter.LOGTAG, "Parsing Game Result");
 		// actions des aktuellen States nach identifier durchgucken
-		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId).value.toString());
-		MdsState state= (MdsState)whiteboard.getAttribute(Interpreter.WB_PLAYERS, ""+myId, FsmManager.CURRENT_STATE).value;
+		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(playerGroup, ""+myId).value.toString());
+		MdsState state= (MdsState)whiteboard.getAttribute(playerGroup, ""+myId, FsmManager.CURRENT_STATE).value;
 		for(MdsAction startAction : state.getStartAction()) {
 			HashMap<String, Object> actionParams = startAction.getParams();
 			// search in Params for identifier
@@ -370,12 +369,12 @@ public class ActionParser {
 	}
 	
 	
-	private Whiteboard parseActionString(Whiteboard root, List<String> keysToValue, MdsState state, String myId){
+	private Whiteboard parseActionString(Whiteboard root, List<String> keysToValue, List<String> playerGroup, MdsState state, String myId){
 		//Whiteboard, in dem das zuändernde Attribut liegt
 		Whiteboard currentWb = root;
 		
 		if(keysToValue.get(0).equals("self")){
-			currentWb = (Whiteboard) root.getAttribute(Interpreter.WB_PLAYERS,myId+"").value;
+			currentWb = (Whiteboard) root.getAttribute(playerGroup, myId+"").value;
 			keysToValue.remove(0);
 		}else if(keysToValue.get(0).equals("subject")){
 			currentWb = (Whiteboard) state.getSubjects().get(0).value;

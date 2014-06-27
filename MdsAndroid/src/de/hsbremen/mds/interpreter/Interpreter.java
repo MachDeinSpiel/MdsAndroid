@@ -1,6 +1,7 @@
 package de.hsbremen.mds.interpreter;
 
 import java.io.File;
+import java.security.acl.Owner;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -35,7 +36,6 @@ import de.hsbremen.mds.parser.Parser;
 public class Interpreter implements InterpreterInterface, ClientInterpreterInterface, FsmInterface{
 	
 	public static final String LOGTAG = "InterpreterClient";
-	public static final String WB_PLAYERS = "Players";
 	public static final String CURRENT_STATE = "currentState";
 	
 	private ActionParser actionParser;
@@ -119,24 +119,25 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		// tell the server
 		try {
 			// TODO: alle Aufrufe, bei denen auf den Player geguckt werden müssen aktualisiert werden
-			whiteboard.setAttributeValue(Double.toString(longitude), WB_PLAYERS, myId, "longitude");
+			whiteboard.setAttributeValue(Double.toString(longitude), fsmManager.getOwnGroup(), myId, "longitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
 		}
 		List<String> keys = new Vector<String>();
-		keys.add(WB_PLAYERS);
+		for(String key : fsmManager.getOwnGroup())
+			keys.add(key);
 		keys.add(""+myId);
 		keys.add("longitude");
-		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, myId, "longitude"));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "longitude"));
 		
 		try {
-			whiteboard.setAttributeValue(Double.toString(latitude), WB_PLAYERS, myId, "latitude");
+			whiteboard.setAttributeValue(Double.toString(latitude), fsmManager.getOwnGroup(), myId, "latitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
 		}
 		keys.remove(keys.size()-1);
 		keys.add("latitude");
-		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(WB_PLAYERS, myId, "latitude"));
+		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "latitude"));
 		
 		fsmManager.checkEvents(null);
 		
@@ -169,7 +170,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		boolean isMiniGame = false;
 		if(setTo.equals(CURRENT_STATE)) {
 			Log.i(LOGTAG, "Zustand geändert");
-			Log.i(LOGTAG, "Last State" + ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getName());
+			Log.i(LOGTAG, "Last State" + ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value)).getName());
 			MdsState current = fsmManager.getCurrentState();
 			Log.i(LOGTAG, "Current State" + current.getName());
 			// Actions des Current states
@@ -181,7 +182,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if (current.getEndAction() != null) Log.i(LOGTAG, "End Action des States: " + current.getEndAction().getIdent());
 			
 			// endAction of LastState
-			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			Log.i(LOGTAG, "Executing Action");
 			if(endAction != null){
 				endAction.execute(gui);
@@ -190,7 +191,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			// startActions of CurrentState
 			for(MdsAction startAction : current.getStartAction()) {
 				MdsActionExecutable startActionExec = actionParser.parseAction("start", startAction, 
-																		  ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, 
+																		  ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"",FsmManager.LAST_STATE).value)), whiteboard, 
 																		   fsmManager.getOwnGroup(), myId, serverInterpreter);
 				Log.i(LOGTAG, "Executing Action");
 				if(startActionExec != null){
@@ -199,7 +200,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				}
 			}
 			// do Action of CurrentState
-			MdsActionExecutable doAction = actionParser.parseAction("do", ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(WB_PLAYERS,myId+"",FsmManager.LAST_STATE).value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+			MdsActionExecutable doAction = actionParser.parseAction("do", ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"",FsmManager.LAST_STATE).value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			if (doAction instanceof MdsMiniAppAction) isMiniGame = true;
 			
 			Log.i(LOGTAG, "Executing Action");
@@ -211,8 +212,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if (!isMiniGame)
 				fsmManager.checkWBCondition();
 			
-			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","health").value);
-			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(WB_PLAYERS, myId+"","inventory").value);
+			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","health").value);
+			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","inventory").value);
 		}
 	}
 
@@ -270,7 +271,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		if(identifier.equals("use")) {
 			Log.i(LOGTAG, "User is using an item");
 			// get Item
-			WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory", item.getPathKey());
+			WhiteboardEntry wbItem = whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey());
 			// get useAction
 			WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
 			for (String key : ((Whiteboard)useAction.value).keySet()) {
@@ -301,7 +302,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 					Log.e(LOGTAG, "No Action Ident found in Action " + key + ". Returning nothing");
 					return;
 				}
-				MdsState state = (MdsState)(whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value);
+				MdsState state = (MdsState)(whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value);
 				MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 				
 				// execute Action if possible
@@ -309,14 +310,14 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 					actionExecute.execute(gui);
 				}
 				// Testausgabe
-				Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory").value.toString());
-				Log.i("Mistake", "Health des Spielers ist: " + whiteboard.getAttribute(WB_PLAYERS, ""+myId, "health").value);
+				Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory").value.toString());
+				Log.i("Mistake", "Health des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "health").value);
 			}
 		// remove item
 		} else if(identifier.equals("remove")) {
 			Log.i(LOGTAG, "User is removing an item");
 			// get Item
-			WhiteboardEntry wbItem = whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory", item.getPathKey());
+			WhiteboardEntry wbItem = whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey());
 			// get useAction
 			WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
 			Log.i(LOGTAG, "Executing Action Remove of Item " + item.getImagePath());
@@ -340,7 +341,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			// parse Action
 			MdsActionIdent ident = MdsActionIdent.removeFromGroup;
 			MdsAction action = new MdsAction(ident, params);
-			MdsState state = (MdsState)(whiteboard.getAttribute(WB_PLAYERS,myId+"","lastState").value);
+			MdsState state = (MdsState)(whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value);
 			MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			
 			// execute Action if possible
@@ -348,7 +349,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				actionExecute.execute(gui);
 			}
 			// Testausgabe
-			Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(WB_PLAYERS, ""+myId, "inventory").value.toString());
+			Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory").value.toString());
 		}
 				
 	}
@@ -372,8 +373,21 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		// remove dummy from inventory
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("name", "removeFromGroup");
-		params.put("target", WB_PLAYERS + "." + myId + "." + "inventory.dummy");
-		params.put("group", WB_PLAYERS + "." + myId + "." + "inventory");
+		
+		// adding param taget = inventory.dummy
+		String paramString = fsmManager.getOwnGroup().get(0);
+		for(int i = 1; i < fsmManager.getOwnGroup().size(); i++)
+			paramString += "." + fsmManager.getOwnGroup().get(i);
+		paramString += "." + myId + "." + "inventory.dummy";
+		params.put("target", paramString);
+		
+		// adding param group = inventory
+		paramString = fsmManager.getOwnGroup().get(0);
+		for(int i = 1; i < fsmManager.getOwnGroup().size(); i++)
+			paramString += "." + fsmManager.getOwnGroup().get(i);
+		paramString += "." + myId + "." + "inventory";
+		params.put("group", paramString);
+		
 		MdsAction action = new MdsAction(MdsActionIdent.removeFromGroup, params);
 		MdsActionExecutable actionExec = actionParser.parseAction("dummyDelete", action, null, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 		if (actionExec != null) {

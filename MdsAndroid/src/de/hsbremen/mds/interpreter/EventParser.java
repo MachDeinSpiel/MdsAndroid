@@ -214,9 +214,9 @@ public class EventParser {
 		
 		// get value and compValue
 		double value = -1;
-		String sValue = null;
+		Object oValue = null;
 		double compValue = -2;
-		String sCompValue = null;
+		Object oCompValue = null;
 		
 		try {  
 		    value = (Double)cond.getParams().get("value");  
@@ -227,26 +227,34 @@ public class EventParser {
 				try {
 					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
 					Log.i("Mistake", "ConditionName ist: " + cond.getName());
-					Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+(String)cond.getParams().get("value"));
-					String paramString = (String)cond.getParams().get("value");
-					String[] paramsSplitted = ((String)parseParam(paramString, null, wb, playerGroup, playerId)).split("\\.");
+					Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+cond.getParams().get("value").toString());
+					String paramString = (cond.getParams().get("value").toString());
+					Object parsedParam = parseParam(paramString, null, wb, playerGroup, playerId);
 
-					if(paramsSplitted[paramsSplitted.length-1].equals("length")){
-						//Wenn die L‰nge abgefragt werden soll
-						//Entferne "length" aus den Parametern
-						List<String> temp = new Vector<String>(Arrays.asList(paramsSplitted));
-						temp.remove(paramsSplitted.length-1);
-						//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
-						//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
-						value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
-					}else{
-						MdsState current;
-						current = (MdsState)wb.getAttribute(playerGroup, ""+playerId, FsmManager.CURRENT_STATE).value;
-						sValue = (String) parseParam(cond.getParams().get("value").toString(), current, wb, playerGroup, playerId);
-						Log.i("Mistake", "SValue ist: " + sValue);
-						Log.i("Mistake", "WB ist: " + wb);
-						value = Double.parseDouble(sValue);
-						Log.i("Mistake", "Value ist: " + value);
+					if(parsedParam instanceof String) {
+						String[] paramsSplitted = ((String)parsedParam).split("\\.");
+						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
+							//Wenn die L‰nge abgefragt werden soll
+							//Entferne "length" aus den Parametern
+							List<String> temp = new Vector<String>(Arrays.asList(paramsSplitted));
+							temp.remove(paramsSplitted.length-1);
+							//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
+							//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
+							value = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
+						// sonst ist der Parsed direkt der Value
+						}else{
+							oValue = (String)parsedParam;
+							Log.i("Mistake", "OValue ist: " + oValue);
+							Log.i("Mistake", "WB ist: " + wb);
+							value = Double.parseDouble((String) oValue);
+							Log.i("Mistake", "Value ist: " + value);
+						}
+					} else if(parsedParam instanceof Whiteboard) {
+						oValue = (Whiteboard)parsedParam;
+						Log.i("Mistake", "OValue ist: " + oValue);
+					} else if(parsedParam instanceof WhiteboardEntry) {
+						oValue = ((WhiteboardEntry)parsedParam).value;
+						Log.i("Mistake", "OValue ist: " + oValue);
 					}
 				} catch (NumberFormatException nfe2) {
 					// something went wrong, Value is not a Number
@@ -255,17 +263,18 @@ public class EventParser {
 		} 
 	
 		if (cond.getName().equals("condition") || cond.getName().equals("compare")) {
-			try {  
-			    compValue = (Double)cond.getParams().get("compValue");  
-			} catch(ClassCastException cce){
-				try{
-					compValue = Double.parseDouble(cond.getParams().get("compValue").toString());
-				}catch(NumberFormatException nfe) {  
-					try {
-						//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
+			try{
+				compValue = Double.parseDouble(cond.getParams().get("compValue").toString());
+			}catch(NumberFormatException nfe) {  
+				try {
+					//Einzelne Teile, die Punkten getrennt sind aufsplitten und den Wert des Arributs in Double parsen
+					Log.i("Mistake", "ConditionName ist: " + cond.getName());
+					Log.i(Interpreter.LOGTAG,"checkCondition: value ist kein Double, versuche zu splitten. params: "+cond.getParams().get("compValue").toString());
+					String paramString = cond.getParams().get("compValue").toString();
+					Object parsedParam = parseParam(paramString, null, wb, playerGroup, playerId);
 
-						String[] paramsSplitted = ((String) cond.getParams().get("value")).split("\\.");
-
+					if(parsedParam instanceof String) {
+						String[] paramsSplitted = ((String)parsedParam).split("\\.");
 						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
 							//Wenn die L‰nge abgefragt werden soll
 							//Entferne "length" aus den Parametern
@@ -274,25 +283,28 @@ public class EventParser {
 							//Navigiere zum WhiteboardEintrag, caste ihn als Whiteboard (von der wir die L‰nge haben wollen)
 							//Dann holen wir mit entrySet() alle Eintr‰ge und mit size() dann schlieﬂlich die L‰nge
 							compValue = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
+						// sonst ist der Parsed direkt der Value
 						}else{
-							MdsState current;
-							current = (MdsState)wb.getAttribute(playerGroup, ""+playerId, FsmManager.CURRENT_STATE).value;
-							sCompValue = (String) parseParam(cond.getParams().get("compValue").toString(), current, wb, playerGroup, playerId);
-							Log.i("Mistake", "SCompValue ist: " + sCompValue);
+							oCompValue = (String)parsedParam;
+							Log.i("Mistake", "oCompValue ist: " + oCompValue);
 							Log.i("Mistake", "WB ist: " + wb);
-							compValue = Double.parseDouble(sCompValue);
-							Log.i("Mistake", "Value ist: " + value);
+							compValue = Double.parseDouble((String) oCompValue);
+							Log.i("Mistake", "Value ist: " + compValue);
 						}
-					} catch (NumberFormatException nfe2) {
-						// something went wrong, Value is not a Number
-					} 
-				} 
+					} else if(parsedParam instanceof Whiteboard) {
+						oCompValue = (Whiteboard)parsedParam;
+					} else if(parsedParam instanceof WhiteboardEntry) {
+						oCompValue = (WhiteboardEntry)parsedParam;
+					}
+				} catch (NumberFormatException nfe2) {
+					// something went wrong, Value is not a Number
+				}
 			}
 			
 			// get checkType
 			Log.i("Mistake", cond.getParams().toString());
-			if(sValue != null || sCompValue != null) {
-				if (sValue.equals(sCompValue)) return true;
+			if(oValue != null || oCompValue != null) {
+				if (oValue.equals(oCompValue)) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.EQUALS)) {
 				if (value == compValue) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.LOWER)) {
@@ -384,11 +396,14 @@ public class EventParser {
 		Object tmpObj = wb;
 		/* ---------------- Getting objects from different sources --------------------------*/
 		// Wenn das Schl¸sselwort "self vorkommt"
-		if(splitted.size() > 2 && splitted.get(0).equals("Players") &&  splitted.get(1).equals(""+playerId) && splitted.get(2).equals("object")) {
+		if(splitted.size() > 2 && splitted.get(0).equals(playerGroup.get(0))) {
+			// den verweis auf den Player removen
+			for(String key : playerGroup)
+				splitted.remove(0);
+			splitted.remove(0);
 			Log.i(Interpreter.LOGTAG, "Parse Object of Self");
+				
 			// auf Whiteboard des Spielers setzen und "Players" + ID lˆschen
-			splitted.remove(0);
-			splitted.remove(0);
 			tmpObj = (Whiteboard) ((Whiteboard)tmpObj).getAttribute(playerGroup, ""+playerId).value;
 		}
 		// wenn object in current state
@@ -404,6 +419,7 @@ public class EventParser {
 		//Wenn das Schl¸sselwort "Objekt" oder "Subject" vorkommt, werden dessen Attribute genutzt
 		if(splitted.size() > 0 && splitted.get(0).equals("object")){
 			
+			Log.i(Interpreter.LOGTAG, "Parsing Object of Self");
 			splitted.remove(0);
 			String[] keys = (String[]) splitted.toArray(new String[0]);
 
@@ -431,10 +447,7 @@ public class EventParser {
 				Log.e(Interpreter.LOGTAG,"Error: no objects(from trigger) in whiteboard in state "+state.getName()+ " trying currentState...");
 				Whiteboard currentState = null;
 				try{
-					if(playerGroup.size() > 1)
-						currentState = (Whiteboard)wb.getAttribute(playerGroup.get(0), playerGroup.get(1), ""+playerId,FsmManager.CURRENT_STATE).value;
-					else
-						currentState = (Whiteboard)wb.getAttribute(playerGroup.get(0), ""+playerId,FsmManager.CURRENT_STATE).value;
+					currentState = (Whiteboard)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
 					Object o = ((Whiteboard) ((Whiteboard)currentState.get("objects").value).get(0).value).getAttribute(keys);
 				}catch(Exception e){
 					Log.e(Interpreter.LOGTAG,"Error while getting objects from whiteboard in state ");
@@ -447,6 +460,7 @@ public class EventParser {
 			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).toString());
 			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).value.toString());
 			if(keys.length >0 ){
+				Log.i("Mistake", "Returning " + (String) ((Whiteboard)objects.get(""+0).value).getAttribute(keys).value);
 				return (String) ((Whiteboard)objects.get(""+0).value).getAttribute(keys).value;
 			}else{
 				return (WhiteboardEntry)objects.get(""+0);
@@ -470,25 +484,36 @@ public class EventParser {
 			return buffer.toString();
 		/* --------------------------everything with OwnGroup -------------------------------*/
 		} else if (splitted.size() > 0 && splitted.get(0).equals("ownGroup")) {
+			Log.i(Interpreter.LOGTAG, "Parsing ownGroup");
 			// get whiteboard of own group and remove the key
 			splitted.remove(0);
-			WhiteboardEntry ownGroup = wb.getAttribute(playerGroup);
+			WhiteboardEntry ownGroup = wb.getAttribute((String[]) playerGroup.toArray(new String[0]));
 		
 			if(splitted.size() > 0 && splitted.get(0).equals("enemy")) {
+				Log.i(Interpreter.LOGTAG, "Parsing ownGroup.enemy");
 				// get path to enemy
 				String pathToEnemy = (String)((Whiteboard)ownGroup.value).get("enemy").value;
 				// return enemy from wb
 				return wb.getAttribute(pathToEnemy.split("\\."));
 			// else return the value
+			} else if(splitted.size() > 1){
+				Log.i("Mistake", "Splitted Size ist: " + splitted.size());
+				Log.i("Mistake", "Splitted 0 ist: " + splitted.get(0));
+				return ((Whiteboard)ownGroup.value).getAttribute((String[]) splitted.toArray(new String[0]));
+			} else if(splitted.size() == 1){
+				Log.i("Mistake", "Splitted Size ist: " + splitted.size());
+				Log.i("Mistake", "Splitted 0 ist: " + splitted.get(0));
+				return ((Whiteboard)ownGroup.value).get(splitted.get(0));
 			} else {
-				return ((Whiteboard)ownGroup.value).get(splitted);
+				return ownGroup;
 			}
 		}
 		
 		//Ansonsten Daten aus dem Whiteboard holen
 		try{
-			Object o = wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
-			return  wb.getAttribute((String[]) splitted.toArray(new String[0])).value;
+			Whiteboard o = (Whiteboard)tmpObj;
+			Log.i("Mistake", o.toString());
+			return  ((Whiteboard)tmpObj).getAttribute((String[]) splitted.toArray(new String[0])).value;
 		}catch(NullPointerException e){
 			Log.d(Interpreter.LOGTAG,"Could not parse param ["+param+"], returning itself");
 			return param;
