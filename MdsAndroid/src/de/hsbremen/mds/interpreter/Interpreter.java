@@ -210,7 +210,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			}
 			// only checkWBCond if Action is not miniGame, miniGame WBconds will be checked later
 			if (!isMiniGame)
-				fsmManager.checkWBCondition();
+				fsmManager.checkEvents(null);;
 			
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","health").value);
 			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","inventory").value);
