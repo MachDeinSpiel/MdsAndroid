@@ -178,15 +178,15 @@ public class GameLobby extends Activity implements WebServicesInterface,
 					}
 					if (json.getString("mode").equals("full")) {
 
-								// Fullwhiteboardupdate (Spiel wurde gestartet)
-								Intent intent = new Intent(GameLobby.this,
-										MainActivity.class);
-								intent.putExtra("username", username);
-								intent.putExtra("json", json.toString());
-								intent.putExtra("spielejson", spielejson);
-								intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-								getApplicationContext().startActivity(intent);
-								finish();
+						// Fullwhiteboardupdate (Spiel wurde gestartet)
+						Intent intent = new Intent(GameLobby.this,
+								MainActivity.class);
+						intent.putExtra("username", username);
+						intent.putExtra("json", json.toString());
+						intent.putExtra("spielejson", spielejson);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						getApplicationContext().startActivity(intent);
+						finish();
 					}
 					if (json.get("mode").equals("gametemplates")
 							|| json.get("mode").equals("activegames")) {
@@ -196,6 +196,19 @@ public class GameLobby extends Activity implements WebServicesInterface,
 						myIntent.putExtra("json", json.toString());
 						GameLobby.this.startActivity(myIntent);
 						finish();
+					}
+					if (json.getString("mode").equals("error")) {
+						runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								Toast toast = Toast.makeText(
+										getApplicationContext(), message,
+										Toast.LENGTH_LONG);
+								toast.show();
+
+							}
+						});
 					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block

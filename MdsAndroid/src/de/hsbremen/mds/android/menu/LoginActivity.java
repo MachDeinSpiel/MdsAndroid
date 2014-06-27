@@ -112,16 +112,25 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				progress.setTitle(message);
-				progress.setIcon(R.drawable.bomb);
-				progress.setIconAttribute(RESULT_OK);
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(success){
+					progress.setTitle(message);
+					progress.setIcon(R.drawable.bomb);
+					progress.setIconAttribute(RESULT_OK);
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					progress.dismiss();
+				} else {
+					progress.dismiss();
+					
+					Toast toast = Toast.makeText(getApplicationContext(),
+							message,
+							Toast.LENGTH_LONG);
+					toast.show();
 				}
-				progress.dismiss();
 				
 			}
 		}).start();
