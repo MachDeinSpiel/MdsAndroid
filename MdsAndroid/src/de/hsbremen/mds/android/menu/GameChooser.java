@@ -230,9 +230,9 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 	protected void stopLoadingScreen(final String message, final boolean success) {
 		if (success) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
+//			new Thread(new Runnable() {
+//				@Override
+//				public void run() {
 					progress.setMessage(message);
 					progress.setIcon(R.drawable.bomb);
 					progress.setIconAttribute(RESULT_OK);
@@ -243,8 +243,8 @@ public class GameChooser extends Activity implements WebServicesInterface {
 						e.printStackTrace();
 					}
 					progress.dismiss();
-				}
-			}).start();
+//				}
+//			}).start();
 		} else {
 			progress.dismiss();
 
