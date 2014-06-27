@@ -1,4 +1,4 @@
-package de.hsbremen.mds.android.login;
+package de.hsbremen.mds.android.menu;
 
 public interface KickPlayerListener {
 

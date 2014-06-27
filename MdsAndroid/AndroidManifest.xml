@@ -32,7 +32,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="de.hsbremen.mds.android.login.GameLobby"
+            android:name="de.hsbremen.mds.android.menu.GameLobby"
             android:label="@string/app_name" >
         </activity>
         <activity
@@ -40,7 +40,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="de.hsbremen.mds.android.login.LoginActivity"
+            android:name="de.hsbremen.mds.android.menu.LoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.hsbremen.mds.android.login.GameChooser"
+            android:name="de.hsbremen.mds.android.menu.GameChooser"
             android:label="@string/app_name" >
         </activity>
 

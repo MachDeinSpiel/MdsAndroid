@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.hsbremen.mds.android.login;
+package de.hsbremen.mds.android.menu;
 
 import java.io.File;
 import java.util.Vector;
