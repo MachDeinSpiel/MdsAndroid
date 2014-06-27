@@ -19,8 +19,6 @@ import de.hsbremen.mds.mdsandroid.R;
 
 public class FragmentGameReaction extends Fragment{
 	
-	private static final int MINSCORE = 2;
-
 	private List<Button> buttonList = new ArrayList<Button>();
 	private List<Integer> shotList = new ArrayList<Integer>();
 	private TextView timer;
@@ -95,11 +93,8 @@ public class FragmentGameReaction extends Fragment{
 		 		 
 			 	 int returnValue = calculateScore();
 			 	 
-		 		 if(score >= MINSCORE){
-			 		 mA.interpreterCom.onGameResult(true, "Puzzle");
-		 		 }else{
-		 			mA.interpreterCom.onGameResult(false, "Puzzle");
-		 		 }
+			 	 mA.interpreterCom.onGameResult(returnValue, "Puzzle");
+
 		     }
 		  }.start();
 		
@@ -187,7 +182,7 @@ public class FragmentGameReaction extends Fragment{
 	}	
 	
 	private int calculateScore(){
-		int score = 0;
+		int returnScore = 0;
 		
 		if(this.score == 0){
 			return -10;
@@ -201,6 +196,6 @@ public class FragmentGameReaction extends Fragment{
 			return 10;
 		}
 		
-		return score;
+		return returnScore;
 	}
 }

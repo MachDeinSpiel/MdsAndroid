@@ -85,8 +85,8 @@ public class InterpreterCommunicator {
 			fullUpdateLocalWhiteboard(wObj);
 	}
 	
-	public void onGameResult(boolean hasWon, String identifier){
-		this.interpreter.onGameResult(hasWon, identifier);
+	public void onGameResult(int points, String identifier){
+		this.interpreter.onGameResult(points, identifier);
 	}
 
 }
