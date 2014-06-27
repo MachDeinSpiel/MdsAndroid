@@ -160,11 +160,9 @@ public class ActionParser {
 						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("pathKey").value+"]) to group [" 
 								+ parsedParams.get("group").toString()+ " + " + (String)((Whiteboard)target.value).get("pathKey").value +"]");
 						
-						// tell the server
-						sii.onWhiteboardUpdate(keysToValue, copy);
-						
 						// wenn die Gruppe Inventory war, füge dem Backpack hinzu
 						if(groupKeys[groupKeys.length-1].equals("inventory")) {
+							((Whiteboard)copy.value).get("visibility").value = "none";
 							Log.i(Interpreter.LOGTAG, "Adding Item to Backpack");
 							// create item
 							Log.i("Mistake", "Title: " +((Whiteboard)target.value).get("title").value.toString());
@@ -175,6 +173,10 @@ public class ActionParser {
 							// and tell server to add in backpack
 							guiInterface.addToBackpack(item);
 						}
+						
+						// tell the server
+						sii.onWhiteboardUpdate(keysToValue, copy);
+						
 						// update Map view
 						changeMapEntities(guiInterface, wb);
 
@@ -193,20 +195,50 @@ public class ActionParser {
 					
 					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
 					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
+					Log.i("Mistake", "Group is: " + currentWb.toString());
 					String[] keys = ((String)params.get("target")).split("\\.");
-					WhiteboardEntry result = currentWb.remove(keys[keys.length-1]);
-					
-					Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
-					// server bescheid geben
-					List<String> keysToValue = new Vector<String>();
-					for(String s : ((String)params.get("target")).split("\\."))
-						keysToValue.add(s);
+					WhiteboardEntry result;
 					try {
-						sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
-					} catch (InvalidWhiteboardEntryException e) {
-						e.printStackTrace();
+						// only gives result when path is directly written (e.g. Bombs.Bomb1)
+						result = currentWb.remove(keys[keys.length-1]);
+						Log.i("Mistake", "Target-Key: " + keys[keys.length-1]);
+						Log.i("Mistake", "result is: " + result.toString());
+						Log.i("Mistake", "result is: " + result.value.toString());
+						
+						Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
+						// server bescheid geben
+						List<String> keysToValue = new Vector<String>();
+						for(String s : ((String)params.get("target")).split("\\."))
+							keysToValue.add(s);
+						try {
+							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
+						} catch (InvalidWhiteboardEntryException e) {
+							e.printStackTrace();
+						}
+						changeMapEntities(guiInterface, wb);
+					} catch (NullPointerException npe) {
+						// otherwise we use the parsed value
+						Log.i(Interpreter.LOGTAG, "Removing an Object");
+						
+						String key = (String) parsedParams.get("target");
+						Log.i("Mistake", "Parsed Key: " + key);
+						Log.i("Mistake", "Group is: " + currentWb.toString());
+						result = currentWb.remove(key);
+						Log.i("Mistake", "result is: " + result.toString());
+						Log.i("Mistake", "result is: " + result.value.toString());
+						
+						Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+key+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
+						// server bescheid geben
+						List<String> keysToValue = new Vector<String>();
+						for(String s : ((String)params.get("target")).split("\\."))
+							keysToValue.add(s);
+						try {
+							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
+						} catch (InvalidWhiteboardEntryException e) {
+							e.printStackTrace();
+						}
+						changeMapEntities(guiInterface, wb);
 					}
-					changeMapEntities(guiInterface, wb);
 					
 				}
 			};
@@ -327,7 +359,7 @@ public class ActionParser {
 		
 	}
 		
-	public void parseGameResult(Whiteboard whiteboard, boolean hasWon, String identifier, List<String> playerGroup, String myId) {
+	public boolean parseGameResult(Whiteboard whiteboard,  int points, String identifier, List<String> playerGroup, String myId) {
 		Log.i(Interpreter.LOGTAG, "Parsing Game Result");
 		// actions des aktuellen States nach identifier durchgucken
 		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(playerGroup, ""+myId).value.toString());
@@ -343,28 +375,32 @@ public class ActionParser {
 					
 					for(GameResult result : results) {
 						String[] attributes = ((String)EventParser.parseParam(result.attribute, state, whiteboard, playerGroup, myId)).split("\\.");
-						if (hasWon) {
+						int minPoints = result.minScore;
+						if (minPoints <= points) {
 							if(result.setWin != null) {
 								whiteboard.getAttribute(attributes).value = result.setWin;
 							}
-							if(result.addResult != 0) {
+							if(result.addResult != null) {
 								double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
-								value += result.addResult;
+								value += points;
 								whiteboard.getAttribute(attributes).value = value;
 							}
+							return true;
 						} else {
 							if(result.setLoose != null)
 								whiteboard.getAttribute(attributes).value = result.setLoose;
-							if(result.addResult != 0) {
+							if(result.addResult != null) {
 								double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
-								value -= result.addResult;
+								value -= points;
 								whiteboard.getAttribute(attributes).value = value;
 							}
+							return false;
 						}
 					}
 				}
 			}
 		}
+		return false;
 		// no key = identifier found
 	}
 	

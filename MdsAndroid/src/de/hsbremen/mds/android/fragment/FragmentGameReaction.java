@@ -66,6 +66,8 @@ public class FragmentGameReaction extends Fragment{
 	
 	private void startGameTimer(int time) {
 		
+		resetGame();
+		
 		timer = (TextView)getActivity().findViewById(R.id.timer);
 		
 		 new CountDownTimer(time, 1000) {
@@ -84,6 +86,9 @@ public class FragmentGameReaction extends Fragment{
 		 			lb.setOnClickListener(null);
 		 			lb.setBackgroundResource(R.drawable.reactiongamebutton);       
 		 	     }
+		 	     
+		 	     buttonList.clear();
+		 	     
 		 		 timer.setBackgroundColor(Color.GREEN);  
 		 		 
 		 		 MainActivity mA = (MainActivity)getActivity();
@@ -182,20 +187,23 @@ public class FragmentGameReaction extends Fragment{
 	}	
 	
 	private int calculateScore(){
-		int returnScore = 0;
 		
 		if(this.score == 0){
-			return -10;
-		}else if(this.score < 1){
-			return -5;
-		}else if(this.score < 3){
 			return 0;
+		}else if(this.score < 1){
+			return 1;
+		}else if(this.score < 3){
+			return 4;
 		}else if(this.score < 5){
-			return 5;
+			return 7;
 		}else if(this.score >= 5){
 			return 10;
 		}
 		
-		return returnScore;
+		return 0;
+	}
+	
+	private void resetGame(){
+		
 	}
 }
