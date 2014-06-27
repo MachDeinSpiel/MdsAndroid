@@ -106,7 +106,7 @@ public class FragmentInventory extends Fragment{
 						MainActivity activity = (MainActivity) getActivity();
 						Button b = (Button)v;
 						System.out.println("buttontext : " + b.getText().toString());
-//						activity.interpreterCom.useItem(itemList.get(itemPosition), b.getText().toString());
+						activity.interpreterCom.useItem(itemList.get(itemPosition), b.getText().toString());
 						itemList.remove(itemPosition);
 						updateItemlist();
 						dialog.dismiss();
