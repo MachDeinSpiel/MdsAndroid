@@ -109,10 +109,10 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 	}
 
 	protected void stopLoadingScreen(final String message, final boolean success) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				if(success){
+		if (success) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
 					progress.setTitle(message);
 					progress.setIcon(R.drawable.bomb);
 					progress.setIconAttribute(RESULT_OK);
@@ -123,17 +123,16 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 						e.printStackTrace();
 					}
 					progress.dismiss();
-				} else {
-					progress.dismiss();
-					
-					Toast toast = Toast.makeText(getApplicationContext(),
-							message,
-							Toast.LENGTH_LONG);
-					toast.show();
 				}
-				
-			}
-		}).start();
+			}).start();
+		} else {
+			progress.dismiss();
+
+			Toast toast = Toast.makeText(getApplicationContext(), message,
+					Toast.LENGTH_LONG);
+			toast.show();
+		}
+
 	}
 
 	@Override
@@ -158,8 +157,8 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 					@Override
 					public void run() {
-						LoginActivity.this
-								.stopLoadingScreen("Login successfull", true);
+						LoginActivity.this.stopLoadingScreen(
+								"Login successfull", true);
 
 						Intent myIntent = new Intent(LoginActivity.this,
 								GameChooser.class);
@@ -206,7 +205,8 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 				@Override
 				public void run() {
-					stopLoadingScreen("Server konnte nicht erreicht werden", false);
+					stopLoadingScreen("Server konnte nicht erreicht werden",
+							false);
 
 				}
 			});
@@ -221,8 +221,8 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 			@Override
 			public void run() {
-				LoginActivity.this
-						.stopLoadingScreen("Server konnte nicht erreicht werden", false);
+				LoginActivity.this.stopLoadingScreen(
+						"Server konnte nicht erreicht werden", false);
 
 			}
 		});
