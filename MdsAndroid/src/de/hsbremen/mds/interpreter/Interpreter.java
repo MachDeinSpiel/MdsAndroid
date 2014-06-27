@@ -183,7 +183,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			
 			// endAction of LastState
 			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
-			Log.i(LOGTAG, "Executing Action");
+			Log.i(LOGTAG, "Executing End-Action");
 			if(endAction != null){
 				endAction.execute(gui);
 				if (endAction instanceof MdsMiniAppAction) isMiniGame = true;
@@ -193,7 +193,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				MdsActionExecutable startActionExec = actionParser.parseAction("start", startAction, 
 																		  ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"",FsmManager.LAST_STATE).value)), whiteboard, 
 																		   fsmManager.getOwnGroup(), myId, serverInterpreter);
-				Log.i(LOGTAG, "Executing Action");
+				Log.i(LOGTAG, "Executing Start-Action");
 				if(startActionExec != null){
 					startActionExec.execute(gui);
 					if (startActionExec instanceof MdsMiniAppAction) isMiniGame = true;
@@ -203,7 +203,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			MdsActionExecutable doAction = actionParser.parseAction("do", ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","currentState").value)).getDoAction(), ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"",FsmManager.LAST_STATE).value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			if (doAction instanceof MdsMiniAppAction) isMiniGame = true;
 			
-			Log.i(LOGTAG, "Executing Action");
+			Log.i(LOGTAG, "Executing Do-Action");
 			
 			if(doAction != null){
 				doAction.execute(gui);
@@ -413,12 +413,12 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 
 	@Override
-	public void onGameResult(boolean hasWon, String identifier) {
+	public void onGameResult(int points, String identifier) {
 		Log.i(LOGTAG, "OnGameResult");
-		actionParser.parseGameResult(whiteboard, hasWon, identifier, fsmManager.getOwnGroup(), myId);
+		boolean won = actionParser.parseGameResult(whiteboard, points, identifier, fsmManager.getOwnGroup(), myId);
 		String text;
-		Log.i("Mistake", "Der Spieler hat gewonnen: " + hasWon);
-		if (hasWon)
+		Log.i("Mistake", "Der Spieler hat gewonnen: " + points);
+		if (won)
 			text = "Super du hast das Spiel gewonnen.";
 		else
 			text = "Du hast das Spiel leider veroren";	

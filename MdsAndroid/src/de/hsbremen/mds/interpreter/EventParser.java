@@ -275,7 +275,9 @@ public class EventParser {
 
 					if(parsedParam instanceof String) {
 						String[] paramsSplitted = ((String)parsedParam).split("\\.");
+						Log.i("Mistake", "CompValue is String");
 						if(paramsSplitted[paramsSplitted.length-1].equals("length")){
+							Log.i("Mistake", "Length");
 							//Wenn die Länge abgefragt werden soll
 							//Entferne "length" aus den Parametern
 							List<String> temp = new Vector<String>(Arrays.asList(paramsSplitted));
@@ -285,6 +287,7 @@ public class EventParser {
 							compValue = ((Whiteboard)wb.getAttribute((String[]) temp.toArray(new String[0])).value).entrySet().size();
 						// sonst ist der Parsed direkt der Value
 						}else{
+							Log.i("Mistake", "Just String");
 							oCompValue = (String)parsedParam;
 							Log.i("Mistake", "oCompValue ist: " + oCompValue);
 							Log.i("Mistake", "WB ist: " + wb);
@@ -499,11 +502,12 @@ public class EventParser {
 			} else if(splitted.size() > 1){
 				Log.i("Mistake", "Splitted Size ist: " + splitted.size());
 				Log.i("Mistake", "Splitted 0 ist: " + splitted.get(0));
-				return ((Whiteboard)ownGroup.value).getAttribute((String[]) splitted.toArray(new String[0]));
+				return ((Whiteboard)ownGroup.value).getAttribute((String[]) splitted.toArray(new String[0])).value;
 			} else if(splitted.size() == 1){
 				Log.i("Mistake", "Splitted Size ist: " + splitted.size());
 				Log.i("Mistake", "Splitted 0 ist: " + splitted.get(0));
-				return ((Whiteboard)ownGroup.value).get(splitted.get(0));
+				Log.i("Mistake", "Returning: " + ((Whiteboard)ownGroup.value).get(splitted.get(0)).value.toString());
+				return ((Whiteboard)ownGroup.value).get(splitted.get(0)).value;
 			} else {
 				return ownGroup;
 			}
@@ -513,6 +517,7 @@ public class EventParser {
 		try{
 			Whiteboard o = (Whiteboard)tmpObj;
 			Log.i("Mistake", o.toString());
+			Log.i("Mistake", "Returning " + ((Whiteboard)tmpObj).getAttribute((String[]) splitted.toArray(new String[0])).value);
 			return  ((Whiteboard)tmpObj).getAttribute((String[]) splitted.toArray(new String[0])).value;
 		}catch(NullPointerException e){
 			Log.d(Interpreter.LOGTAG,"Could not parse param ["+param+"], returning itself");

@@ -248,8 +248,9 @@ public class Parser {
 			String attribute = null;
 			String setWin = null;
 			String setLoose = null;
-			double addResult = 0;
+			String addResult = null;
 			double factor = 1;
+			int minScore = -10;
 			Set<String> keySet = result.keySet();
 			
 			// die param werte aus dem KeySet werden dem params HashMap übergeben
@@ -261,11 +262,13 @@ public class Parser {
 				else if(key.equals("setLoose"))
 					setLoose = result.get(key).toString();
 				else if(key.equals("addResult"))
-					addResult = Double.parseDouble(result.get(key).toString());
+					addResult = result.get(key).toString();
 				else if(key.equals("factor"))
 					factor = Double.parseDouble(result.get(key).toString());
+				else if(key.equals("minScore"))
+					minScore = Integer.parseInt(result.get(key).toString());
 			}
-			gameResults[i] = new GameResult(attribute, setWin, setLoose, addResult, factor);
+			gameResults[i] = new GameResult(attribute, setWin, setLoose, addResult, factor, minScore);
 		}
 		return gameResults;
 	}
