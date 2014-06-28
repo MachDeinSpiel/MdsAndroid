@@ -204,6 +204,6 @@ public class FragmentGameReaction extends Fragment{
 	}
 	
 	private void resetGame(){
-		
+		this.score = 0;
 	}
 }
