@@ -64,6 +64,8 @@ public class EventParser {
 				// Locationobjekt des Spielers erzeuegen
 				Log.i("Mistake", "PlayerWb von Spieler " + playerId + "ist:" + wb.getAttribute(playerGroup, playerId).value.toString());
 				try {
+					Log.i("Mistake", (String) wb.getAttribute(playerGroup, playerId, "longitude").value);
+					Log.i("Mistake", (String) wb.getAttribute(playerGroup, playerId, "latitude").value);
 					double longitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "longitude").value);
 					double latitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "latitude").value);
 					Location playerLoc = new Location("PlayerLoc");
@@ -460,7 +462,7 @@ public class EventParser {
 				}
 			}
 			Log.i(Interpreter.LOGTAG, "parseParam: objectsSize: "+objects.size());
-			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).toString());
+			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.toString());
 			Log.i(Interpreter.LOGTAG, "parseParam: object[0] "+objects.get(""+0).value.toString());
 			if(keys.length >0 ){
 				Log.i("Mistake", "Returning " + (String) ((Whiteboard)objects.get(""+0).value).getAttribute(keys).value);
@@ -518,7 +520,7 @@ public class EventParser {
 			Whiteboard o = (Whiteboard)tmpObj;
 			Log.i("Mistake", o.toString());
 			Log.i("Mistake", "Returning " + ((Whiteboard)tmpObj).getAttribute((String[]) splitted.toArray(new String[0])).value);
-			return  ((Whiteboard)tmpObj).getAttribute((String[]) splitted.toArray(new String[0])).value;
+			return  ((Whiteboard)tmpObj).getAttribute((String[]) splitted.toArray(new String[0]));
 		}catch(NullPointerException e){
 			Log.d(Interpreter.LOGTAG,"Could not parse param ["+param+"], returning itself");
 			return param;

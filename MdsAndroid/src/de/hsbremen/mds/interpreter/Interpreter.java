@@ -209,7 +209,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				doAction.execute(gui);
 			}
 			// only checkWBCond if Action is not miniGame, miniGame WBconds will be checked later
-			if (!isMiniGame)
+			if (!isMiniGame && !((String)whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "longitude").value).equals("null")
+				&& fsmManager.getCurrentState().getTransitions() != null)
 				fsmManager.checkEvents(null);;
 			
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","health").value);
@@ -415,13 +416,32 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	@Override
 	public void onGameResult(int points, String identifier) {
 		Log.i(LOGTAG, "OnGameResult");
-		boolean won = actionParser.parseGameResult(whiteboard, points, identifier, fsmManager.getOwnGroup(), myId);
+		boolean won = false;
+		MdsState state = (MdsState)whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, FsmManager.CURRENT_STATE).value;
+		// get all stateActions
+		for(MdsAction startAction :state.getStartAction()) {
+			if(actionParser.parseGameResult(whiteboard, startAction, state, points, identifier, fsmManager.getOwnGroup(), ""+myId)) {
+				won = true;
+				break;
+			}
+		}
+		// do actions, if not already won
+		if (!won && state.getDoAction() != null) {
+			won = actionParser.parseGameResult(whiteboard, state.getDoAction(), state, points, identifier, fsmManager.getOwnGroup(), ""+myId);
+		}
+		// end result, if not already won
+		if (!won && state.getEndAction() != null) {
+			won = actionParser.parseGameResult(whiteboard, state.getEndAction(), state, points, identifier, fsmManager.getOwnGroup(), ""+myId);
+		}
 		String text;
-		Log.i("Mistake", "Der Spieler hat gewonnen: " + points);
-		if (won)
+		if (won) {
 			text = "Super du hast das Spiel gewonnen.";
-		else
-			text = "Du hast das Spiel leider veroren";	
+			Log.i("Mistake", "Der Spieler hat gewonnen: " + points);
+		}
+		else {
+			text = "Du hast das Spiel leider verloren";
+			Log.i("Mistake", "Der Spieler hat verloren: " + points);
+		}
 		List<String> buttons = new Vector<String>();
 		buttons.add("back");
 		MdsActionExecutable action = new MdsTextAction("showText", text, buttons);

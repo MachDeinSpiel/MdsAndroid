@@ -139,14 +139,15 @@ public class ActionParser {
 					Log.i(Interpreter.LOGTAG, "Target found");
 					
 					// create copy of object
-					if(target == null) Log.e(Interpreter.LOGTAG, "Target Null");
+					if(target == null) Log.e(Interpreter.LOGTAG, "Target bei AddtoGroup Null");
 					//Log.i(Interpreter.LOGTAG, "Keys sind" + keys[0] + keys[1] + ((keys[2] != null) ? keys[2] : "kein dritter key"));
 					WhiteboardEntry copy;
 					try {
 						copy = new WhiteboardEntry(target.value, target.visibility);
 						// fill new Element into Whiteboard
 						// get group
-						Whiteboard group = (Whiteboard) parsedParams.get("group");
+						Log.i(Interpreter.LOGTAG, "Getting group in AddToGroup");
+						Whiteboard group = (Whiteboard) ((WhiteboardEntry)parsedParams.get("group")).value;
 						String[] groupKeys = ((String)params.get("group")).split("\\.");
 						
 						// immer gruppe + name für server
@@ -170,7 +171,7 @@ public class ActionParser {
 							Log.i("Mistake", "pathKey: " + ((Whiteboard)target.value).get("pathKey").value.toString());
 							MdsItem item = new MdsItem(((Whiteboard)target.value).get("title").value.toString(), ((Whiteboard)target.value).get("imagePath").value.toString(), 
 													   ((Whiteboard)target.value).get("pathKey").value.toString());
-							// and tell server to add in backpack
+							// and tell android to add in backpack
 							guiInterface.addToBackpack(item);
 						}
 						
@@ -194,7 +195,7 @@ public class ActionParser {
 				public void execute(GuiInterface guiInterface) {
 					
 					//List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("group")).split("\\.")));
-					Whiteboard currentWb = (Whiteboard)parsedParams.get("group");//parseActionString(wb, keysToValue, state, myId);
+					Whiteboard currentWb = (Whiteboard)((WhiteboardEntry)parsedParams.get("group")).value;//parseActionString(wb, keysToValue, state, myId);
 					Log.i("Mistake", "Group is: " + currentWb.toString());
 					String[] keys = ((String)params.get("target")).split("\\.");
 					WhiteboardEntry result;
@@ -204,6 +205,13 @@ public class ActionParser {
 						Log.i("Mistake", "Target-Key: " + keys[keys.length-1]);
 						Log.i("Mistake", "result is: " + result.toString());
 						Log.i("Mistake", "result is: " + result.value.toString());
+						
+						// aus dem Backpack removen wenn inventory
+						Log.i("Mistake", "Dies sollte die Gruppe sein: " + keys[keys.length-2]);
+						if(keys[keys.length-2].equals("inventory") && !keys[keys.length-1].equals("dummy")) {
+							Log.i(Interpreter.LOGTAG, "Removing Item from Backpack");
+							guiInterface.removeFromBackpack(keys[keys.length-1]);
+						}
 						
 						Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
 						// server bescheid geben
@@ -359,43 +367,40 @@ public class ActionParser {
 		
 	}
 		
-	public boolean parseGameResult(Whiteboard whiteboard,  int points, String identifier, List<String> playerGroup, String myId) {
+	public boolean parseGameResult(Whiteboard whiteboard, MdsAction action, MdsState state, int points, String identifier, List<String> playerGroup, String myId) {
 		Log.i(Interpreter.LOGTAG, "Parsing Game Result");
 		// actions des aktuellen States nach identifier durchgucken
 		Log.i("Mistake", "Player Whiteboard ist: " + whiteboard.getAttribute(playerGroup, ""+myId).value.toString());
-		MdsState state= (MdsState)whiteboard.getAttribute(playerGroup, ""+myId, FsmManager.CURRENT_STATE).value;
-		for(MdsAction startAction : state.getStartAction()) {
-			HashMap<String, Object> actionParams = startAction.getParams();
-			// search in Params for identifier
-			for(String key : actionParams.keySet()) {
-				if(key.equals("type") && actionParams.get(key).equals(identifier)) {
-					// get Result Object
-					GameResult[] results = (GameResult[]) actionParams.get("result");
-					// get Key to the attribute that has 2 be changed
-					
-					for(GameResult result : results) {
-						String[] attributes = ((String)EventParser.parseParam(result.attribute, state, whiteboard, playerGroup, myId)).split("\\.");
-						int minPoints = result.minScore;
-						if (minPoints <= points) {
-							if(result.setWin != null) {
-								whiteboard.getAttribute(attributes).value = result.setWin;
-							}
-							if(result.addResult != null) {
-								double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
-								value += points;
-								whiteboard.getAttribute(attributes).value = value;
-							}
-							return true;
-						} else {
-							if(result.setLoose != null)
-								whiteboard.getAttribute(attributes).value = result.setLoose;
-							if(result.addResult != null) {
-								double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
-								value -= points;
-								whiteboard.getAttribute(attributes).value = value;
-							}
-							return false;
+		HashMap<String, Object> actionParams = action.getParams();
+		// search in Params for identifier
+		for(String key : actionParams.keySet()) {
+			if(key.equals("type") && actionParams.get(key).equals(identifier)) {
+				// get Result Object
+				GameResult[] results = (GameResult[]) actionParams.get("result");
+				// get Key to the attribute that has 2 be changed
+				
+				for(GameResult result : results) {
+					String[] attributes = ((String)EventParser.parseParam(result.attribute, state, whiteboard, playerGroup, myId)).split("\\.");
+					int minPoints = result.minScore;
+					if (minPoints <= points) {
+						if(result.setWin != null) {
+							whiteboard.getAttribute(attributes).value = result.setWin;
 						}
+						if(result.addResult != null) {
+							double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
+							value += points;
+							whiteboard.getAttribute(attributes).value = value;
+						}
+						return true;
+					} else {
+						if(result.setLoose != null)
+							whiteboard.getAttribute(attributes).value = result.setLoose;
+						if(result.addResult != null) {
+							double value = Double.parseDouble((String)whiteboard.getAttribute(attributes).value);
+							value -= points;
+							whiteboard.getAttribute(attributes).value = value;
+						}
+						return false;
 					}
 				}
 			}

@@ -315,9 +315,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void removeFromBackpack(MdsItem item) {
+	public void removeFromBackpack(String itemPathKey) {
 		FragmentInventory f = (FragmentInventory) swipeAdapter.getFragment("inventory");
-		f.removeItem(item);
+		f.removeItem(itemPathKey);
 	}
 
 	@Override

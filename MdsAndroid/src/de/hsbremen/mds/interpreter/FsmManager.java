@@ -4,6 +4,7 @@ package de.hsbremen.mds.interpreter;
 import java.util.List;
 
 import android.util.Log;
+import de.hsbremen.mds.common.valueobjects.statemachine.MdsCondition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsState;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition;
 import de.hsbremen.mds.common.valueobjects.statemachine.MdsTransition.EventType;
@@ -190,6 +191,16 @@ public class FsmManager {
 				// if both results are fullfilled set true
 				result = (result && result2) ? true : false;
 				break;
+			case multiplewhiteboardEvent:
+				result = true;
+				// go through all conditions and set res to false if one is false
+				for(MdsCondition cond : t.getCondition()) {
+					if (!EventParser.checkWhiteboardEvent(cond, wb, ownGroup, myID)) {
+						result = false;
+						break;
+					}
+				}
+				break;
 			default:
 				//TODO: Fehler abfangen
 				result = false;
@@ -197,7 +208,7 @@ public class FsmManager {
 			}
 				
 			if(result){
-				
+				Log.i(Interpreter.LOGTAG, "Result is true, changing state");
 				this.setState(getCurrentState(), LAST_STATE);
 				this.setState(t.getTarget(), CURRENT_STATE);
 

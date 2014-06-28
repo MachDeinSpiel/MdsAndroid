@@ -317,6 +317,8 @@ public class Parser {
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.locationWhiteboardEvent);
 			else if(event.equals("uiWhiteboardEvent"))
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.uiWhiteboardEvent);
+			else if(event.equals("multipleWhiteboardEvent"))
+				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.multiplewhiteboardEvent);
 			allTrans[j].setConditions(conditionsArray);
 		}
 		return allTrans;

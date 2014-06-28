@@ -156,15 +156,15 @@ public class FragmentInventory extends Fragment{
 		updateItemlist();
 	}
 	
-	public void removeItem(MdsItem item){
-		itemList.remove(findItemInList(item));
+	public void removeItem(String itemPathKey){
+		itemList.remove(findItemInList(itemPathKey));
 		updateItemlist();
 	}
 	
-	private int findItemInList(MdsItem item){
+	private int findItemInList(String itemPathKey){
 		int itemIndex = 0;
 		for(MdsItem i : itemList){
-			if(item.getPathKey().equals(i.getPathKey())){
+			if(itemPathKey.equals(i.getPathKey())){
 				return itemIndex;
 			}
 			itemIndex++;
