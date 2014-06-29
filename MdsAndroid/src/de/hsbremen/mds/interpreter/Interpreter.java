@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import com.google.android.gms.internal.ax;
+
 import android.util.Log;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.common.interfaces.ClientInterpreterInterface;
@@ -270,78 +272,119 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	public void useItem(MdsItem item, String identifier) {
 		// use item
 		if(identifier.equals("use")) {
-			Log.i(LOGTAG, "User is using an item");
-			// get Item
-			WhiteboardEntry wbItem = whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey());
-			// get useAction
-			WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
-			for (String key : ((Whiteboard)useAction.value).keySet()) {
-				Log.i(LOGTAG, "Executing Action Use: " + key + " of Item " + item.getImagePath());
-				// get Action
-				WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get(key);
-				
-				// get Params
-				HashMap<String, Object> params = new HashMap<String, Object>();
-				for(String actionParam : ((Whiteboard)wbAction.value).keySet()) {
-					Log.i(LOGTAG, "Adding Param " + actionParam + " to Action");
-					// bei removeFrom Group muss das Inventory als Group angegeben werden
-					if (key.equals("removeFromGroup") && actionParam.equals("group"))
-						params.put("group", "self.inventory");
-					else
-						params.put(actionParam, (String)((Whiteboard)wbAction.value).get(actionParam).value);
-				}
-
-				// parse Action
-				MdsActionIdent ident = null;
-				if (key.equals("changeAttribute"))
-					ident = MdsActionIdent.changeAttribute;
-				else if (key.equals("removeFromGroup"))
-					ident = MdsActionIdent.removeFromGroup;
-				MdsAction action = new MdsAction(ident, params);
-				// TODO: Exceptions schreiben
-				if(ident == null) {
-					Log.e(LOGTAG, "No Action Ident found in Action " + key + ". Returning nothing");
-					return;
-				}
-				MdsState state = (MdsState)(whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value);
-				MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
-				
-				// execute Action if possible
-				if(actionExecute != null) {
-					actionExecute.execute(gui);
-				}
-				// Testausgabe
-				Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory").value.toString());
-				Log.i("Mistake", "Health des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "health").value);
-			}
+			doUseItem(item);
 		// remove item
 		} else if(identifier.equals("remove")) {
-			Log.i(LOGTAG, "User is removing an item");
-			// get Item
-			WhiteboardEntry wbItem = whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey());
-			// get useAction
-			WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
-			Log.i(LOGTAG, "Executing Action Remove of Item " + item.getImagePath());
-			// get Action
-			WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get("removeFromGroup");
-			if (wbAction == null) {
-				Log.e(LOGTAG, "No Action removeFromGroup Found in Item, returning nothing");
+			deleteBackpackItem(item);
+		} else if (identifier.equals("drop")) {
+			doDropItem(item);			
+		}
+				
+	}
+
+
+	private void doDropItem(MdsItem item) {
+		Log.i(LOGTAG, "User is dropping an item");
+		
+		// dropAction ausführen
+		Whiteboard wbItem = (Whiteboard)whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey()).value;
+		Whiteboard dropAction = (Whiteboard)wbItem.get("dropAction").value;
+		// jede Action ausführen
+		for(String action : dropAction.keySet()) {
+			Log.i("Mistake", "Action ist " + action);
+			Whiteboard wbAction = (Whiteboard)dropAction.get(action).value;
+			// get Params of Action
+			HashMap<String, Object> params = new HashMap<String, Object>();
+			for(String actionParam : wbAction.keySet()) {
+				Log.i("Mistake", "Adding Param " + actionParam);
+				params.put(actionParam, (String)wbAction.get(actionParam).value);
+			}
+			// create Action
+			MdsAction realAction;
+			if (action.equals("addToGroup")) {
+				Log.i("Mistake", "DropAction ist AddToGroup");
+				realAction = new MdsAction(MdsActionIdent.addToGroup, params);
+			} else if (action.equals("removeFromGroup")) {
+				realAction = new MdsAction(MdsActionIdent.removeFromGroup, params);
+			} else if (action.equals("changeAttribute")) {
+				realAction = new MdsAction(MdsActionIdent.changeAttribute, params);
+			} else if (action.equals("showImage")) {
+				realAction = new MdsAction(MdsActionIdent.showImage, params);
+			} else if (action.equals("showMap")) {
+				realAction = new MdsAction(MdsActionIdent.showMap, params);
+			} else if (action.equals("showText")) {
+				realAction = new MdsAction(MdsActionIdent.showText, params);
+			} else if (action.equals("showVideo")) {
+				realAction = new MdsAction(MdsActionIdent.showVideo, params);
+			} else if (action.equals("startMiniApp")) {
+				realAction = new MdsAction(MdsActionIdent.startMiniApp, params);
+			} else if (action.equals("updateMap")) {
+				realAction = new MdsAction(MdsActionIdent.updateMap, params);
+			} else if (action.equals("useItem")) {
+				realAction = new MdsAction(MdsActionIdent.useItem, params);
+			} else {
+				Log.e(LOGTAG, "Die DropAction konnte nicht identifiziert werden");
 				return;
 			}
+			// parse action
+			MdsActionExecutable actionExec = actionParser.parseAction("drop", realAction, fsmManager.getCurrentState(), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+			// and execute if not null
+			if (actionExec != null)
+				actionExec.execute(gui);
+		}
+		
+		// Testausgabe
+		Log.i("Mistake", "Flags ist: " + whiteboard.get("Flags").value);
+		
+		// Item aus dem Backpack removen
+		deleteBackpackItem(item);
+	}
+
+
+	private void deleteBackpackItem(MdsItem item) {
+		Log.i(LOGTAG, "User is removing an item");
+		// Item aus dem Backpack removen
+		Whiteboard inventory = (Whiteboard)whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory").value;
+		inventory.remove(item.getPathKey());		
+		// Testausgabe
+		Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory").value.toString());
+	}
+
+
+	private void doUseItem(MdsItem item) {
+		Log.i(LOGTAG, "User is using an item");
+		// get Item
+		WhiteboardEntry wbItem = whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey());
+		// get useAction
+		WhiteboardEntry useAction = ((Whiteboard)wbItem.value).get("useAction");
+		for (String key : ((Whiteboard)useAction.value).keySet()) {
+			Log.i(LOGTAG, "Executing Action Use: " + key + " of Item " + item.getImagePath());
+			// get Action
+			WhiteboardEntry wbAction = ((Whiteboard)useAction.value).get(key);
 			
 			// get Params
 			HashMap<String, Object> params = new HashMap<String, Object>();
 			for(String actionParam : ((Whiteboard)wbAction.value).keySet()) {
 				Log.i(LOGTAG, "Adding Param " + actionParam + " to Action");
-				if (actionParam.equals("group"))
+				// bei removeFrom Group muss das Inventory als Group angegeben werden
+				if (key.equals("removeFromGroup") && actionParam.equals("group"))
 					params.put("group", "self.inventory");
-				else 
+				else
 					params.put(actionParam, (String)((Whiteboard)wbAction.value).get(actionParam).value);
 			}
 
 			// parse Action
-			MdsActionIdent ident = MdsActionIdent.removeFromGroup;
+			MdsActionIdent ident = null;
+			if (key.equals("changeAttribute"))
+				ident = MdsActionIdent.changeAttribute;
+			else if (key.equals("removeFromGroup"))
+				ident = MdsActionIdent.removeFromGroup;
 			MdsAction action = new MdsAction(ident, params);
+			// TODO: Exceptions schreiben
+			if(ident == null) {
+				Log.e(LOGTAG, "No Action Ident found in Action " + key + ". Returning nothing");
+				return;
+			}
 			MdsState state = (MdsState)(whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value);
 			MdsActionExecutable actionExecute = actionParser.parseAction("user", action, state, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			
@@ -351,8 +394,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			}
 			// Testausgabe
 			Log.i("Mistake", "Inventory des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory").value.toString());
+			Log.i("Mistake", "Health des Spielers ist: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "health").value);
 		}
-				
 	}
 
 
@@ -401,7 +444,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 
 	@Override
 	public void dropItem(MdsItem item) {
-		// TODO Auto-generated method stub
 		
 	}
 

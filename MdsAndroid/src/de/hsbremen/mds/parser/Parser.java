@@ -125,10 +125,14 @@ public class Parser {
 				allMdsActions[i] = new MdsAction(MdsActionIdent.changeAttribute, defaults);
 			else if(ident.equals("useItem"))
 				allMdsActions[i] = new MdsAction(MdsActionIdent.useItem, defaults);
+			else if(ident.equals("dropItem"))
+				allMdsActions[i] = new MdsAction(MdsActionIdent.dropItem, defaults);
 			else if(ident.equals("updateMap"))
 				allMdsActions[i] = new MdsAction(MdsActionIdent.updateMap, defaults);
 			else if(ident.equals("startMiniApp"))
 				allMdsActions[i] = new MdsAction(MdsActionIdent.startMiniApp, defaults);
+			else
+				Log.e("Mistake", "Action Ident " + ident + " could not be resolved");
 			
 		}
 		return allMdsActions;
@@ -169,6 +173,7 @@ public class Parser {
 			MdsAction doMdsAction = null;
 			if(element.get("doAction") instanceof JSONObject) {
 				JSONObject doMdsActionObject = (JSONObject) element.get("doAction");
+				if(doMdsActionObject.get("name") == null) System.err.println("Do-Action in " + name + " is null");
 				doMdsAction = readAction(doMdsActionObject);
 			}
 			
@@ -179,6 +184,7 @@ public class Parser {
 				JSONArray sAction = (JSONArray) element.get("startAction");
 				for(int j = 0; j < sAction.size(); j++) {
 					JSONObject startAction = (JSONObject) sAction.get(j);
+					if(startAction.get("name") == null) System.err.println("Start-Action in " + name + " is null");
 					startActions.add(readAction(startAction));
 				}
 				
@@ -187,6 +193,7 @@ public class Parser {
 			ident = element.get("endAction").toString();
 			if(!ident.equals("null")) {
 				JSONObject eAction = (JSONObject) element.get("endAction");
+				if(eAction.get("name") == null) System.err.println("End-Action in " + name + " is null");
 				endAction = readAction(eAction);
 			}
 			
@@ -201,7 +208,7 @@ public class Parser {
 			
 			if(!element.get("transition").equals("null")) {
 				JSONArray transition = (JSONArray) element.get("transition");	// lesen des transition arrays aus der JSON datei
-				allTrans = readTransitions(transition);
+				allTrans = readTransitions(transition, (String)element.get("name"));
 			}
 			allMdsStates[i].setTransitions(allTrans); 
 		}
@@ -230,6 +237,8 @@ public class Parser {
 		}
 		
 		for(int j = 0; j < this.allMdsActions.length;j++) {
+			Log.i("Mistake", "MdsActionObject: " + MdsActionObject.get("name").toString());
+			Log.i("Mistake", "ActionIdent: " + this.allMdsActions[j].getIdent().toString());
 			if (MdsActionObject.get("name").toString().equals(this.allMdsActions[j].getIdent().toString())) {
 					mdsAction = new MdsAction(this.allMdsActions[j].getIdent(), this.allMdsActions[j].getParams());
 					if(defaults != null) {
@@ -273,7 +282,7 @@ public class Parser {
 		return gameResults;
 	}
 
-	private MdsTransition[] readTransitions(JSONArray transition) {
+	private MdsTransition[] readTransitions(JSONArray transition, String stateName) {
 		MdsTransition[] allTrans = new MdsTransition[transition.size()];	// die größe des arrays wird festgelegt
 		String event, nameTransition;
 		MdsState target = null;			// temp variablen
@@ -292,6 +301,7 @@ public class Parser {
 				
 				// transition/condition
 				String name = condition.get("name").toString();
+				if (name == null) System.err.println("Condition name ist null");
 				conditionsArray[i] = new MdsCondition(name, paramsHM);
 			}
 			
@@ -319,6 +329,8 @@ public class Parser {
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.uiWhiteboardEvent);
 			else if(event.equals("multipleWhiteboardEvent"))
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.multiplewhiteboardEvent);
+			else
+				System.err.println("Eventtype " + event + " could not be resolved in State " + stateName);
 			allTrans[j].setConditions(conditionsArray);
 		}
 		return allTrans;

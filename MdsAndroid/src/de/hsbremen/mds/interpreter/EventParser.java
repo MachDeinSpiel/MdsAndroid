@@ -142,51 +142,56 @@ public class EventParser {
 		}else if(cond.getName().equals("!nearby")) {
 			// wenn das Subject "self" ist, im Einzelspieler immer
 			if(subject.getName().equals("self")){
-				// Locationobjekt des Spielers erzeuegen
-				double longitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "longitude").value);
-				double latitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "latitude").value);
-				Location playerLoc = new Location("PlayerLoc");
-				playerLoc.setLatitude(latitude);
-				playerLoc.setLongitude(longitude);
+				try {
+					// Locationobjekt des Spielers erzeuegen
+					double longitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "longitude").value);
+					double latitude = Double.parseDouble((String) wb.getAttribute(playerGroup, playerId, "latitude").value);
+					Location playerLoc = new Location("PlayerLoc");
+					playerLoc.setLatitude(latitude);
+					playerLoc.setLongitude(longitude);
 
-				//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
-				//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
+					//Unterwhiteboard (z.B. die Gruppe "exhbitis") wird anhand des parameter "target" ermittelt
+					//Dafür wird der String dafür bei jedem Punkt geteilt, in einen Array gepackt und davon die value als Whiteboard gecastet
 
-				Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
+					Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
 
-				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
-				
-				boolean result = false;
-				// CheckType des Quantifiers identifizieren
-				if (checkType.equals(MdsCondition.EQUALS)) {
-					if (objects.size() != quanti) result = true;
-				} else if (checkType.equals(MdsQuantifier.LOWER)) {
-					if (objects.size() >= quanti) result = true;
-				} else if (checkType.equals(MdsQuantifier.HIGHER)) {
-					if (objects.size() <= quanti) result = true;
-				} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
-					if (objects.size() > quanti) result = true;
-				} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
-					if (objects.size() < quanti) result = true;
-				} else if (checkType.equals(MdsQuantifier.EXISTS)) {
-					if (objects.size() < 1) result = true;
-				} else if (checkType.equals(MdsQuantifier.ALL)) {
-					if (objects.size() < realObject.entrySet().size()) result = true;
-				} 
-				if(result){
-					MdsState currentState; 
-					currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
-					currentState.setObjects(objects);
-					Log.i("Mistake", "Object Size ist " + objects.size());
-					// WB im State und beim Player speichern
-					// Erstmal nur ein Object
-					WhiteboardEntry target;
-					wb.setAttribute(objects.get(0), playerGroup, ""+playerId, "object");
-					target = wb.getAttribute(playerGroup,""+playerId, "object");
-					Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
-					return result;
-				} else {
-					Log.e(Interpreter.LOGTAG, "Error in Eventparser, CheckLocationEvent, result is null");
+					List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
+					
+					boolean result = false;
+					// CheckType des Quantifiers identifizieren
+					if (checkType.equals(MdsCondition.EQUALS)) {
+						if (objects.size() != quanti) result = true;
+					} else if (checkType.equals(MdsQuantifier.LOWER)) {
+						if (objects.size() >= quanti) result = true;
+					} else if (checkType.equals(MdsQuantifier.HIGHER)) {
+						if (objects.size() <= quanti) result = true;
+					} else if (checkType.equals(MdsQuantifier.LOWEQUALS)) {
+						if (objects.size() > quanti) result = true;
+					} else if (checkType.equals(MdsQuantifier.HIGHEQUALS)) {
+						if (objects.size() < quanti) result = true;
+					} else if (checkType.equals(MdsQuantifier.EXISTS)) {
+						if (objects.size() < 1) result = true;
+					} else if (checkType.equals(MdsQuantifier.ALL)) {
+						if (objects.size() < realObject.entrySet().size()) result = true;
+					} 
+					if(result){
+						MdsState currentState; 
+						currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
+						currentState.setObjects(objects);
+						Log.i("Mistake", "Object Size ist " + objects.size());
+						// WB im State und beim Player speichern
+						// Erstmal nur ein Object
+						WhiteboardEntry target;
+						wb.setAttribute(objects.get(0), playerGroup, ""+playerId, "object");
+						target = wb.getAttribute(playerGroup,""+playerId, "object");
+						Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
+						return result;
+					} else {
+						Log.e(Interpreter.LOGTAG, "Error in Eventparser, CheckLocationEvent, result is null");
+					}
+				} catch (NumberFormatException e1) {
+					Log.e(Interpreter.LOGTAG, "Position Attribute could not be parsed to double");
+					return false;
 				}
 			}else{
 				// TODO: Hier muss noch viel überlegt werden bei Multiplayer
@@ -260,6 +265,9 @@ public class EventParser {
 					}
 				} catch (NumberFormatException nfe2) {
 					// something went wrong, Value is not a Number
+				} catch (NullPointerException npe) {
+					Log.e(Interpreter.LOGTAG, "No Object found returning false");
+					return false;
 				}
 			}
 		} 

@@ -59,13 +59,11 @@ public class ActionParser {
 			MdsState buttonState = (MdsState) wb.getAttribute(myGroup, myId + "","currentState").value;
 			Log.i(Interpreter.LOGTAG, "Parse Action: " + action.getIdent() + " des States: " + buttonState.getName());
 			MdsTransition[] trans = buttonState.getTransitions();
-			if (trans != null) {
-				if(type.equals("start") || type.equals("do")) {		
-					// Alle Transitions durchgehen
-					for(int i = 0; i < trans.length; i++) {
-						if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
-							buttons.add(trans[i].getCondition()[0].getName());
-						}
+			if (trans != null && (type.equals("start") || type.equals("do"))) {		
+				// Alle Transitions durchgehen
+				for(int i = 0; i < trans.length; i++) {
+					if (trans[i].getEventType() == MdsTransition.EventType.uiEvent) {
+						buttons.add(trans[i].getCondition()[0].getName());
 					}
 				}
 			}
@@ -116,7 +114,7 @@ public class ActionParser {
 					
 					Log.i(Interpreter.LOGTAG, "Changing Map Entities: Interface is: " + guiInterface.toString());
 					//Und Bomben und Medipacks anzeigen
-					changeMapEntities(guiInterface, wb);
+					changeMapEntities(guiInterface, wb, myGroup);
 					//Map anzeigen
 					mma.execute(guiInterface);
 					
@@ -136,6 +134,7 @@ public class ActionParser {
 					Log.i(Interpreter.LOGTAG, "AddToGroup wird ausgeführt");
 					// get target
 					WhiteboardEntry target = (WhiteboardEntry) parsedParams.get("target");
+					Log.i("Mistake", "Target Value is " + target.value);
 					Log.i(Interpreter.LOGTAG, "Target found");
 					
 					// create copy of object
@@ -159,7 +158,7 @@ public class ActionParser {
 						// füge item der Gruppe hinzu
 						group.put((String)((Whiteboard)target.value).get("pathKey").value, copy);
 						Log.i(Interpreter.LOGTAG, "addToGroup: ["+params.get("target")+ "] (["+(String)((Whiteboard)target.value).get("pathKey").value+"]) to group [" 
-								+ parsedParams.get("group").toString()+ " + " + (String)((Whiteboard)target.value).get("pathKey").value +"]");
+								+ ((WhiteboardEntry)parsedParams.get("group")).value.toString()+ " + " + (String)((Whiteboard)target.value).get("pathKey").value +"]");
 						
 						// wenn die Gruppe Inventory war, füge dem Backpack hinzu
 						if(groupKeys[groupKeys.length-1].equals("inventory")) {
@@ -169,8 +168,12 @@ public class ActionParser {
 							Log.i("Mistake", "Title: " +((Whiteboard)target.value).get("title").value.toString());
 							Log.i("Mistake", "Image: " + ((Whiteboard)target.value).get("imagePath").value.toString());
 							Log.i("Mistake", "pathKey: " + ((Whiteboard)target.value).get("pathKey").value.toString());
+							// Look if item has drop action
+							boolean isDroppable = false;
+							if (((Whiteboard)target.value).get("dropAction") != null)
+								isDroppable = true;
 							MdsItem item = new MdsItem(((Whiteboard)target.value).get("title").value.toString(), ((Whiteboard)target.value).get("imagePath").value.toString(), 
-													   ((Whiteboard)target.value).get("pathKey").value.toString());
+													   ((Whiteboard)target.value).get("pathKey").value.toString(), isDroppable);
 							// and tell android to add in backpack
 							guiInterface.addToBackpack(item);
 						}
@@ -179,7 +182,7 @@ public class ActionParser {
 						sii.onWhiteboardUpdate(keysToValue, copy);
 						
 						// update Map view
-						changeMapEntities(guiInterface, wb);
+						changeMapEntities(guiInterface, wb, myGroup);
 
 					} catch (InvalidWhiteboardEntryException e1) {
 						Log.e(Interpreter.LOGTAG, "Could not create Copy-WBEntry");
@@ -223,7 +226,7 @@ public class ActionParser {
 						} catch (InvalidWhiteboardEntryException e) {
 							e.printStackTrace();
 						}
-						changeMapEntities(guiInterface, wb);
+						changeMapEntities(guiInterface, wb, myGroup);
 					} catch (NullPointerException npe) {
 						// otherwise we use the parsed value
 						Log.i(Interpreter.LOGTAG, "Removing an Object");
@@ -245,7 +248,7 @@ public class ActionParser {
 						} catch (InvalidWhiteboardEntryException e) {
 							e.printStackTrace();
 						}
-						changeMapEntities(guiInterface, wb);
+						changeMapEntities(guiInterface, wb, myGroup);
 					}
 					
 				}
@@ -428,10 +431,10 @@ public class ActionParser {
 		return currentWb;
 	}
 	
-	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb) {
+	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb, List<String> playerGroup) {
 		
 		//TODO: add more visibilities
-		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, "", "all");
+		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, wb, playerGroup, "", "all", "ownGroup");
 		Log.i(Interpreter.LOGTAG, "Size of Entities ist: " + mapEntities.size() + ", GuiInterface: " + guiInterface);
 		guiInterface.showMap(mapEntities);	
 	}
@@ -444,7 +447,7 @@ public class ActionParser {
 	 * @param visibility Array von Sichtbarkeiten, die ein Whiteboard haben kann, um in die Liste zu kommen
 	 * @return ArrayList von MdsItems, welche aus Whiteboards erzeugt wurden, die die verlangte Visibility haben
 	 */
-	private ArrayList<MdsItem> getEntriesAsItem(Whiteboard wb, String pathKey, String... visibility ){
+	private ArrayList<MdsItem> getEntriesAsItem(Whiteboard root, Whiteboard wb, List<String> playerGroup,String pathKey, String... visibility ){
 		ArrayList<MdsItem> items = new ArrayList<MdsItem>();
 		
 		//Mich (Whiteboard wb) hinzufügen?
@@ -452,8 +455,20 @@ public class ActionParser {
 		if(wb.containsKey("visibility")){
 			for(String v : visibility){
 				if(((String)wb.getAttribute("visibility").value).equals(v)){
-					addMe = true;
-					break;
+					// if key equals all add directly
+					if(v.equals("all")) {
+						addMe = true;
+						break;
+					// else look if key equals ownGroup.title	
+					} else {
+						Log.i("Mistake", "Group is: " + v);
+						Log.i("Mistkae", "OnwGroup Title ist: " + root.getAttribute(playerGroup, "title").value);
+						if (v.equals((String)root.getAttribute(playerGroup, "title").value)) {
+							addMe = true;
+							break;
+						}
+						
+					}
 				}
 			}
 		}
@@ -468,7 +483,7 @@ public class ActionParser {
 			if(wb.containsKey("imagePath")){
 				imgPath = (String)wb.getAttribute("imagePath").value;
 			}
-			MdsItem item = new MdsItem(title, imgPath, pathKey);
+			MdsItem item = new MdsItem(title, imgPath, pathKey, false);
 			if(wb.containsKey("latitude") &&  wb.containsKey("longitude")){
 				try {
 					//item.setName(pathKey);
@@ -484,7 +499,7 @@ public class ActionParser {
 		//Rekursiv alle Whiteboards in diesem Whiteboard prüfen
 		for(String key : wb.keySet()){
 			if(wb.getAttribute(key).value instanceof Whiteboard){
-				items.addAll(getEntriesAsItem((Whiteboard)wb.getAttribute(key).value, key, visibility));
+				items.addAll(getEntriesAsItem(root, (Whiteboard)wb.getAttribute(key).value, playerGroup, key, visibility));
 			}
 		}
 		
