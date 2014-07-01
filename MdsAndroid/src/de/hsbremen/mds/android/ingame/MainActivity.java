@@ -3,13 +3,13 @@ package de.hsbremen.mds.android.ingame;
 import java.io.File;
 import java.nio.channels.NotYetConnectedException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -21,9 +21,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -66,15 +65,19 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		//Remove title bar
+	    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+	    //Remove notification bar
+	    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		
 		setContentView(R.layout.activity_main);
 
 		Bundle extras = getIntent().getExtras();
 		username = extras.getCharSequence("username");
 
 		webServ = WebServices.createWebServices(this);
-
-		ActionBar actionbar = getActionBar();
-		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
@@ -159,38 +162,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	protected void onDestroy() {
 		webServ.closeWebServices();
 		super.onDestroy();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-
-//		LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
-//		LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
-//
-//		if (item.getItemId() == R.id.toggleMap) {
-//
-//			if (l.getHeight() > l2.getHeight()) {
-//				l.setLayoutParams(new TableLayout.LayoutParams(
-//						LayoutParams.WRAP_CONTENT, 0, 1.5f));
-//				l2.setLayoutParams(new TableLayout.LayoutParams(
-//						LayoutParams.WRAP_CONTENT, 0, 3.5f));
-//			} else {
-//				l.setLayoutParams(new TableLayout.LayoutParams(
-//						LayoutParams.WRAP_CONTENT, 0, 3.5f));
-//				l2.setLayoutParams(new TableLayout.LayoutParams(
-//						LayoutParams.WRAP_CONTENT, 0, 1.5f));
-//			}
-//		}
-		return true;
 	}
 
 	@Override
@@ -337,5 +308,17 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void onWebSocketConnected() {
 		
+	}
+
+	@Override
+	public void setPlayerData(HashMap<String, Object> dataMap) {
+		FragmentMap f = (FragmentMap)swipeAdapter.getFragment("showMap");
+		
+		for(String key : dataMap.keySet()){
+			if(key.equals("health")){
+				f.setHealthbar(((int[])dataMap.get(key))[1], ((int[])dataMap.get(key))[0]);
+			}
+		}
+		// TODO: hier noch restlichen UI Elemente
 	}
 }
