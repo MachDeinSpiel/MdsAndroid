@@ -265,19 +265,20 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
+		
+		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
 		if(!(mds.getName().equals("showMap")) && !(mds.getName().equals("backToMap"))){
 		
-			System.out.println("NextFragment aufgerufen mit: " + mds.getName());
+
 			
 			if(!(mds.getName().equals("showMap"))){
 				swipeAdapter.setFragmentInformation(mds);
 				swipeAdapter.addFragment(mds.getName());
 			}
+			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()), true);
 		}
 		
-		if(!(mds.getName().equals("backToMap"))){
-			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()), true);
-		}else{
+		if((mds.getName().equals("backToMap"))){
 			if(swipeAdapter.getCount() == 3){
 				updateSwipeAdapter(swipeAdapter.getLastFragmentName());
 			}
