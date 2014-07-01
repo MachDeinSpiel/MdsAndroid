@@ -145,6 +145,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "latitude"));
 		
 		fsmManager.checkEvents(null);
+		sendPlayerData();
 		
 	}
 
@@ -219,6 +220,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				fsmManager.checkEvents(null);
 				sendPlayerData();
 			}
+			Log.i("Mistake", "Sending Player Data");
 			// TODO: Testausgaben
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","health").value);
 			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","inventory").value);
@@ -457,6 +459,13 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		// after update, initiate fsm, sendPlayerData and remove Dummy
 		fsmManager.initiate();
 		
+		// delete dummy from inventory
+		deleteDummy();
+		
+	}
+
+
+	private void deleteDummy() {
 		Log.i(LOGTAG, "Removing Dummy Text in Inventory");
 		// remove dummy from inventory
 		HashMap<String, Object> params = new HashMap<String, Object>();
@@ -482,7 +491,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			Log.i(LOGTAG, "Executing Action " + action.getIdent().toString());
 			actionExec.execute(gui);
 		}
-		
 	}
 
 	@Override
