@@ -166,4 +166,8 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 	public MdsInfoObject getFragmentInformation(){
 		return this.fragmentInfo;
 	}
+	
+	public void removeLastFragment(){
+		removeFragment(activeFragmentsNumbers.get(activeFragmentsList.size()-1));
+	}
 }
