@@ -203,9 +203,9 @@ public class ActionParser {
 					Log.i("Mistake", "Group is: " + currentWb.toString());
 					String[] keys = ((String)params.get("target")).split("\\.");
 					WhiteboardEntry result;
-					try {
+					result = currentWb.remove(keys[keys.length-1]);
+					if (result != null) {
 						// only gives result when path is directly written (e.g. Bombs.Bomb1)
-						result = currentWb.remove(keys[keys.length-1]);
 						Log.i("Mistake", "Target-Key: " + keys[keys.length-1]);
 						Log.i("Mistake", "result is: " + result.toString());
 						Log.i("Mistake", "result is: " + result.value.toString());
@@ -228,7 +228,7 @@ public class ActionParser {
 							e.printStackTrace();
 						}
 						changeMapEntities(guiInterface, wb, myGroup);
-					} catch (NullPointerException npe) {
+					} else {
 						// otherwise we use the parsed value
 						Log.i(Interpreter.LOGTAG, "Removing an Object");
 						
@@ -433,7 +433,6 @@ public class ActionParser {
 	}
 	
 	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb, List<String> playerGroup) {
-		
 		//TODO: add more visibilities
 		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, wb, playerGroup, "", "all", "ownGroup");
 		Log.i(Interpreter.LOGTAG, "Size of Entities ist: " + mapEntities.size() + ", GuiInterface: " + guiInterface);
