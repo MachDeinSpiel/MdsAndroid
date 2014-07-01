@@ -25,6 +25,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -56,6 +58,11 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	    //Remove title bar
+	    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+	    //Remove notification bar
+	    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		setContentView(R.layout.gamechooser);
 		// GameList adapter = new GameList(GameChooser.this, gameNames,
@@ -80,7 +87,9 @@ public class GameChooser extends Activity implements WebServicesInterface {
 					@Override
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
-						startLoadingScreen();
+						Log.d("Menu", "Loading Screen wird gestartet");
+						startLoadingScreen(GameChooser.this);
+						Log.d("Menu", "Loading Screen wurde gestartet");
 						JSONObject json = null;
 						try {
 							json = new JSONObject();
@@ -135,7 +144,9 @@ public class GameChooser extends Activity implements WebServicesInterface {
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
 
-						startLoadingScreen();
+						Log.d("Menu", "Loading Screen wird gestartet");
+						startLoadingScreen(GameChooser.this);
+						Log.d("Menu", "Loading Screen wurde gestartet");
 						JSONObject json = null;
 
 						try {
@@ -222,10 +233,18 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		}
 	}
 
-	protected void startLoadingScreen() {
-		progress = new ProgressDialog(GameChooser.this);
-		progress.setMessage("Initialisiere Lobby...");
-		progress.show();
+	protected void startLoadingScreen(final Activity a) {
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+
+				progress = new ProgressDialog(a);
+				progress.setMessage("Initialisiere Lobby...");
+				progress.show();
+			}
+		});
 	}
 
 	protected void stopLoadingScreen(final String message, final boolean success) {
