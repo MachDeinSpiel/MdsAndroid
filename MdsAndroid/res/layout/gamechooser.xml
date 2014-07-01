@@ -18,13 +18,14 @@
             <Button
                 android:id="@+id/labelGameName"
                 android:layout_width="fill_parent"
-                android:layout_height="30dp"
-                android:layout_weight="1"
+                android:layout_height="25dp"
                 android:layout_marginTop="5dp"
+                android:layout_weight="1"
                 android:background="@drawable/buttonshape_noborder"
                 android:text="Zocker123"
                 android:textColor="#FF7800"
                 android:textSize="20sp" />
+
         </TableRow>
 
         <TableRow
@@ -50,75 +51,78 @@
         <TableRow
             android:id="@+id/tableRow2"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp" >
+            android:layout_height="0dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1" >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:orientation="vertical" >
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical" >
+                <Button
+                    android:id="@+id/button1"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="fill_parent"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/buttonshape_noborder"
+                    android:text="Laufende Spiele" />
 
-                    <Button
-                        android:id="@+id/button1"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="fill_parent"
-                        android:layout_height="20dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/buttonshape_noborder"
-                        android:text="Laufende Spiele" />
-
-                    <android.support.v4.widget.SwipeRefreshLayout
-                        xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:id="@+id/swipe_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1" >
-
-                        <ListView
-                            android:id="@+id/gameList"
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_marginLeft="15dp"
-                            android:layout_weight="1" />
-                    </android.support.v4.widget.SwipeRefreshLayout>
-                </LinearLayout>
-
-                <LinearLayout
+                <android.support.v4.widget.SwipeRefreshLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/swipe_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical" >
+                    android:layout_weight="1" >
 
-                    <Button
-                        android:id="@+id/Button01"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="fill_parent"
-                        android:layout_height="35dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/buttonshape_noborder"
-                        android:text="Neues Spiel erstellen" />
-
-                    <LinearLayout
-                        android:id="@+id/linLayout"
+                    <ListView
+                        android:id="@+id/gameList"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1" >
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="15dp"
+                        android:layout_weight="1" />
+                </android.support.v4.widget.SwipeRefreshLayout>
+            </LinearLayout>
 
-                        <ListView
-                            android:id="@+id/newGameList"
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
-                            android:layout_weight="1" >
-                        </ListView>
-                    </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/Button01"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="fill_parent"
+                    android:layout_height="35dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonshape_noborder"
+                    android:text="Neues Spiel erstellen" />
+
+                <LinearLayout
+                    android:id="@+id/linLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <ListView
+                        android:id="@+id/newGameList"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="1" >
+                    </ListView>
                 </LinearLayout>
             </LinearLayout>
 

@@ -28,20 +28,20 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/mds"
+        android:icon="@drawable/mds_appicon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name="de.hsbremen.mds.android.menu.GameLobby"
-            android:label="GameLobby" >
+            android:label="Game Lobby" >
         </activity>
         <activity
             android:name="de.hsbremen.mds.android.ingame.MainActivity"
-            android:label="Game" >
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="de.hsbremen.mds.android.menu.LoginActivity"
-            android:label="Login" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,7 +50,7 @@
         </activity>
         <activity
             android:name="de.hsbremen.mds.android.menu.GameChooser"
-            android:label="GameCenter" >
+            android:label="Game Center" >
         </activity>
 
         <meta-data
