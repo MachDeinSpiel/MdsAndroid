@@ -90,8 +90,9 @@ public class ActionParser {
 		switch(action.getIdent()){
 		case showVideo:
 			return new MdsVideoAction((String)parsedParams.get("title"), (String)parsedParams.get("url"), (String)parsedParams.get("text"), buttons);
-		case showMap:
-			// not called atm
+		case backToMap:
+			Log.i(Interpreter.LOGTAG, "Executing backToMap action");
+			return new MdsMapAction("backToMap", 0, 0);
 		case startMiniApp:
 			Log.i(Interpreter.LOGTAG, "Executing Minigame " + parsedParams.get("type"));
 			return new MdsMiniAppAction((String)parsedParams.get("type"), null, buttons);			

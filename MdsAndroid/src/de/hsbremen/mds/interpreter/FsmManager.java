@@ -201,6 +201,25 @@ public class FsmManager {
 					}
 				}
 				break;
+			case locationMultiplewhiteboardEvent:
+				Log.i(Interpreter.LOGTAG, "Checking locationMultiplewhiteboardEvent");
+				result = true;
+				
+				//first one is a location event
+				if (!EventParser.checkLocationEvent(t.getCondition()[0], wb, ownGroup, myID)) {
+					result = false;
+					break;
+				}
+				// go through all conditions and set res to false if one is false
+				Log.i("Mistake", "Checking Conditions with Size " + t.getCondition().length);
+				for(int i = 1; i < t.getCondition().length; i++) {
+					Log.i("Mistake", "Checking whiteboardEvent number " + (i));
+					if (!EventParser.checkWhiteboardEvent(t.getCondition()[i], wb, ownGroup, myID)) {
+						result = false;
+						break;
+					}
+				}
+				break;
 			default:
 				//TODO: Fehler abfangen
 				result = false;

@@ -55,6 +55,7 @@ public class EventParser {
 		String checkType = objQuanti.getChecktype();
 		
 		Log.i("Mistake", "Checking different Conditions");
+		Log.i(Interpreter.LOGTAG, "ConditionName ist " + cond.getName());
 		// -------------- alle Verschiedenen Location Events -----------//
 		if(cond.getName().equals("nearby")) {
 			Log.i("Mistake", "Condition is nearby");
@@ -80,7 +81,7 @@ public class EventParser {
 					Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
 
 					Log.i("Mistake", "Getting all Objects resulting from Nearby");
-					List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
+					List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius, object.getName().split("\\."));
 					
 					boolean result = false;
 					// CheckType des Quantifiers identifizieren
@@ -113,7 +114,7 @@ public class EventParser {
 						Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
 						return result;
 					} else {
-						Log.e(Interpreter.LOGTAG, "Error in Eventparser, CheckLocationEvent, result is null");
+						Log.i(Interpreter.LOGTAG, "Result in EventParser, CheckLocationEvent, result is false");
 					}
 				} catch (NumberFormatException e1) {
 					Log.e(Interpreter.LOGTAG, "Position Attribute could not be parsed to double");
@@ -133,7 +134,7 @@ public class EventParser {
 				// Location des Objekts
 				Location someLoc = new Location("somLoc");
 
-				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
+				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius, ((String)cond.getParams().get("object")).split("\\."));
 				
 				MdsState currentState;
 				currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
@@ -155,7 +156,7 @@ public class EventParser {
 
 					Whiteboard realObject = (Whiteboard)wb.getAttribute(object.getName().split("\\.")).value;
 
-					List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius);
+					List<WhiteboardEntry> objects = getEntriesNearTo(realObject, playerLoc, radius, object.getName().split("\\."));
 					
 					boolean result = false;
 					// CheckType des Quantifiers identifizieren
@@ -175,19 +176,9 @@ public class EventParser {
 						if (objects.size() < realObject.entrySet().size()) result = true;
 					} 
 					if(result){
-						MdsState currentState; 
-						currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
-						currentState.setObjects(objects);
-						Log.i("Mistake", "Object Size ist " + objects.size());
-						// WB im State und beim Player speichern
-						// Erstmal nur ein Object
-						WhiteboardEntry target;
-						wb.setAttribute(objects.get(0), playerGroup, ""+playerId, "object");
-						target = wb.getAttribute(playerGroup,""+playerId, "object");
-						Log.i("Mistake", "Adding Object to" + playerGroup + playerId + " object" + target.value);
 						return result;
 					} else {
-						Log.e(Interpreter.LOGTAG, "Error in Eventparser, CheckLocationEvent, result is null");
+						Log.i(Interpreter.LOGTAG, "Result in Eventparser, CheckLocationEvent, is false");
 					}
 				} catch (NumberFormatException e1) {
 					Log.e(Interpreter.LOGTAG, "Position Attribute could not be parsed to double");
@@ -206,7 +197,7 @@ public class EventParser {
 				// Location des Objekts
 				Location someLoc = new Location("somLoc");
 				// Hier evtl eine Liste von Locations?
-				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius);
+				List<WhiteboardEntry> objects = getEntriesNearTo(realObject, someLoc, radius, ((String)cond.getParams().get("object")).split("\\."));
 				
 				MdsState currentState;
 				currentState = (MdsState)wb.getAttribute(playerGroup, ""+playerId,FsmManager.CURRENT_STATE).value;
@@ -355,24 +346,54 @@ public class EventParser {
 	 * @param radius
 	 * @return Liste mit Items innerhalb des Radius
 	 */
-	private static List<WhiteboardEntry> getEntriesNearTo(Whiteboard wb, Location playerLoc, int radius ) {
+	private static List<WhiteboardEntry> getEntriesNearTo(Whiteboard wb, Location playerLoc, int radius, String[] pathToEntry ) {
 		
 		List<WhiteboardEntry> result = new Vector<WhiteboardEntry>();
+		double longi = 0;
+		double lati = 0;
+		boolean longiFound = false;
+		boolean latiFound = false;
 		
+		Log.i("Mistake", "Wb in EntriesNearTo" + wb.toString());
 		// Alle Einträge durchgehen
 		for (String key :  wb.keySet()) {
-			Whiteboard entry = (Whiteboard) wb.getAttribute(key).value;
-			if(entry.containsKey("longitude") && entry.containsKey("latitude")) {
-				// Location Object des Objects erstellen
-				double longi = Double.parseDouble(""+ entry.getAttribute("longitude").value);
-				double lati = Double.parseDouble(""+ entry.getAttribute("latitude").value);
+			Object entry = wb.getAttribute(key).value;
+			
+			// if element is whiteboard
+			if(entry instanceof Whiteboard) {
+				Whiteboard wbEntry = (Whiteboard) entry;
+				if(wbEntry.containsKey("longitude") && wbEntry.containsKey("latitude")) {
+					// Location Object des Objects erstellen
+					longi = Double.parseDouble(""+ wbEntry.getAttribute("longitude").value);
+					lati = Double.parseDouble(""+ wbEntry.getAttribute("latitude").value);
+					Location loc = new Location("WBLoc");
+					loc.setLatitude(lati);
+					loc.setLongitude(longi);
+					// Distanz mit Radius vergleichen
+					if(playerLoc.distanceTo(loc) <= radius) {
+						result.add(wb.getAttribute(key));
+					}
+				}
+			// else if entry is string (longi or lati)
+			} else if(entry instanceof String && key.equals("latitude")) {
+				Log.i("Mistake", "Latitude is " + entry);
+				lati = Double.parseDouble((String)entry);
+				latiFound = true;
+			} else if(entry instanceof String && key.equals("longitude")) {
+				Log.i("Mistake", "Longitude is " + entry);
+				longi = Double.parseDouble((String)entry);
+				longiFound = true;
+			// wenn beide gefunden sind, Location erstellen und vergleichen
+			} else if(longiFound && latiFound) {
 				Location loc = new Location("WBLoc");
 				loc.setLatitude(lati);
 				loc.setLongitude(longi);
 				// Distanz mit Radius vergleichen
 				if(playerLoc.distanceTo(loc) <= radius) {
-					result.add(wb.getAttribute(key));
+					result.add(wb.getAttribute(pathToEntry));
 				}
+				longiFound = false;
+				latiFound = false;
 			}
 		}
 		return result;
@@ -535,12 +556,6 @@ public class EventParser {
 		}
 		
 				
-	}
-
-	
-	private static String parseOwnGroup(List<String> playerGroup) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	private static String parseSelf(List<String> playerGroup, String playerId) {

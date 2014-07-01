@@ -131,6 +131,8 @@ public class Parser {
 				allMdsActions[i] = new MdsAction(MdsActionIdent.updateMap, defaults);
 			else if(ident.equals("startMiniApp"))
 				allMdsActions[i] = new MdsAction(MdsActionIdent.startMiniApp, defaults);
+			else if(ident.equals("backToMap"))
+				allMdsActions[i] = new MdsAction(MdsActionIdent.backToMap, defaults);
 			else
 				Log.e("Mistake", "Action Ident " + ident + " could not be resolved");
 			
@@ -329,6 +331,8 @@ public class Parser {
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.uiWhiteboardEvent);
 			else if(event.equals("multipleWhiteboardEvent"))
 				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.multiplewhiteboardEvent);
+			else if(event.equals("locationMultiplewhiteboardEvent"))
+				allTrans[j] = new MdsTransition(target, MdsTransition.EventType.locationMultiplewhiteboardEvent);
 			else
 				System.err.println("Eventtype " + event + " could not be resolved in State " + stateName);
 			allTrans[j].setConditions(conditionsArray);

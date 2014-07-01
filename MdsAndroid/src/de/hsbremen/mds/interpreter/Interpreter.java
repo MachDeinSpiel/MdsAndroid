@@ -279,6 +279,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		} else if (identifier.equals("drop")) {
 			doDropItem(item);			
 		}
+		fsmManager.checkEvents(null);
 				
 	}
 
