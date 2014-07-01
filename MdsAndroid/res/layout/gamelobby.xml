@@ -46,12 +46,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" >
 
-            <LinearLayout 
-        		android:id="@+id/layoutTeam1"
+            <LinearLayout
+                android:id="@+id/layoutTeam1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical" >
 
                 <Button
                     android:id="@+id/labelTeamname1"
@@ -76,8 +76,8 @@
                 </ListView>
             </LinearLayout>
 
-            <LinearLayout 
-        		android:id="@+id/layoutTeam2"
+            <LinearLayout
+                android:id="@+id/layoutTeam2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -115,13 +115,13 @@
         android:layout_marginBottom="10dp"
         android:layout_weight="1" >
 
-        <LinearLayout 
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" >
 
-            <LinearLayout 
-        		android:id="@+id/layoutTeam3"
+            <LinearLayout
+                android:id="@+id/layoutTeam3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -151,8 +151,7 @@
             </LinearLayout>
 
             <LinearLayout
-                 
-        		android:id="@+id/layoutTeam4"
+                android:id="@+id/layoutTeam4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -195,8 +194,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" >
 
-            <LinearLayout 
-        		android:id="@+id/layoutTeam5"
+            <LinearLayout
+                android:id="@+id/layoutTeam5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -225,8 +224,8 @@
                 </ListView>
             </LinearLayout>
 
-            <LinearLayout 
-        		android:id="@+id/layoutTeam6"
+            <LinearLayout
+                android:id="@+id/layoutTeam6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -269,8 +268,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" >
 
-            <LinearLayout 
-        		android:id="@+id/layoutTeam7"
+            <LinearLayout
+                android:id="@+id/layoutTeam7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -299,8 +298,8 @@
                 </ListView>
             </LinearLayout>
 
-            <LinearLayout 
-        		android:id="@+id/layoutTeam8"
+            <LinearLayout
+                android:id="@+id/layoutTeam8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -340,6 +339,8 @@
             android:id="@+id/leaveBtn"
             android:layout_width="0dp"
             android:layout_height="35dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:layout_weight="1"
             android:background="@drawable/buttonshape"
             android:text="@string/leave"
@@ -350,6 +351,8 @@
             android:id="@+id/startBtn"
             android:layout_width="0dp"
             android:layout_height="35dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:layout_weight="1"
             android:background="@drawable/buttonshape"
             android:text="@string/start"

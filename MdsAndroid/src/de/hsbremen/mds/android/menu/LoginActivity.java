@@ -17,6 +17,8 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,13 +38,13 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 	private String userPassword;
 	private WebServices webService;
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		getMenuInflater().inflate(R.menu.login, menu);
-
-		return super.onCreateOptionsMenu(menu);
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//
+//		getMenuInflater().inflate(R.menu.login, menu);
+//
+//		return super.onCreateOptionsMenu(menu);
+//	}
 
 	@Override
 	protected void onResume() {
@@ -52,15 +54,14 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.login);
 
 		Button loginBtn = (Button) findViewById(R.id.loginBtn);
 		Button registerBtn = (Button) findViewById(R.id.registerBtn);
 		final TextView usernameTxt = (TextView) findViewById(R.id.usernameText);
 		final TextView userpasswordTxt = (TextView) findViewById(R.id.passwordText);
-		usernameTxt.setText("Julian");
-		userpasswordTxt.setText("julian");
+		usernameTxt.setText("Cedric");
+		userpasswordTxt.setText("cedric");
 
 		View.OnClickListener registerClick = new OnClickListener() {
 			@Override
