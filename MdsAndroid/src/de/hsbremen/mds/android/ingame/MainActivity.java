@@ -279,7 +279,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()), true);
 		}else{
 			if(swipeAdapter.getCount() == 3){
-				swipeAdapter.removeLastFragment();
+				updateSwipeAdapter(swipeAdapter.getLastFragmentName());
 			}
 		}
 	}

@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.ViewGroup;
-import de.hsbremen.mds.android.fragment.FragmentGamePipe;
 import de.hsbremen.mds.android.fragment.FragmentGameReaction;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
@@ -167,7 +166,7 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 		return this.fragmentInfo;
 	}
 	
-	public void removeLastFragment(){
-		removeFragment(activeFragmentsNumbers.get(activeFragmentsList.size()-1));
+	public String getLastFragmentName(){
+		return activeFragmentsNumbers.get(activeFragmentsList.size()-1);
 	}
 }
