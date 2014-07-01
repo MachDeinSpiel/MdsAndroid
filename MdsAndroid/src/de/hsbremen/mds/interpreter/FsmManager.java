@@ -25,7 +25,7 @@ public class FsmManager {
 	private List<MdsState> states;
 	private String myID;
 	private Whiteboard wb;
-	private Interpreter interpreter; //TODO: interface
+	private Interpreter interpreter;
 	private boolean isRunning = false;
 	private List<String> ownGroup;
 	
@@ -55,7 +55,7 @@ public class FsmManager {
 					wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup.get(0), ""+myID,CURRENT_STATE);
 					wb.setAttribute(new WhiteboardEntry("lastSt","all"), ownGroup.get(0),""+myID,LAST_STATE);
 				}
-				//TODO: fix my shit up
+				//FIXME: fix my shit up
 				wb.getAttribute(ownGroup, myID, LAST_STATE).value = new MdsState(-1, "", null , null, null, null, false, false);
 
 				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup.get(0));
@@ -96,27 +96,10 @@ public class FsmManager {
 				Log.e(Interpreter.LOGTAG, "Error: Whiteboard is null while changing state");
 			}
 			
-			//TODO: Sneaky methode zum setzen des States enternen, WhiteboardEntry akzeptiert ja eigentlich
-			//nur Strings und Whiteboards, hier wird (falls noch nicht da) erst ein leerer string gesetzt
-			//und dann mit einem MdsState überschrieben (muhahahah *evil face*)
-			
-//			if(wb.getAttribute(ownGroup,myID,setTo) == null){
-//				try {
-//					wb.setAttribute(new WhiteboardEntry("", "all"), ownGroup,myID,setTo);
-//				} catch (InvalidWhiteboardEntryException e) {
-//					e.printStackTrace();
-//				}
-//			}
-			if(ownGroup.size() > 1)
-				wb.getAttribute(ownGroup.get(0), ownGroup.get(1), ""+myID, setTo).value = current;
-			else 
-				wb.getAttribute(ownGroup.get(0), ""+myID, setTo).value = current;
+			wb.getAttribute(ownGroup, ""+myID, setTo).value = current;
 		
 			this.onstateChanged(current, setTo);
 		} else {
-			/*
-			 * TODO fehler auffangen
-			 */
 			Log.e(Interpreter.LOGTAG, "Error: setTo doesn't equal 'currentState' or 'lastState'");
 		}
 	}
@@ -153,7 +136,6 @@ public class FsmManager {
 	 * hier läuft die finit state maschine
 	 */
 	public void checkEvents(String buttonName){
-		//TODO buttonName irgendwo anders herbekommen
 		
 		for(MdsTransition t : this.getCurrentState().getTransitions()){
 			boolean result;
@@ -221,7 +203,7 @@ public class FsmManager {
 				}
 				break;
 			default:
-				//TODO: Fehler abfangen
+				Log.e(Interpreter.LOGTAG, "EventType could not be resolved in CheckEvents");
 				result = false;
 				break;
 			}

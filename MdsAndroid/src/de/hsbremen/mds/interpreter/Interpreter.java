@@ -46,6 +46,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	private String myId;
 	private GuiInterface gui;
 	private ServerInterpreterInterface serverInterpreter;
+	
+	private int maxHealth = 0;
 		
 	public Interpreter(File json, GuiInterface guiInterface, ServerInterpreterInterface serverInterpreter, String playerId){
 		Log.i(LOGTAG, "Interpreter erzeugt");
@@ -119,8 +121,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		Log.i(LOGTAG, "Neue Position von Android bekommen : [long:"+longitude+" ,|lat:"+latitude+"]");
 		
 		// tell the server
+		// longitude
 		try {
-			// TODO: alle Aufrufe, bei denen auf den Player geguckt werden müssen aktualisiert werden
 			whiteboard.setAttributeValue(Double.toString(longitude), fsmManager.getOwnGroup(), myId, "longitude");
 		} catch (InvalidWhiteboardEntryException e) {
 			e.printStackTrace();
@@ -132,6 +134,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		keys.add("longitude");
 		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "longitude"));
 		
+		// latitude
 		try {
 			whiteboard.setAttributeValue(Double.toString(latitude), fsmManager.getOwnGroup(), myId, "latitude");
 		} catch (InvalidWhiteboardEntryException e) {
@@ -212,9 +215,11 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			}
 			// only checkWBCond if Action is not miniGame, miniGame WBconds will be checked later
 			if (!isMiniGame && !((String)whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "longitude").value).equals("null")
-				&& fsmManager.getCurrentState().getTransitions() != null)
-				fsmManager.checkEvents(null);;
-			
+				&& fsmManager.getCurrentState().getTransitions() != null) {
+				fsmManager.checkEvents(null);
+				sendPlayerData();
+			}
+			// TODO: Testausgaben
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","health").value);
 			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","inventory").value);
 		}
@@ -262,8 +267,44 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		}
 		
 		fsmManager.checkEvents(null);
+		// send data to android
+		sendPlayerData();
 		
 		
+	}
+
+
+	private void sendPlayerData() {
+		
+		Log.i("Mistake", "Sending PlayerData");
+		HashMap<String, Object> dataMap = new HashMap<String, Object>();
+		// get Values of player
+		Whiteboard player = (Whiteboard)whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId).value;
+		
+		Log.i("Mistake", "PlayerAtt Size ist: " + player.keySet().size());
+		for(String playerAtt : player.keySet()) {
+			// only save sth if value is of string
+			if(player.get(playerAtt).value instanceof String) {
+				// if key is health treat it specially
+				if (playerAtt.equals("health")) {
+					Log.i("Mistake", "Adding Health");
+					int health = (int)Double.parseDouble((String)player.get(playerAtt).value);
+					if(health > maxHealth)
+						maxHealth = health;
+					int[] healthArray = {health, maxHealth};
+					Log.i("Mistake", "Health is " + health + ". MaxHealth: " + maxHealth);
+					dataMap.put(playerAtt, healthArray);
+					
+				// else just save the key and the value, if NOT standart key
+				} else if(!(playerAtt.equals("pathKey") || playerAtt.equals("latitude") || playerAtt.equals("longitude") || 
+						  playerAtt.equals("visibility") || playerAtt.equals("iconName") || playerAtt.equals("imagePath") || playerAtt.equals("inventory"))){
+					Log.i("Mistake", "Adding " + playerAtt);
+					dataMap.put(playerAtt, (String)player.get(playerAtt).value);
+				}
+			}
+		}
+		// send it to android
+		gui.setPlayerData(dataMap);
 	}
 
 
@@ -280,6 +321,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			doDropItem(item);			
 		}
 		fsmManager.checkEvents(null);
+		sendPlayerData();
 				
 	}
 
@@ -334,7 +376,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				actionExec.execute(gui);
 		}
 		
-		// Testausgabe
+		// TODO: Testausgabe
 		Log.i("Mistake", "Flags ist: " + whiteboard.get("Flags").value);
 		
 		// Item aus dem Backpack removen
@@ -412,8 +454,9 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			whiteboard.setAttribute(wuo.getValue(), (String[])wuo.getKeys().toArray(new String[0]));
 			
 		}
-		
+		// after update, initiate fsm, sendPlayerData and remove Dummy
 		fsmManager.initiate();
+		
 		Log.i(LOGTAG, "Removing Dummy Text in Inventory");
 		// remove dummy from inventory
 		HashMap<String, Object> params = new HashMap<String, Object>();
@@ -441,20 +484,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		}
 		
 	}
-
-
-	@Override
-	public void dropItem(MdsItem item) {
-		
-	}
-
-
-	@Override
-	public void onMinigameResult(int punkte, boolean gewonnen) {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 	@Override
 	public void onGameResult(int points, String identifier) {
@@ -490,7 +519,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		MdsActionExecutable action = new MdsTextAction("showText", text, buttons);
 		if (action != null)
 			action.execute(gui);
-		//fsmManager.checkWBCondition();
 	}
 
 

@@ -319,7 +319,9 @@ public class EventParser {
 				if (value <= compValue) return true;
 			} else if (cond.getParams().get("checkType").equals(MdsCondition.HIGHEQUALS)) {
 				if (value >= compValue) return true;
-			} 
+			} else {
+				Log.e(Interpreter.LOGTAG, "Checktype could not be resolved");
+			}
 		}
 			
 		return false;
