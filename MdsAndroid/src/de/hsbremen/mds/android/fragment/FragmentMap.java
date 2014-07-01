@@ -19,8 +19,10 @@ public class FragmentMap extends Fragment{
     private ProgressBar healthBar;
     private int maxHealth = 1;
     private int currentHealth = 1;
-    private int scoreStatus = 0;
-    private int optionalStatus = 0;
+    private String scoreName = "Optional";
+    private String scoreValue = "0";
+    private String optionalName = "Optional";
+    private String optionalValue = "0";
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,13 +60,13 @@ public class FragmentMap extends Fragment{
 		TextView score = (TextView)mapView.findViewById(R.id.scoreSummary);
 		score.setBackgroundResource(R.drawable.labelshape);
 		score.setTextSize(25);
-		setScore(0);
+		setScore(scoreName, scoreValue);
 		
 		// set Optional
 		TextView optional = (TextView)mapView.findViewById(R.id.optional);
 		optional.setBackgroundResource(R.drawable.labelshape);
 		optional.setTextSize(25);
-		setOptional(0);
+		setOptional(optionalName, optionalValue);
 	}
 	
 	public void setHealthbar(int maxValue, int value){
@@ -99,21 +101,26 @@ public class FragmentMap extends Fragment{
 		healthNumber.setText(t);
 	}
 	
-	public void setScore(int value){
-		this.scoreStatus = value;
+	public void setScore(String name, String value){
+		this.scoreName = name;
+		this.scoreValue = value;
+		TextView scoreLabel = (TextView)mapView.findViewById(R.id.scoreLabel);
 		TextView scoreSummary = (TextView)mapView.findViewById(R.id.scoreSummary);
 		if(scoreSummary != null){
-			scoreSummary.setText(Integer.toString(scoreStatus));
+			scoreSummary.setText(scoreValue);
+			scoreLabel.setText(scoreName);
 		}else{
 			Log.i("fragment", "Scorefeld war beim Setzen null");
 		}
 	}
 	
-	public void setOptional(int value){
-		this.optionalStatus = value;
+	public void setOptional(String name, String value){
+		this.optionalValue = value;
 		TextView optional = (TextView)mapView.findViewById(R.id.optional);
+		TextView optionalLabel = (TextView)mapView.findViewById(R.id.optionalLabel);
 		if(optional != null){
-			optional.setText(Integer.toString(optionalStatus));
+			optional.setText(optionalValue);
+			optionalLabel.setText(optionalName);
 		}else{
 			Log.i("fragment", "Optionalfeld war beim Setzen null");
 		}
@@ -123,7 +130,7 @@ public class FragmentMap extends Fragment{
 	public void onResume() {
 		super.onResume();
 		setHealthbar(maxHealth, currentHealth);
-		setScore(scoreStatus);
-		setOptional(optionalStatus);
+		setScore(scoreName, scoreValue);
+		setOptional(optionalName, optionalValue);
 	}
 }
