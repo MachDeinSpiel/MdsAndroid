@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.ViewGroup;
+import de.hsbremen.mds.android.fragment.FragmentGamePipe;
 import de.hsbremen.mds.android.fragment.FragmentGameReaction;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
@@ -41,6 +42,8 @@ public class SwipeAdapter extends FragmentPagerAdapter{
 
 	private void initFragments() {	
         
+		/*----AKTIV FRAGMENTS----*/
+		// Init Standard Fragments
         FragmentMap locationFragment = new FragmentMap();
         activeFragmentsList.put("showMap", locationFragment);
         activeFragmentsNumbers.add("showMap");
@@ -49,7 +52,8 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         activeFragmentsList.put("inventory", inventoryFragment);
         activeFragmentsNumbers.add("inventory");
         
-        //INAKTIVE FRAGMENTS
+        /*----INAKTIVE FRAGMENTS----*/
+        // Init Dialog Fragments
         FragmentText textFragment = new FragmentText();
         textFragment.setSwipeAdapter(this);
         fragmentsPoolList.put("showText", textFragment);
@@ -62,8 +66,12 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         videoFragment.setSwipeAdapter(this);
         fragmentsPoolList.put("showVideo", videoFragment);	
         
+        // Init Minigames
         FragmentGameReaction reactionGameFragment = new FragmentGameReaction();
-        fragmentsPoolList.put("Puzzle", reactionGameFragment);	
+        fragmentsPoolList.put("Puzzle", reactionGameFragment);
+        
+//        FragmentGamePipe pipeGameFragment = new FragmentGamePipe();
+//        fragmentsPoolList.put("Puzzle", pipeGameFragment);
 	}
 	
 	public void removeFragment(String fragmentName){   
