@@ -188,8 +188,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			
 			// endAction of LastState
 			MdsActionExecutable endAction = actionParser.parseAction("end", ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value)).getEndAction(), ((MdsState) (whiteboard.getAttribute(fsmManager.getOwnGroup(),myId+"","lastState").value)), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
-			Log.i(LOGTAG, "Executing End-Action");
 			if(endAction != null){
+				Log.i(LOGTAG, "Executing End-Action");
 				endAction.execute(gui);
 				if (endAction instanceof MdsMiniAppAction) isMiniGame = true;
 			}
