@@ -3,10 +3,12 @@ package de.hsbremen.mds.android.fragment;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import de.hsbremen.mds.android.ingame.ImageLoader;
 import de.hsbremen.mds.common.guiobjects.MdsItem;
 import de.hsbremen.mds.mdsandroid.R;
 
@@ -27,6 +30,7 @@ public class GoogleMapFragment extends MapFragment {
 	private Location lastLocation;
 	private ArrayList<MdsItem> itemLocations = null;
 	private Location playerlocation;
+	private ImageLoader imageLoader;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -37,7 +41,7 @@ public class GoogleMapFragment extends MapFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+		imageLoader = new ImageLoader();
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 	@Override
@@ -60,8 +64,6 @@ public class GoogleMapFragment extends MapFragment {
 		  Criteria criteria = new Criteria();
 		  criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		  String provider = lm.getBestProvider(criteria, true);
-//		  Location myLocation = lm.getLastKnownLocation(provider);
-//		  gmapsUpdate();
 	}
 	
 
@@ -69,18 +71,22 @@ public class GoogleMapFragment extends MapFragment {
 		
 		if(map != null){
 			map.clear();
-	
-			MarkerOptions mp = new MarkerOptions();
-			mp.position(new LatLng(loc.getLatitude(), loc.getLongitude()));
-			mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
-			map.addMarker(mp);
 			
 			if(itemLocations != null){
 				for(MdsItem i : itemLocations){
 					MarkerOptions mpi = new MarkerOptions();
 					mpi.position(new LatLng(i.getLatitude(), i.getLongitude()));
 					mpi.title(i.getName());
-					mpi.icon(BitmapDescriptorFactory.fromResource(R.drawable.unknown));
+					
+					Bitmap icon = imageLoader.getBitmapFromURL(i.getImagePath());
+
+					// Scale big images so normsize
+					int height = icon.getHeight();
+					int width = icon.getWidth();
+					int weight = height/width;
+					Bitmap resized =Bitmap.createScaledBitmap(icon, 100,100*weight, false);
+					
+					mpi.icon(BitmapDescriptorFactory.fromBitmap(resized));
 					map.addMarker(mpi);
 				}
 			}
@@ -91,16 +97,18 @@ public class GoogleMapFragment extends MapFragment {
 			if(!loc.getProvider().equals("dummie")){
 				playerlocation = loc;
 			}
-				mp.position(new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()));
+			
+			MarkerOptions mp = new MarkerOptions();
+			mp.position(new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()));
+	
+			mp.title("Player Position");
+	
+			mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
+			
+			map.addMarker(mp);
 		
-				mp.title("Player Position");
-		
-				mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
-				
-				map.addMarker(mp);
-		
-				map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-				new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()), 16));
+			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+			new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()), 16));
 			
 		}
 	}

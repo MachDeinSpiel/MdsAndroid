@@ -324,11 +324,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			if(iterator < 3){
 				if(key.equals("health")){
 					f.setHealthbar(((int[])dataMap.get(key))[1], ((int[])dataMap.get(key))[0]);
-				}else if(iterator == 2){
-					f.setOptional(((String[])dataMap.get(key))[0], ((String[])dataMap.get(key))[1]);
-				}else{
-					f.setScore(((String[])dataMap.get(key))[0], ((String[])dataMap.get(key))[1]);
 				}
+//				else if(iterator == 2){
+//					f.setOptional(((String[])dataMap.get(key))[0], ((String[])dataMap.get(key))[1]);
+//				}else{
+//					f.setScore(((String[])dataMap.get(key))[0], ((String[])dataMap.get(key))[1]);
+//				}
 				iterator++;
 			}
 		}
