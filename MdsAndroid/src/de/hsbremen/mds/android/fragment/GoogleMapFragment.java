@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +47,6 @@ public class GoogleMapFragment extends MapFragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelable("LAST_LOCATION", lastLocation);
-		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 	}
 	
@@ -80,6 +79,10 @@ public class GoogleMapFragment extends MapFragment {
 					
 					Bitmap icon = imageLoader.getBitmapFromURL(i.getImagePath());
 
+					if(icon == null){
+						icon = BitmapFactory.decodeResource(getResources(), R.drawable.unknown);
+					}
+					
 					// Scale big images so normsize
 					int height = icon.getHeight();
 					int width = icon.getWidth();
@@ -109,7 +112,6 @@ public class GoogleMapFragment extends MapFragment {
 		
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
 			new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()), 16));
-			
 		}
 	}
 	
