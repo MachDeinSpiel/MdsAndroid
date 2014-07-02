@@ -5,6 +5,7 @@ import java.security.acl.Owner;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import com.google.android.gms.internal.ax;
 
@@ -146,6 +147,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		
 		fsmManager.checkEvents(null);
 		sendPlayerData();
+		actionParser.changeMapEntities(gui, whiteboard, fsmManager.getOwnGroup());
 		
 	}
 
@@ -214,6 +216,18 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			if(doAction != null){
 				doAction.execute(gui);
 			}
+			
+			// endGame if final state
+			if(fsmManager.getCurrentState().isFinalsState()) {
+				try {
+					TimeUnit.SECONDS.sleep(10);
+				} catch (InterruptedException e) {
+					Log.e(LOGTAG, "Sleep was interrupted");
+				}
+				gui.endGame();
+				return;
+			}
+			
 			// only checkWBCond if Action is not miniGame, miniGame WBconds will be checked later
 			if (!isMiniGame && !((String)whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "longitude").value).equals("null")
 				&& fsmManager.getCurrentState().getTransitions() != null) {
@@ -271,6 +285,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		fsmManager.checkEvents(null);
 		// send data to android
 		sendPlayerData();
+		actionParser.changeMapEntities(gui, whiteboard, fsmManager.getOwnGroup());
 		
 		
 	}
@@ -334,49 +349,53 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		// dropAction ausführen
 		Whiteboard wbItem = (Whiteboard)whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey()).value;
 		Whiteboard dropAction = (Whiteboard)wbItem.get("dropAction").value;
-		// jede Action ausführen
-		for(String action : dropAction.keySet()) {
-			Log.i("Mistake", "Action ist " + action);
-			Whiteboard wbAction = (Whiteboard)dropAction.get(action).value;
-			// get Params of Action
-			HashMap<String, Object> params = new HashMap<String, Object>();
-			for(String actionParam : wbAction.keySet()) {
-				Log.i("Mistake", "Adding Param " + actionParam);
-				params.put(actionParam, (String)wbAction.get(actionParam).value);
+		if (dropAction != null) {
+			// jede Action ausführen
+			for(String action : dropAction.keySet()) {
+				Log.i("Mistake", "Action ist " + action);
+				Whiteboard wbAction = (Whiteboard)dropAction.get(action).value;
+				// get Params of Action
+				HashMap<String, Object> params = new HashMap<String, Object>();
+				for(String actionParam : wbAction.keySet()) {
+					Log.i("Mistake", "Adding Param " + actionParam);
+					params.put(actionParam, (String)wbAction.get(actionParam).value);
+				}
+				// create Action
+				MdsAction realAction;
+				if (action.equals("addToGroup")) {
+					Log.i("Mistake", "DropAction ist AddToGroup");
+					realAction = new MdsAction(MdsActionIdent.addToGroup, params);
+				} else if (action.equals("removeFromGroup")) {
+					realAction = new MdsAction(MdsActionIdent.removeFromGroup, params);
+				} else if (action.equals("changeAttribute")) {
+					realAction = new MdsAction(MdsActionIdent.changeAttribute, params);
+				} else if (action.equals("showImage")) {
+					realAction = new MdsAction(MdsActionIdent.showImage, params);
+				} else if (action.equals("showMap")) {
+					realAction = new MdsAction(MdsActionIdent.showMap, params);
+				} else if (action.equals("showText")) {
+					realAction = new MdsAction(MdsActionIdent.showText, params);
+				} else if (action.equals("showVideo")) {
+					realAction = new MdsAction(MdsActionIdent.showVideo, params);
+				} else if (action.equals("startMiniApp")) {
+					realAction = new MdsAction(MdsActionIdent.startMiniApp, params);
+				} else if (action.equals("updateMap")) {
+					realAction = new MdsAction(MdsActionIdent.updateMap, params);
+				} else if (action.equals("useItem")) {
+					realAction = new MdsAction(MdsActionIdent.useItem, params);
+				} else {
+					Log.e(LOGTAG, "Die DropAction konnte nicht identifiziert werden");
+					return;
+				}
+				
+				// parse action
+				MdsActionExecutable actionExec = actionParser.parseAction("drop", realAction, fsmManager.getCurrentState(), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
+				// and execute if not null
+				if (actionExec != null)
+					actionExec.execute(gui);
 			}
-			// create Action
-			MdsAction realAction;
-			if (action.equals("addToGroup")) {
-				Log.i("Mistake", "DropAction ist AddToGroup");
-				realAction = new MdsAction(MdsActionIdent.addToGroup, params);
-			} else if (action.equals("removeFromGroup")) {
-				realAction = new MdsAction(MdsActionIdent.removeFromGroup, params);
-			} else if (action.equals("changeAttribute")) {
-				realAction = new MdsAction(MdsActionIdent.changeAttribute, params);
-			} else if (action.equals("showImage")) {
-				realAction = new MdsAction(MdsActionIdent.showImage, params);
-			} else if (action.equals("showMap")) {
-				realAction = new MdsAction(MdsActionIdent.showMap, params);
-			} else if (action.equals("showText")) {
-				realAction = new MdsAction(MdsActionIdent.showText, params);
-			} else if (action.equals("showVideo")) {
-				realAction = new MdsAction(MdsActionIdent.showVideo, params);
-			} else if (action.equals("startMiniApp")) {
-				realAction = new MdsAction(MdsActionIdent.startMiniApp, params);
-			} else if (action.equals("updateMap")) {
-				realAction = new MdsAction(MdsActionIdent.updateMap, params);
-			} else if (action.equals("useItem")) {
-				realAction = new MdsAction(MdsActionIdent.useItem, params);
-			} else {
-				Log.e(LOGTAG, "Die DropAction konnte nicht identifiziert werden");
-				return;
-			}
-			
-			// parse action
-			MdsActionExecutable actionExec = actionParser.parseAction("drop", realAction, fsmManager.getCurrentState(), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
-			// and execute if not null
-			if (actionExec != null)
-				actionExec.execute(gui);
+		} else {
+			Log.d(LOGTAG, "DropAction is null, nothing has been changed");
 		}
 		
 		// Item aus dem Backpack removen

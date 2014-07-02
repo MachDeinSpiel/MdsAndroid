@@ -439,7 +439,7 @@ public class ActionParser {
 		return currentWb;
 	}
 	
-	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb, List<String> playerGroup) {
+	public void changeMapEntities(GuiInterface guiInterface, Whiteboard wb, List<String> playerGroup) {
 		//TODO: add more visibilities
 		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, wb, playerGroup, "", "all", "ownGroup");
 		Log.i(Interpreter.LOGTAG, "Size of Entities ist: " + mapEntities.size() + ", GuiInterface: " + guiInterface);

@@ -25,7 +25,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import de.hsbremen.mds.android.communication.InterpreterCommunicator;
@@ -378,5 +377,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
 			}
 		}
+	}
+
+	@Override
+	public void endGame() {
+		// TODO Auto-generated method stub
+		
 	}
 }
