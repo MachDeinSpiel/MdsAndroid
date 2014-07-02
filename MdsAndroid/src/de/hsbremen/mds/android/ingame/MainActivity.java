@@ -11,8 +11,10 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -383,5 +385,27 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void endGame() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	
+	
+	@Override
+	public void endGame() {
+		showEndDialog();
+	}
+	
+	private void showEndDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Game ended")
+               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   finish();
+                   }
+               })
+               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   finish();
+                   }
+               }).show();
 	}
 }

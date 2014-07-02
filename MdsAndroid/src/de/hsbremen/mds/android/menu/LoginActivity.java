@@ -183,6 +183,7 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 					public void run() {
 						try {
 							stopLoadingScreen(json.getString("message"), false);
+							
 
 						} catch (JSONException e) {
 							e.printStackTrace();
@@ -190,6 +191,8 @@ public class LoginActivity extends Activity implements WebServicesInterface {
 
 					}
 				});
+				webService.closeWebServices();
+
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
