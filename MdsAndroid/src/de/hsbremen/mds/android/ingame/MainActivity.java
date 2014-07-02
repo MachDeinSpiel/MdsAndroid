@@ -380,14 +380,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			}
 		}
 	}
-
-	@Override
-	public void endGame() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
 	
 	@Override
 	public void endGame() {
