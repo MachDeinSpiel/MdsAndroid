@@ -111,8 +111,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		}
 		
 		gpsInit();
-		
-		endGame();
 	}
 	
 	private void setOnPageChangedListener() {
