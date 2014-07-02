@@ -318,6 +318,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void setPlayerData(HashMap<String, Object> dataMap) {
 		FragmentMap f = (FragmentMap)swipeAdapter.getFragment("showMap");
 		
+		validateDataMap(dataMap);
+		
 		int iterator = 0;
 		
 		for(String key : dataMap.keySet()){
@@ -333,5 +335,38 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 				iterator++;
 			}
 		}
+	}
+
+	private void validateDataMap(HashMap<String, Object> dataMap) {
+		boolean health = false;
+		boolean optional1 = false;
+		boolean optional2 = false;
+		
+		if(dataMap.size() >= 3 && dataMap.containsKey("health")){
+			health = true;
+			optional1 = true;
+			optional2 = true;
+		}else if(dataMap.size() == 2 && dataMap.containsKey("health")){
+			health = true;
+			optional1 = true;
+			optional2 = false;
+		}else if(dataMap.size() == 1 && dataMap.containsKey("health")){
+			health = true;
+			optional1 = false;
+			optional2 = false;
+		}else if(dataMap.size() == 1 && !dataMap.containsKey("health")){
+			health = false;
+			optional1 = true;
+			optional2 = false;
+		}else if(dataMap.size() == 2 && !dataMap.containsKey("health")){
+			health = false;
+			optional1 = true;
+			optional2 = true;
+		}else if(dataMap.size() >= 3 && !dataMap.containsKey("health")){
+			health = false;
+			optional1 = true;
+			optional2 = true;
+		}
+		
 	}
 }
