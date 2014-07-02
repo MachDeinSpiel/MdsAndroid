@@ -50,6 +50,8 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 	private WebServices webServ;
 	private SwipeRefreshLayout swipeLayout;
+	
+	Thread loadingThread;
 
 	private Intent lobbyIntent;
 
@@ -58,11 +60,12 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    //Remove title bar
-	    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		// Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-	    //Remove notification bar
-	    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		// Remove notification bar
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		setContentView(R.layout.gamechooser);
 		// GameList adapter = new GameList(GameChooser.this, gameNames,
@@ -87,54 +90,57 @@ public class GameChooser extends Activity implements WebServicesInterface {
 					@Override
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
-						Log.d("Menu", "Loading Screen wird gestartet");
-						startLoadingScreen(GameChooser.this);
-						Log.d("Menu", "Loading Screen wurde gestartet");
-						JSONObject json = null;
-						try {
-							json = new JSONObject();
-							json.put("mode", "join");
-							json.put("id", id);
-							json.put("name", user);
-						} catch (JSONException e) {
-							e.printStackTrace();
-						}
 
-						webServ.send(json.toString());
+						startLoadingScreen("Joining Lobby...");
 
-						lobbyIntent = new Intent(GameChooser.this,
-								GameLobby.class);
-						lobbyIntent.putExtra("isInitial", false);
-						lobbyIntent.putExtra("username", user);
-						lobbyIntent.putExtra("game",
-								activeGamesAdapter.getName(position));
-						lobbyIntent.putExtra("maxplayers",
-								activeGamesAdapter.getMaxplayers(position));
-						lobbyIntent.putExtra("players",
-								activeGamesAdapter.getPlayers(position));
-						File f = GameChooser.this
-								.jsonEinlesen(activeGamesAdapter
-										.getClienturl(position));
-						lobbyIntent.putExtra("spielejson", f);
-						lobbyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						final long gameid = activeGamesAdapter.getId(position);
+						final int pos = position;
 
-						// // TODO Sollte eigentlich ohne anfrage vom server
-						// // gesendet werden
-						// // LobbyListe anfordern:
-						// json = null;
-						//
-						// try {
-						// json = new JSONObject();
-						// json.put("mode", "gamelobby");
-						// // TODO Später GameID einkommentieren
-						// // json.put("id", gameIds[position]);
-						// json.put("action", "players");
-						// } catch (JSONException e) {
-						// // TODO Auto-generated catch block
-						// e.printStackTrace();
-						// }
-						//
-						// webServ.send(json.toString());
+						loadingThread = new Thread(new Runnable() {
+
+							@Override
+							public void run() {
+
+								File f = GameChooser.this
+										.jsonEinlesen(activeGamesAdapter
+												.getClienturl(pos));
+								Log.d("Menu", "GameChooser: ClientURL: "
+										+ activeGamesAdapter.getClienturl(pos));
+								if (f.exists()) {
+
+									lobbyIntent = new Intent(GameChooser.this,
+											GameLobby.class);
+									lobbyIntent.putExtra("isInitial", false);
+									lobbyIntent.putExtra("username", user);
+									lobbyIntent.putExtra("game",
+											activeGamesAdapter.getName(pos));
+									lobbyIntent.putExtra("maxplayers",
+											activeGamesAdapter
+													.getMaxplayers(pos));
+									lobbyIntent.putExtra("players",
+											activeGamesAdapter.getPlayers(pos));
+									lobbyIntent.putExtra("spielejson", f);
+									lobbyIntent
+											.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+									JSONObject json = null;
+									try {
+										json = new JSONObject();
+										json.put("mode", "join");
+										json.put("id", gameid);
+										json.put("name", user);
+									} catch (JSONException e) {
+										e.printStackTrace();
+									}
+
+									webServ.send(json.toString());
+								} else {
+									stopLoadingScreen(
+											"Failed to load GameJSON", false);
+								}
+							}
+						});
+						loadingThread.start();
 					}
 				});
 
@@ -145,63 +151,73 @@ public class GameChooser extends Activity implements WebServicesInterface {
 							int position, long id) {
 
 						Log.d("Menu", "Loading Screen wird gestartet");
-						startLoadingScreen(GameChooser.this);
+						startLoadingScreen("Creating Lobby...");
 						Log.d("Menu", "Loading Screen wurde gestartet");
-						JSONObject json = null;
 
-						try {
-							json = new JSONObject();
-							json.put("mode", "create");
-							// TODO Später GameID einkommentieren
-							// json.put("id", gameIds[position]);
-							json.put("id", id);
-							json.put("name", user);
-							// TODO Maxplayers muss noch dynamisch sein
-							json.put("maxplayers", 2);
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						final int pos = position;
 
-						webServ.send(json.toString());
+						loadingThread = new Thread(new Runnable() {
 
-						Log.d("Socket", "GameChooser: OnItemClick position: "
-								+ position);
+							@Override
+							public void run() {
 
-						lobbyIntent = new Intent(GameChooser.this,
-								GameLobby.class);
-						lobbyIntent.putExtra("isInitial", true);
-						lobbyIntent.putExtra("username", user);
-						lobbyIntent.putExtra("game",
-								gametemplatesAdapter.getName(position));
-						lobbyIntent.putExtra("maxplayers",
-								gametemplatesAdapter.getMaxplayers(position));
-						lobbyIntent.putExtra("players",
-								gametemplatesAdapter.getPlayers(position));
-						File f = GameChooser.this
-								.jsonEinlesen(gametemplatesAdapter
-										.getClienturl(position));
-						lobbyIntent.putExtra("spielejson", f);
-						lobbyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								File f = GameChooser.this
+										.jsonEinlesen(gametemplatesAdapter
+												.getClienturl(pos));
+								Log.d("Menu",
+										"GameChooser: ClientURL: "
+												+ gametemplatesAdapter
+														.getClienturl(pos));
 
-						// TODO Sollte eigentlich ohne anfrage vom server
-						// gesendet werden
-						// LobbyListe anfordern:
-						json = null;
+								if (f.exists()) {
+									lobbyIntent = new Intent(GameChooser.this,
+											GameLobby.class);
+									lobbyIntent.putExtra("isInitial", true);
+									lobbyIntent.putExtra("username", user);
+									lobbyIntent.putExtra("game",
+											gametemplatesAdapter.getName(pos));
+									lobbyIntent.putExtra("maxplayers",
+											gametemplatesAdapter
+													.getMaxplayers(pos));
+									lobbyIntent.putExtra("players",
+											gametemplatesAdapter
+													.getPlayers(pos));
+									lobbyIntent.putExtra("spielejson", f);
+									lobbyIntent
+											.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-						try {
-							json = new JSONObject();
-							json.put("mode", "gamelobby");
-							// TODO Später GameID einkommentieren
-							// json.put("id", gameIds[position]);
-							json.put("action", "players");
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+									JSONObject json = null;
 
-						webServ.send(json.toString());
+									try {
+										json = new JSONObject();
+										json.put("mode", "create");
+										json.put("id",
+												gametemplatesAdapter.getId(pos));
+										json.put("name", user);
+										json.put("maxplayers",
+												gametemplatesAdapter
+														.getMaxplayers(pos));
+									} catch (JSONException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 
+									webServ.send(json.toString());
+
+									Log.d("Socket",
+											"GameChooser: OnItemClick position: "
+													+ pos);
+								} else {
+									Log.d("Menu",
+											"NULLPOINTEREXCEPTION f.exists");
+									stopLoadingScreen(
+											"Failed to load GameJSON", false);
+
+								}
+
+							}
+						});
+						loadingThread.start();
 					}
 				});
 
@@ -233,37 +249,41 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		}
 	}
 
-	protected void startLoadingScreen(final Activity a) {
+	protected void startLoadingScreen(final String message) {
 		runOnUiThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 
-				progress = new ProgressDialog(a);
-				progress.setMessage("Initialisiere Lobby...");
-				progress.show();
+				if (progress == null)
+					progress = new ProgressDialog(getActivity());
+				
+				progress.setMessage(message);
+
+				if (progress == null)
+					progress.show();
 			}
 		});
 	}
 
 	protected void stopLoadingScreen(final String message, final boolean success) {
 		if (success) {
-//			new Thread(new Runnable() {
-//				@Override
-//				public void run() {
-					progress.setMessage(message);
-					progress.setIcon(R.drawable.bomb);
-					progress.setIconAttribute(RESULT_OK);
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					progress.dismiss();
-//				}
-//			}).start();
+			// new Thread(new Runnable() {
+			// @Override
+			// public void run() {
+			progress.setMessage(message);
+			progress.setIcon(R.drawable.bomb);
+			progress.setIconAttribute(RESULT_OK);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			progress.dismiss();
+			// }
+			// }).start();
 		} else {
 			progress.dismiss();
 
@@ -370,6 +390,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		return this;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onWebSocketMessage(String message) {
 
@@ -383,18 +404,24 @@ public class GameChooser extends Activity implements WebServicesInterface {
 			} else if (json.getString("mode").equals("activegames")) {
 				onActiveGamesUpdate(json.getJSONArray("games"));
 			} else if (json.getString("mode").equals("gamelobby")) {
+				Log.d("Menu", "Hier");
 				lobbyIntent.putExtra("json", json.toString());
 				webServ.unbindService();
+				Log.d("Menu", "Hier");
 				runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
 						if (lobbyIntent.getExtras().get("spielejson") != null) {
+							Log.d("Menu", "Hier");
 							stopLoadingScreen("Lobby erstellt", true);
 							getApplicationContext().startActivity(lobbyIntent);
-						}else {
-							stopLoadingScreen("SpieleJSON konnte nicht geladen werden", false);
-							
+						} else {
+							Log.d("Menu", "Hier else#");
+							stopLoadingScreen(
+									"SpieleJSON konnte nicht geladen werden",
+									false);
+
 						}
 					}
 				});
@@ -413,7 +440,12 @@ public class GameChooser extends Activity implements WebServicesInterface {
 						getApplicationContext().startActivity(intent);
 					}
 				});
+			} else if(json.getString("mode").equals("error")){
+				if(loadingThread != null)
+					loadingThread.stop();
+				stopLoadingScreen(json.getString("message"), false);
 			}
+				
 			;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

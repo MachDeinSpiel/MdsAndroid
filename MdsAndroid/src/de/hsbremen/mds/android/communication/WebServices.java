@@ -1,10 +1,9 @@
 package de.hsbremen.mds.android.communication;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Vector;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -69,8 +68,6 @@ public class WebServices {
 		return w;
 	}
 
-
-
 	public void send(final String s) {
 		if (socketService != null) {
 			Thread thread = new Thread() {
@@ -91,7 +88,17 @@ public class WebServices {
 
 			@Override
 			public void run() {
-				actInterface.onWebSocketMessage(message);
+				try {
+					if (new JSONObject(message).has("mode"))
+						actInterface.onWebSocketMessage(message);
+					else
+						Log.e("Socket", "WebServices: Kein Mode in JSON: "
+								+ message);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 			}
 		}).start();
 		;
@@ -99,7 +106,16 @@ public class WebServices {
 
 	public void closeWebServices() {
 		// Detach our existing connection.
-		actInterface.getActivity().unbindService(serviceConn);
+
+		actInterface
+				.getActivity()
+				.getBaseContext()
+				.stopService(
+						new Intent(actInterface.getActivity(),
+								SocketService.class));
+
+		actInterface.getActivity().getBaseContext()
+				.unbindService(this.serviceConn);
 	}
 
 	public void onSocketConnected() {
@@ -123,8 +139,9 @@ public class WebServices {
 	public void unbindService() {
 		// Null um ihn zu unbinden vom service
 		socketService.setWebService(null);
-		// TODO Service richtig unbinden:
-		// socketService.unbindService(serviceConn);
+		actInterface.getActivity().getBaseContext()
+				.unbindService(this.serviceConn);
+
 	}
 
 	public void onConnectionClosed(final int code, final String reason,

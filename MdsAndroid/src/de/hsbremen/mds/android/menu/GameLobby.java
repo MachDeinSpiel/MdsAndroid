@@ -163,6 +163,12 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	protected void onResume() {
 		super.onResume();
 	}
+	
+	protected void onDestroy() {
+		webServ.unbindService();
+		super.onDestroy();
+	}
+
 
 	@Override
 	public Activity getActivity() {
@@ -201,6 +207,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 								GameChooser.class);
 						myIntent.putExtra("username", username);
 						myIntent.putExtra("json", json.toString());
+						myIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
 						GameLobby.this.startActivity(myIntent);
 						finish();
 					}
