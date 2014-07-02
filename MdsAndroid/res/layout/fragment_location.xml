@@ -6,6 +6,7 @@
     tools:context="FragmentMap" >
 
     <LinearLayout
+        android:id="@+id/healthBarCont"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -49,6 +50,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/scoreContainer"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -75,6 +77,7 @@
     </LinearLayout>
 
 	<LinearLayout
+	    	android:id="@+id/optionalContainer"
 	        android:layout_width="0dp"
 	        android:layout_height="match_parent"
 	        android:layout_weight="1"

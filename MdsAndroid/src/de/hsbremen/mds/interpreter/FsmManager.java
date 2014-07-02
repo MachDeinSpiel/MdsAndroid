@@ -48,18 +48,12 @@ public class FsmManager {
 			try{
 				// set own group
 				ownGroup = wb.getGroupString(myID);
-				if(ownGroup.size() > 1) {
-					wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup.get(0), ownGroup.get(1), ""+myID, CURRENT_STATE);
-					wb.setAttribute(new WhiteboardEntry("lastSt","all"), ownGroup,""+myID,LAST_STATE);
-				} else {
-					wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup.get(0), ""+myID,CURRENT_STATE);
-					wb.setAttribute(new WhiteboardEntry("lastSt","all"), ownGroup.get(0),""+myID,LAST_STATE);
-				}
+				wb.setAttribute(new WhiteboardEntry("currentSt","all"), ownGroup, ""+myID, CURRENT_STATE);
+				wb.setAttribute(new WhiteboardEntry("lastSt","all"), ownGroup,""+myID,LAST_STATE);
 				//FIXME: fix my shit up
 				wb.getAttribute(ownGroup, myID, LAST_STATE).value = new MdsState(-1, "", null , null, null, null, false, false);
 
 				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup.get(0));
-				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(ownGroup,myID).value.toString());
 				
 			}catch(InvalidWhiteboardEntryException e){
 				e.printStackTrace();

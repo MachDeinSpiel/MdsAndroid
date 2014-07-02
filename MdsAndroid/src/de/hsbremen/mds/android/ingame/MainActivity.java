@@ -11,8 +11,10 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -109,6 +111,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		}
 		
 		gpsInit();
+		
+		endGame();
 	}
 	
 	private void setOnPageChangedListener() {
@@ -318,6 +322,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void setPlayerData(HashMap<String, Object> dataMap) {
 		FragmentMap f = (FragmentMap)swipeAdapter.getFragment("showMap");
 		
+		validateDataMap(dataMap);
+		Log.i("image", "Size von Hashmap: " + dataMap.size());
+		
 		int iterator = 0;
 		
 		for(String key : dataMap.keySet()){
@@ -334,4 +341,70 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			}
 		}
 	}
+
+	private void validateDataMap(HashMap<String, Object> dataMap) {
+
+		LinearLayout healthlayout = (LinearLayout)findViewById(R.id.healthBarCont);
+		LinearLayout scoreLayout = (LinearLayout)findViewById(R.id.scoreContainer);
+		LinearLayout optionalLayout = (LinearLayout)findViewById(R.id.optionalContainer);
+		
+		if(healthlayout != null || scoreLayout != null || optionalLayout != null) {
+			if(dataMap.size() >= 3 && dataMap.containsKey("health")){
+				Log.i("image", "1");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+			}else if(dataMap.size() == 2 && dataMap.containsKey("health")){
+				Log.i("image", "2");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+			}else if(dataMap.size() == 1 && dataMap.containsKey("health")){
+				Log.i("image", "3");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+			}else if(dataMap.size() == 1 && !dataMap.containsKey("health")){
+				Log.i("image", "4");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+			}else if(dataMap.size() == 2 && !dataMap.containsKey("health")){
+				Log.i("image", "5");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+			}else if(dataMap.size() >= 3 && !dataMap.containsKey("health")){
+				Log.i("image", "6");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+			}
+		}
+	}
+
+	
+	
+	
+	@Override
+	public void endGame() {
+		showEndDialog();
+	}
+	
+	private void showEndDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Game ended")
+               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   finish();
+                   }
+               })
+               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   finish();
+                   }
+               }).show();
+	}
+	
+	
 }

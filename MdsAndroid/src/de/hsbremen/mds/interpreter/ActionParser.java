@@ -1,5 +1,6 @@
 package de.hsbremen.mds.interpreter;
 
+import java.security.acl.Owner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(String type, MdsAction action, final MdsState state, final Whiteboard wb, final List<String> myGroup, final String myId, final ServerInterpreterInterface sii){
+	public MdsActionExecutable parseAction(final String type, MdsAction action, final MdsState state, final Whiteboard wb, final List<String> myGroup, final String myId, final ServerInterpreterInterface sii){
 		
 		if(action == null){
 			//Action exisitert eigentlich gar nicht? -> GTFO!
@@ -143,6 +144,12 @@ public class ActionParser {
 					//Log.i(Interpreter.LOGTAG, "Keys sind" + keys[0] + keys[1] + ((keys[2] != null) ? keys[2] : "kein dritter key"));
 					WhiteboardEntry copy;
 					try {
+						// if type is drop, set Position of Item to player's position
+						if (type.equals("drop")) {
+							((Whiteboard)target.value).getAttribute("longitude").value = wb.getAttribute(myGroup, ""+myId, "longitude").value;
+							((Whiteboard)target.value).getAttribute("latitude").value = wb.getAttribute(myGroup, ""+myId, "latitude").value;
+						}
+						
 						copy = new WhiteboardEntry(target.value, target.visibility);
 						// fill new Element into Whiteboard
 						// get group
@@ -203,9 +210,9 @@ public class ActionParser {
 					Log.i("Mistake", "Group is: " + currentWb.toString());
 					String[] keys = ((String)params.get("target")).split("\\.");
 					WhiteboardEntry result;
-					try {
+					result = currentWb.remove(keys[keys.length-1]);
+					if (result != null) {
 						// only gives result when path is directly written (e.g. Bombs.Bomb1)
-						result = currentWb.remove(keys[keys.length-1]);
 						Log.i("Mistake", "Target-Key: " + keys[keys.length-1]);
 						Log.i("Mistake", "result is: " + result.toString());
 						Log.i("Mistake", "result is: " + result.value.toString());
@@ -228,7 +235,7 @@ public class ActionParser {
 							e.printStackTrace();
 						}
 						changeMapEntities(guiInterface, wb, myGroup);
-					} catch (NullPointerException npe) {
+					} else {
 						// otherwise we use the parsed value
 						Log.i(Interpreter.LOGTAG, "Removing an Object");
 						
@@ -433,7 +440,6 @@ public class ActionParser {
 	}
 	
 	private void changeMapEntities(GuiInterface guiInterface, Whiteboard wb, List<String> playerGroup) {
-		
 		//TODO: add more visibilities
 		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, wb, playerGroup, "", "all", "ownGroup");
 		Log.i(Interpreter.LOGTAG, "Size of Entities ist: " + mapEntities.size() + ", GuiInterface: " + guiInterface);

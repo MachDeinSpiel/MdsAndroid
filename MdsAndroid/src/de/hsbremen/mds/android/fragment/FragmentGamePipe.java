@@ -83,7 +83,7 @@ public class FragmentGamePipe extends Fragment{
 
 		     public void onTick(long millisUntilFinished) {
 		    	 long remainingTime = millisUntilFinished / 1000;
-		         timer.setText("Hit every Field " + remainingTime);
+		         timer.setText("Time remaining: " + remainingTime);
 		         
 		         checkPipes(remainingTime);
 		     }
@@ -92,10 +92,13 @@ public class FragmentGamePipe extends Fragment{
 		 		 
 		 		 MainActivity mA = (MainActivity)getActivity();
 		 		
-		 		 //Prepare MdsInfoObject for nextFragment
-			 	 mA.updateSwipeAdapter("Puzzle");
-			 	 
-			 	 mA.interpreterCom.onGameResult(0, "Puzzle");
+		 		 if(!gameEnded){
+			 		 //Prepare MdsInfoObject for nextFragment
+				 	 mA.updateSwipeAdapter("Puzzle");
+				 	 
+				 	 mA.interpreterCom.onGameResult(0, "Puzzle");
+		 		 }
+
 
 		     }
 		  }.start();
@@ -261,5 +264,24 @@ public class FragmentGamePipe extends Fragment{
 		gameEnded = false;
 		pipeList.clear();
 		placePipes(gameNumber);
+		
+		if (gameNumber == 1) {
+			currentGame = game1;
+			currentGameDraws = game1Draws;
+			end = (TextView) gameView.findViewById(R.id.targetLeft);
+			end.setTextColor(Color.WHITE);
+
+		} else if (gameNumber == 2) {
+			currentGame = game2;
+			currentGameDraws = game2Draws;
+			end = (TextView) gameView.findViewById(R.id.targetLeft);
+			end.setTextColor(Color.WHITE);
+		} else {
+			currentGame = game3;
+			currentGameDraws = game3Draws;
+			end = (TextView) gameView.findViewById(R.id.targetRight);
+			end.setTextColor(Color.WHITE);
+		}
+		
 	}
 }

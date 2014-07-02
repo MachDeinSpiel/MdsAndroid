@@ -145,6 +145,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "latitude"));
 		
 		fsmManager.checkEvents(null);
+		sendPlayerData();
 		
 	}
 
@@ -219,6 +220,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				fsmManager.checkEvents(null);
 				sendPlayerData();
 			}
+			Log.i("Mistake", "Sending Player Data");
 			// TODO: Testausgaben
 			Log.i(LOGTAG, "Health des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","health").value);
 			Log.i(LOGTAG, "Inventory des Spielers: " + whiteboard.getAttribute(fsmManager.getOwnGroup(), myId+"","inventory").value);
@@ -297,7 +299,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 					
 				// else just save the key and the value, if NOT standart key
 				} else if(!(playerAtt.equals("pathKey") || playerAtt.equals("latitude") || playerAtt.equals("longitude") || 
-						  playerAtt.equals("visibility") || playerAtt.equals("iconName") || playerAtt.equals("imagePath") || playerAtt.equals("inventory"))){
+						  playerAtt.equals("visibility") || playerAtt.equals("iconName") || playerAtt.equals("imagePath") || playerAtt.equals("mimagePath") || playerAtt.equals("inventory"))){
 					Log.i("Mistake", "Adding " + playerAtt);
 					dataMap.put(playerAtt, (String)player.get(playerAtt).value);
 				}
@@ -369,15 +371,13 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				Log.e(LOGTAG, "Die DropAction konnte nicht identifiziert werden");
 				return;
 			}
+			
 			// parse action
 			MdsActionExecutable actionExec = actionParser.parseAction("drop", realAction, fsmManager.getCurrentState(), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			// and execute if not null
 			if (actionExec != null)
 				actionExec.execute(gui);
 		}
-		
-		// TODO: Testausgabe
-		Log.i("Mistake", "Flags ist: " + whiteboard.get("Flags").value);
 		
 		// Item aus dem Backpack removen
 		deleteBackpackItem(item);
@@ -457,32 +457,37 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		// after update, initiate fsm, sendPlayerData and remove Dummy
 		fsmManager.initiate();
 		
-		Log.i(LOGTAG, "Removing Dummy Text in Inventory");
-		// remove dummy from inventory
-		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put("name", "removeFromGroup");
+		// delete dummy from inventory
+		deleteDummy(whiteboard, new Vector<String>());
 		
-		// adding param taget = inventory.dummy
-		String paramString = fsmManager.getOwnGroup().get(0);
-		for(int i = 1; i < fsmManager.getOwnGroup().size(); i++)
-			paramString += "." + fsmManager.getOwnGroup().get(i);
-		paramString += "." + myId + "." + "inventory.dummy";
-		params.put("target", paramString);
-		
-		// adding param group = inventory
-		paramString = fsmManager.getOwnGroup().get(0);
-		for(int i = 1; i < fsmManager.getOwnGroup().size(); i++)
-			paramString += "." + fsmManager.getOwnGroup().get(i);
-		paramString += "." + myId + "." + "inventory";
-		params.put("group", paramString);
-		
-		MdsAction action = new MdsAction(MdsActionIdent.removeFromGroup, params);
-		MdsActionExecutable actionExec = actionParser.parseAction("dummyDelete", action, null, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
-		if (actionExec != null) {
-			Log.i(LOGTAG, "Executing Action " + action.getIdent().toString());
-			actionExec.execute(gui);
+	}
+
+
+	/**
+	 * Looks in Whiteboard for dummys and removes them
+	 * @param wb
+	 * @param keys
+	 */
+	private void deleteDummy(Whiteboard wb, List<String> keys) {
+		// go through whiteboard
+		for(String key : wb.keySet()) {
+			Log.i("Mistake", "Key is " + key);
+			if(wb.get(key).value instanceof Whiteboard) {
+				keys.add(key);
+				deleteDummy((Whiteboard)wb.get(key).value, keys);
+			// if value is String and equals dummy remove it
+			} else if(key.equals("dummy")) {
+				Log.i("Mistake", "Whiteboard " + wb.toString());
+				wb.remove(key);
+				Log.i("Mistake", "WB is now " + wb.toString());
+				// tell server
+				try {
+					serverInterpreter.onWhiteboardUpdate(keys, new WhiteboardEntry("delete", "none"));
+				} catch (InvalidWhiteboardEntryException e) {
+					Log.e(LOGTAG, "Could not delete " + keys.get(keys.size()-1));
+				}
+			}
 		}
-		
 	}
 
 	@Override
