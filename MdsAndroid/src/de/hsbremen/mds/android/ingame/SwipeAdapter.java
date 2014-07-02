@@ -9,8 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.ViewGroup;
-import de.hsbremen.mds.android.fragment.FragmentGamePuzzle;
-import de.hsbremen.mds.android.fragment.FragmentGameReaction;
+import de.hsbremen.mds.android.fragment.FragmentGamePipe;
 import de.hsbremen.mds.android.fragment.FragmentImage;
 import de.hsbremen.mds.android.fragment.FragmentInventory;
 import de.hsbremen.mds.android.fragment.FragmentMap;
@@ -67,11 +66,11 @@ public class SwipeAdapter extends FragmentPagerAdapter{
         fragmentsPoolList.put("showVideo", videoFragment);	
         
         // Init Minigames
-        FragmentGameReaction reactionGameFragment = new FragmentGameReaction();
-        fragmentsPoolList.put("Puzzle", reactionGameFragment);
+//        FragmentGameReaction reactionGameFragment = new FragmentGameReaction();
+//        fragmentsPoolList.put("Puzzle", reactionGameFragment);
         
-//        FragmentGamePipe pipeGameFragment = new FragmentGamePipe();
-//        fragmentsPoolList.put("Puzzle", pipeGameFragment);
+        FragmentGamePipe pipeGameFragment = new FragmentGamePipe();
+        fragmentsPoolList.put("Puzzle", pipeGameFragment);
         
 //        FragmentGamePuzzle puzzleGameFragment = new FragmentGamePuzzle();
 //        fragmentsPoolList.put("Puzzle", puzzleGameFragment);
