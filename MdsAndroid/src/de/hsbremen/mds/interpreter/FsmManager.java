@@ -54,7 +54,6 @@ public class FsmManager {
 				wb.getAttribute(ownGroup, myID, LAST_STATE).value = new MdsState(-1, "", null , null, null, null, false, false);
 
 				Log.i("Mistake", "Gruppe des Spielers: " + ownGroup.get(0));
-				Log.i("Mistake", "Inventory des Spielers " + myID + " ist: " + wb.getAttribute(ownGroup,myID).value.toString());
 				
 			}catch(InvalidWhiteboardEntryException e){
 				e.printStackTrace();

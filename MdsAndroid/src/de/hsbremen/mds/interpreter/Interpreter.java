@@ -460,36 +460,35 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		fsmManager.initiate();
 		
 		// delete dummy from inventory
-		deleteDummy();
+		deleteDummy(whiteboard, new Vector<String>());
 		
 	}
 
 
-	private void deleteDummy() {
-		Log.i(LOGTAG, "Removing Dummy Text in Inventory");
-		// remove dummy from inventory
-		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put("name", "removeFromGroup");
-		
-		// adding param taget = inventory.dummy
-		String paramString = fsmManager.getOwnGroup().get(0);
-		for(int i = 1; i < fsmManager.getOwnGroup().size(); i++)
-			paramString += "." + fsmManager.getOwnGroup().get(i);
-		paramString += "." + myId + "." + "inventory.dummy";
-		params.put("target", paramString);
-		
-		// adding param group = inventory
-		paramString = fsmManager.getOwnGroup().get(0);
-		for(int i = 1; i < fsmManager.getOwnGroup().size(); i++)
-			paramString += "." + fsmManager.getOwnGroup().get(i);
-		paramString += "." + myId + "." + "inventory";
-		params.put("group", paramString);
-		
-		MdsAction action = new MdsAction(MdsActionIdent.removeFromGroup, params);
-		MdsActionExecutable actionExec = actionParser.parseAction("dummyDelete", action, null, whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
-		if (actionExec != null) {
-			Log.i(LOGTAG, "Executing Action " + action.getIdent().toString());
-			actionExec.execute(gui);
+	/**
+	 * Looks in Whiteboard for dummys and removes them
+	 * @param wb
+	 * @param keys
+	 */
+	private void deleteDummy(Whiteboard wb, List<String> keys) {
+		// go through whiteboard
+		for(String key : wb.keySet()) {
+			Log.i("Mistake", "Key is " + key);
+			if(wb.get(key).value instanceof Whiteboard) {
+				keys.add(key);
+				deleteDummy((Whiteboard)wb.get(key).value, keys);
+			// if value is String and equals dummy remove it
+			} else if(key.equals("dummy")) {
+				Log.i("Mistake", "Whiteboard " + wb.toString());
+				wb.remove(key);
+				Log.i("Mistake", "WB is now " + wb.toString());
+				// tell server
+				try {
+					serverInterpreter.onWhiteboardUpdate(keys, new WhiteboardEntry("delete", "none"));
+				} catch (InvalidWhiteboardEntryException e) {
+					Log.e(LOGTAG, "Could not delete " + keys.get(keys.size()-1));
+				}
+			}
 		}
 	}
 
