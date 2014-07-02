@@ -314,7 +314,8 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 					
 				// else just save the key and the value, if NOT standart key
 				} else if(!(playerAtt.equals("pathKey") || playerAtt.equals("latitude") || playerAtt.equals("longitude") || 
-						  playerAtt.equals("visibility") || playerAtt.equals("iconName") || playerAtt.equals("imagePath") || playerAtt.equals("mimagePath") || playerAtt.equals("inventory"))){
+						  playerAtt.equals("visibility") || playerAtt.equals("iconName") || playerAtt.equals("imagePath") || 
+						  playerAtt.equals("mimagePath") || playerAtt.equals("mImagePath") || playerAtt.equals("inventory"))){
 					Log.i("Mistake", "Adding " + playerAtt);
 					dataMap.put(playerAtt, (String)player.get(playerAtt).value);
 				}
