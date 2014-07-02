@@ -11,8 +11,10 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -25,7 +27,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import de.hsbremen.mds.android.communication.InterpreterCommunicator;
@@ -110,6 +111,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		}
 		
 		gpsInit();
+		
+		endGame();
 	}
 	
 	private void setOnPageChangedListener() {
@@ -379,4 +382,29 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			}
 		}
 	}
+
+	
+	
+	
+	@Override
+	public void endGame() {
+		showEndDialog();
+	}
+	
+	private void showEndDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Game ended")
+               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   finish();
+                   }
+               })
+               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   finish();
+                   }
+               }).show();
+	}
+	
+	
 }

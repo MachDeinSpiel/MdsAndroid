@@ -83,7 +83,7 @@ public class FragmentGamePipe extends Fragment{
 
 		     public void onTick(long millisUntilFinished) {
 		    	 long remainingTime = millisUntilFinished / 1000;
-		         timer.setText("Hit every Field " + remainingTime);
+		         timer.setText("Time remaining: " + remainingTime);
 		         
 		         checkPipes(remainingTime);
 		     }
