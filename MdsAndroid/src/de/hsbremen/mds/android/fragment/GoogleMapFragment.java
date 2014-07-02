@@ -100,15 +100,6 @@ public class GoogleMapFragment extends MapFragment {
 			if(!loc.getProvider().equals("dummie")){
 				playerlocation = loc;
 			}
-			
-			MarkerOptions mp = new MarkerOptions();
-			mp.position(new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()));
-	
-			mp.title("Player Position");
-	
-			mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.player));
-			
-			map.addMarker(mp);
 		
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
 			new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()), 16));
