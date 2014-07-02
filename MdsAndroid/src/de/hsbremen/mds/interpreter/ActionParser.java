@@ -1,5 +1,6 @@
 package de.hsbremen.mds.interpreter;
 
+import java.security.acl.Owner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class ActionParser {
 	 * @param myId	Id des Spielers, der diese Action ausführt
 	 * @return	Ausführbares MdsExecutableAction Objekt
 	 */
-	public MdsActionExecutable parseAction(String type, MdsAction action, final MdsState state, final Whiteboard wb, final List<String> myGroup, final String myId, final ServerInterpreterInterface sii){
+	public MdsActionExecutable parseAction(final String type, MdsAction action, final MdsState state, final Whiteboard wb, final List<String> myGroup, final String myId, final ServerInterpreterInterface sii){
 		
 		if(action == null){
 			//Action exisitert eigentlich gar nicht? -> GTFO!
@@ -143,6 +144,12 @@ public class ActionParser {
 					//Log.i(Interpreter.LOGTAG, "Keys sind" + keys[0] + keys[1] + ((keys[2] != null) ? keys[2] : "kein dritter key"));
 					WhiteboardEntry copy;
 					try {
+						// if type is drop, set Position of Item to player's position
+						if (type.equals("drop")) {
+							((Whiteboard)target.value).getAttribute("longitude").value = wb.getAttribute(myGroup, ""+myId, "longitude").value;
+							((Whiteboard)target.value).getAttribute("latitude").value = wb.getAttribute(myGroup, ""+myId, "latitude").value;
+						}
+						
 						copy = new WhiteboardEntry(target.value, target.visibility);
 						// fill new Element into Whiteboard
 						// get group

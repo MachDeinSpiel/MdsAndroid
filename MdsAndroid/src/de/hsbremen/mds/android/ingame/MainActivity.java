@@ -345,36 +345,38 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		LinearLayout scoreLayout = (LinearLayout)findViewById(R.id.scoreContainer);
 		LinearLayout optionalLayout = (LinearLayout)findViewById(R.id.optionalContainer);
 		
-		if(dataMap.size() >= 3 && dataMap.containsKey("health")){
-			Log.i("image", "1");
-			healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-		}else if(dataMap.size() == 2 && dataMap.containsKey("health")){
-			Log.i("image", "2");
-			healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-		}else if(dataMap.size() == 1 && dataMap.containsKey("health")){
-			Log.i("image", "3");
-			healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-			optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-		}else if(dataMap.size() == 1 && !dataMap.containsKey("health")){
-			Log.i("image", "4");
-			healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-			scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-		}else if(dataMap.size() == 2 && !dataMap.containsKey("health")){
-			Log.i("image", "5");
-			healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-			scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-		}else if(dataMap.size() >= 3 && !dataMap.containsKey("health")){
-			Log.i("image", "6");
-			healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-			scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+		if(healthlayout != null || scoreLayout != null || optionalLayout != null) {
+			if(dataMap.size() >= 3 && dataMap.containsKey("health")){
+				Log.i("image", "1");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+			}else if(dataMap.size() == 2 && dataMap.containsKey("health")){
+				Log.i("image", "2");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+			}else if(dataMap.size() == 1 && dataMap.containsKey("health")){
+				Log.i("image", "3");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+			}else if(dataMap.size() == 1 && !dataMap.containsKey("health")){
+				Log.i("image", "4");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+			}else if(dataMap.size() == 2 && !dataMap.containsKey("health")){
+				Log.i("image", "5");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+			}else if(dataMap.size() >= 3 && !dataMap.containsKey("health")){
+				Log.i("image", "6");
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+			}
 		}
 	}
 }

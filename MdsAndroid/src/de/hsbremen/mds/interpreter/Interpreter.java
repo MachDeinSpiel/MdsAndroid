@@ -299,7 +299,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 					
 				// else just save the key and the value, if NOT standart key
 				} else if(!(playerAtt.equals("pathKey") || playerAtt.equals("latitude") || playerAtt.equals("longitude") || 
-						  playerAtt.equals("visibility") || playerAtt.equals("iconName") || playerAtt.equals("imagePath") || playerAtt.equals("inventory"))){
+						  playerAtt.equals("visibility") || playerAtt.equals("iconName") || playerAtt.equals("imagePath") || playerAtt.equals("mimagePath") || playerAtt.equals("inventory"))){
 					Log.i("Mistake", "Adding " + playerAtt);
 					dataMap.put(playerAtt, (String)player.get(playerAtt).value);
 				}
@@ -371,15 +371,13 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 				Log.e(LOGTAG, "Die DropAction konnte nicht identifiziert werden");
 				return;
 			}
+			
 			// parse action
 			MdsActionExecutable actionExec = actionParser.parseAction("drop", realAction, fsmManager.getCurrentState(), whiteboard, fsmManager.getOwnGroup(), myId, serverInterpreter);
 			// and execute if not null
 			if (actionExec != null)
 				actionExec.execute(gui);
 		}
-		
-		// TODO: Testausgabe
-		Log.i("Mistake", "Flags ist: " + whiteboard.get("Flags").value);
 		
 		// Item aus dem Backpack removen
 		deleteBackpackItem(item);
