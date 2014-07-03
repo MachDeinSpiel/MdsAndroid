@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,6 +52,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 
 	PlayerListItem playerAdapter;
 
+	private ProgressDialog progressDial;
 	private WebServices webServ;
 	private File spielejson;
 
@@ -98,8 +100,11 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		if (isInitialPlayer) {
 			startBtn.setOnClickListener(new OnClickListener() {
 
+
 				@Override
 				public void onClick(View v) {
+					progressDial = ProgressDialog.show(getActivity(), "Game Lobby", "Starting Game...");
+					
 					JSONObject json = new JSONObject();
 					try {
 						json.put("mode", "gamelobby");
@@ -165,6 +170,8 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	}
 	
 	protected void onDestroy() {
+		if(progressDial != null)
+			progressDial.dismiss();
 		webServ.unbindService();
 		super.onDestroy();
 	}
@@ -191,6 +198,8 @@ public class GameLobby extends Activity implements WebServicesInterface,
 					}
 					if (json.getString("mode").equals("full")) {
 
+						if(progressDial == null)
+							progressDial = ProgressDialog.show(getActivity(), "Game Lobby", "Starting Game...");
 						// Fullwhiteboardupdate (Spiel wurde gestartet)
 						Intent intent = new Intent(GameLobby.this,
 								MainActivity.class);
@@ -198,7 +207,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 						intent.putExtra("json", json.toString());
 						intent.putExtra("spielejson", spielejson);
 						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						getApplicationContext().startActivity(intent);
+						getApplicationContext().startActivity(intent);						
 						finish();
 					}
 					if (json.get("mode").equals("gametemplates")

@@ -53,6 +53,8 @@ public class WebServices {
 			public void onServiceDisconnected(ComponentName className) {
 				// This is called when the connection with the service has been
 				// unexpectedly disconnected
+
+				Log.d("Socket", "WebService: ServiceConn disconnected" + actInterface.getActivity().getClass().toString());
 				socketService = null;
 			}
 		};
@@ -89,6 +91,7 @@ public class WebServices {
 			@Override
 			public void run() {
 				try {
+					Log.e("Socket", "WebServices: Nachricht angekommen bei: "+ actInterface.getClass().toString());
 					if (new JSONObject(message).has("mode"))
 						actInterface.onWebSocketMessage(message);
 					else
@@ -106,6 +109,7 @@ public class WebServices {
 
 	public void closeWebServices() {
 		// Detach our existing connection.
+		Log.d("Socket", "WebService: wird geschlossen..." + actInterface.getActivity().getClass().toString());
 
 		actInterface
 				.getActivity()
@@ -138,7 +142,7 @@ public class WebServices {
 
 	public void unbindService() {
 		// Null um ihn zu unbinden vom service
-		socketService.setWebService(null);
+		Log.d("Socket", "WebService: wird ungebindet..." + actInterface.getActivity().getClass().toString());
 		actInterface.getActivity().getBaseContext()
 				.unbindService(this.serviceConn);
 
@@ -151,6 +155,7 @@ public class WebServices {
 
 			@Override
 			public void run() {
+				Log.d("Socket", "WebService: onConnectionClosed: " + actInterface.getActivity().getClass().toString());
 				actInterface.onWebserviceConnectionClosed(code, reason, remote);
 			}
 		}).start();
@@ -162,6 +167,7 @@ public class WebServices {
 
 			@Override
 			public void run() {
+				Log.d("Socket", "Webservice: verbunden (Handshake)" + actInterface.getActivity().getClass().toString());
 				actInterface.onWebSocketConnected();
 			}
 		}).start();

@@ -50,7 +50,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 	private WebServices webServ;
 	private SwipeRefreshLayout swipeLayout;
-	
+
 	Thread loadingThread;
 
 	private Intent lobbyIntent;
@@ -106,7 +106,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 												.getClienturl(pos));
 								Log.d("Menu", "GameChooser: ClientURL: "
 										+ activeGamesAdapter.getClienturl(pos));
-								if (f.exists()) {
+								if (f!= null && f.exists()) {
 
 									lobbyIntent = new Intent(GameChooser.this,
 											GameLobby.class);
@@ -150,9 +150,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
 
-						Log.d("Menu", "Loading Screen wird gestartet");
 						startLoadingScreen("Creating Lobby...");
-						Log.d("Menu", "Loading Screen wurde gestartet");
 
 						final int pos = position;
 
@@ -169,7 +167,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 												+ gametemplatesAdapter
 														.getClienturl(pos));
 
-								if (f.exists()) {
+								if (f!=null && f.exists()) {
 									lobbyIntent = new Intent(GameChooser.this,
 											GameLobby.class);
 									lobbyIntent.putExtra("isInitial", true);
@@ -250,40 +248,31 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	}
 
 	protected void startLoadingScreen(final String message) {
-		runOnUiThread(new Runnable() {
 
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
+		progress = ProgressDialog.show(getActivity(), "Initializing Lobby",
+				message);
 
-				if (progress == null)
-					progress = new ProgressDialog(getActivity());
-				
-				progress.setMessage(message);
-
-				if (progress == null)
-					progress.show();
-			}
-		});
 	}
 
 	protected void stopLoadingScreen(final String message, final boolean success) {
 		if (success) {
-			// new Thread(new Runnable() {
-			// @Override
-			// public void run() {
-			progress.setMessage(message);
-			progress.setIcon(R.drawable.bomb);
-			progress.setIconAttribute(RESULT_OK);
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			new Thread(new Runnable() {
+//				@Override
+//				public void run() {
+//					progress.setMessage(message);
+//					progress.setIcon(R.drawable.bomb);
+//					progress.setIconAttribute(RESULT_OK);
+//					try {
+//						Thread.sleep(2000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					progress.dismiss();
+//				}
+//			}).start();
+
 			progress.dismiss();
-			// }
-			// }).start();
 		} else {
 			progress.dismiss();
 
@@ -404,24 +393,15 @@ public class GameChooser extends Activity implements WebServicesInterface {
 			} else if (json.getString("mode").equals("activegames")) {
 				onActiveGamesUpdate(json.getJSONArray("games"));
 			} else if (json.getString("mode").equals("gamelobby")) {
-				Log.d("Menu", "Hier");
 				lobbyIntent.putExtra("json", json.toString());
-				webServ.unbindService();
-				Log.d("Menu", "Hier");
+//				webServ.unbindService();
 				runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
 						if (lobbyIntent.getExtras().get("spielejson") != null) {
-							Log.d("Menu", "Hier");
 							stopLoadingScreen("Lobby erstellt", true);
 							getApplicationContext().startActivity(lobbyIntent);
-						} else {
-							Log.d("Menu", "Hier else#");
-							stopLoadingScreen(
-									"SpieleJSON konnte nicht geladen werden",
-									false);
-
 						}
 					}
 				});
@@ -440,12 +420,12 @@ public class GameChooser extends Activity implements WebServicesInterface {
 						getApplicationContext().startActivity(intent);
 					}
 				});
-			} else if(json.getString("mode").equals("error")){
-				if(loadingThread != null)
+			} else if (json.getString("mode").equals("error")) {
+				if (loadingThread != null)
 					loadingThread.stop();
 				stopLoadingScreen(json.getString("message"), false);
 			}
-				
+
 			;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -559,6 +539,14 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		Log.d("Socket", "GameChooser: onResume()");
 		super.onResume();
 		getNewGameLists();
+	}
+
+	@Override
+	protected void onDestroy() {
+		Log.d("Socket", "GameChooser: onDestroy()");
+		super.onDestroy();
+		stopLoadingScreen(" ", true);
+		webServ.closeWebServices();
 	}
 
 	@Override

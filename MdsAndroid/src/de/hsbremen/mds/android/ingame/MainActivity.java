@@ -162,7 +162,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	protected void onDestroy() {
-		webServ.closeWebServices();
+		webServ.unbindService();
 		super.onDestroy();
 	}
 

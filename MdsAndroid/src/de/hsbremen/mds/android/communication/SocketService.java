@@ -39,10 +39,10 @@ public class SocketService extends Service {
 		Draft d = new Draft_17();
 
 		String PROTOKOLL_WS = "ws://";
-		 String serverIp = "195.37.176.178";
-		 String PORT_WS = ":1387";
-//		String serverIp = "192.168.2.110";
-//		String PORT_WS = ":8887";
+		String serverIp = "195.37.176.178";
+		String PORT_WS = ":1387";
+		// String serverIp = "192.168.2.110";
+		// String PORT_WS = ":8887";
 
 		String serverlocation = PROTOKOLL_WS + serverIp + PORT_WS;
 
@@ -73,7 +73,7 @@ public class SocketService extends Service {
 			if (bufferedMessages.size() > 0) {
 				for (int i = 0; i < bufferedMessages.size(); i++) {
 					webServices.onMessage(bufferedMessages.get(i));
-					
+
 					Log.d("Socket",
 							"SocketService: Buffered Message an Websocket gesendet");
 				}
@@ -91,7 +91,6 @@ public class SocketService extends Service {
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-		webServices = null;
 		return super.onUnbind(intent);
 	}
 
@@ -118,10 +117,14 @@ public class SocketService extends Service {
 	}
 
 	public void onMessage(String message) {
-		if (this.webServices != null)
+		if (this.webServices != null) {
 			webServices.onMessage(message);
-		else
+			Log.d("Socket", "SocketService: onMessage(): Nachricht an webServices geschickt");
+		} else {
 			bufferedMessages.add(message);
+			Log.d("Socket",
+					"SocketService: onMessage(): Nachricht wird gebuffert");
+		}
 	}
 
 	public void onConnectionClosed(int code, String reason, boolean remote) {
