@@ -363,11 +363,10 @@ public class EventParser {
 			
 			// if element is whiteboard
 			if(entry instanceof Whiteboard) {
-				Whiteboard wbEntry = (Whiteboard) entry;
-				if(wbEntry.containsKey("longitude") && wbEntry.containsKey("latitude")) {
+				if(((Whiteboard)entry).containsKey("longitude") && ((Whiteboard)entry).containsKey("latitude")) {
 					// Location Object des Objects erstellen
-					longi = Double.parseDouble(""+ wbEntry.getAttribute("longitude").value);
-					lati = Double.parseDouble(""+ wbEntry.getAttribute("latitude").value);
+					longi = Double.parseDouble(""+ ((Whiteboard)entry).getAttribute("longitude").value);
+					lati = Double.parseDouble(""+ ((Whiteboard)entry).getAttribute("latitude").value);
 					Location loc = new Location("WBLoc");
 					loc.setLatitude(lati);
 					loc.setLongitude(longi);
@@ -400,6 +399,18 @@ public class EventParser {
 		}
 		return result;
 		
+	}
+	
+	public static String parseParamString(String param, List<String> playerGroup, String playerId) {
+		HashMap<String, String> replacements = new HashMap<String, String>();
+		replacements.put("self", parseSelf(playerGroup, playerId));	
+		replacements.put("ownGroup", parsOwnGroup(playerGroup));	
+		
+		for(String toReplace : replacements.keySet()){
+			//Log.i(Interpreter.LOGTAG,"parseParam replace every occurence of ["+toReplace+"]");
+			param = param.replace(toReplace, replacements.get(toReplace));
+		}
+		return param;
 	}
 	
 	/**
@@ -566,6 +577,14 @@ public class EventParser {
 			result += "." + playerGroup.get(i);
 		}
 		result += "." + playerId;
+		return result;
+	}
+	
+	private static String parsOwnGroup(List<String> playerGroup) {
+		String result = playerGroup.get(0);
+		for(int i = 1; i < playerGroup.size(); i++) {
+			result += "." + playerGroup.get(i);
+		}
 		return result;
 	}
 

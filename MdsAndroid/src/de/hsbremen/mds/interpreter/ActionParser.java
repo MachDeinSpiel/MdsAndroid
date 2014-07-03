@@ -226,9 +226,15 @@ public class ActionParser {
 						
 						Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+keys[keys.length-1]+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
 						// server bescheid geben
+						String groupKeyServer = (String)EventParser.parseParamString((String)params.get("group"), myGroup, ""+myId);
+						Log.i("Mistake", "Keys in RemoveToGroup (Group) sind " + groupKeyServer);
 						List<String> keysToValue = new Vector<String>();
-						for(String s : ((String)params.get("target")).split("\\."))
+						for(String s : groupKeyServer.split("\\."))
 							keysToValue.add(s);
+						String targetKeyServer = (String) ((Whiteboard)((WhiteboardEntry)parsedParams.get("target")).value).get("pathKey").value;
+						Log.i("Mistake", "Keys in RemoveToGroup (Target) sind " + targetKeyServer);
+						String[] targetKeys = targetKeyServer.split("\\.");
+						keysToValue.add(targetKeys[targetKeys.length-1]);
 						try {
 							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
 						} catch (InvalidWhiteboardEntryException e) {
@@ -248,9 +254,15 @@ public class ActionParser {
 						
 						Log.i(Interpreter.LOGTAG, "removeFromGroup: ["+params.get("target")+ "] (["+key+"]) from group [" + params.get("group").toString()+"], is:["+result.value.toString()+"]");
 						// server bescheid geben
+						String groupKeyServer = (String)EventParser.parseParamString((String)params.get("group"), myGroup, ""+myId);
+						Log.i("Mistake", "Keys in RemoveToGroup (Group) sind " + groupKeyServer);
 						List<String> keysToValue = new Vector<String>();
-						for(String s : ((String)params.get("target")).split("\\."))
+						for(String s : groupKeyServer.split("\\."))
 							keysToValue.add(s);
+						String targetKeyServer = (String) parsedParams.get("target");
+						Log.i("Mistake", "Keys in RemoveToGroup (Target) sind " + targetKeyServer);
+						String[] targetKeys = targetKeyServer.split("\\.");
+						keysToValue.add(targetKeys[targetKeys.length-1]);
 						try {
 							sii.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete","none"));
 						} catch (InvalidWhiteboardEntryException e) {
@@ -269,6 +281,7 @@ public class ActionParser {
 				public void execute(GuiInterface guiInterface) {
 					//Welches Attribut soll geändert werden?
 					List<String> keysToValue = new Vector<String>(Arrays.asList(((String)parsedParams.get("attribute")).split("\\.")));
+					Log.i("Mistake", "Key in changeAttribute is " + (String)parsedParams.get("attribute"));
 					Whiteboard currentWb = parseActionString(wb, keysToValue, myGroup,state, myId);
 					
 					String attributeToChange;
@@ -441,7 +454,7 @@ public class ActionParser {
 	
 	public void changeMapEntities(GuiInterface guiInterface, Whiteboard wb, List<String> playerGroup) {
 		//TODO: add more visibilities
-		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, wb, playerGroup, "", "all", "ownGroup");
+		ArrayList<MdsItem> mapEntities = getEntriesAsItem(wb, wb, playerGroup, "", "all");
 		Log.i(Interpreter.LOGTAG, "Size of Entities ist: " + mapEntities.size() + ", GuiInterface: " + guiInterface);
 		guiInterface.showMap(mapEntities);	
 	}
@@ -467,16 +480,14 @@ public class ActionParser {
 						addMe = true;
 						break;
 					// else look if key equals ownGroup.title	
-					} else {
-						Log.i("Mistake", "Group is: " + v);
-						Log.i("Mistkae", "OnwGroup Title ist: " + root.getAttribute(playerGroup, "title").value);
-						if (v.equals((String)root.getAttribute(playerGroup, "title").value)) {
-							addMe = true;
-							break;
-						}
-						
 					}
 				}
+			}
+			Log.i("Mistake", "OnwGroup Title ist: " + root.getAttribute(playerGroup, "title").value);
+			String vGroup = (String)wb.get("visibility").value;
+			if (vGroup.equals((String)root.getAttribute(playerGroup, "title").value)) {
+				Log.i("Mistake", "Adding an OwnGroup Object");
+				addMe = true;
 			}
 		}
 		if(addMe && pathKey != "object"){

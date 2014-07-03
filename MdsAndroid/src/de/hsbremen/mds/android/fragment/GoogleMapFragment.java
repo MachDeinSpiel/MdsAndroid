@@ -9,6 +9,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,8 +102,12 @@ public class GoogleMapFragment extends MapFragment {
 				playerlocation = loc;
 			}
 		
-			map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-			new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()), 16));
+			try {
+				map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+						new LatLng(playerlocation.getLatitude(), playerlocation.getLongitude()), 16));
+			} catch(NullPointerException e1) {
+				System.err.println("Could not animate Camera. Locaction is null");
+			}
 		}
 	}
 	

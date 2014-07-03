@@ -146,7 +146,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		serverInterpreter.onWhiteboardUpdate(keys, whiteboard.getAttribute(fsmManager.getOwnGroup(), myId, "latitude"));
 		
 		fsmManager.checkEvents(null);
-		sendPlayerData();
 		actionParser.changeMapEntities(gui, whiteboard, fsmManager.getOwnGroup());
 		
 	}
@@ -258,7 +257,6 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 			String elementKey = keys.remove(keys.size()-1);
 			Log.i("Mistake", "elementKey ist: " + elementKey);
 			try{
-				Log.i("Mistake", "Whiteboard: " +whiteboard.toString());
 				WhiteboardEntry groupEntry = whiteboard.getAttribute(keys.toArray(new String[0]));
 //				if(groupEntry == null) {
 //					Log.e(LOGTAG, "No Item Found to Key " + elementKey + ". Maybe it has already been removed");
@@ -350,10 +348,11 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		// dropAction ausführen
 		Whiteboard wbItem = (Whiteboard)whiteboard.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory", item.getPathKey()).value;
 		Whiteboard dropAction = (Whiteboard)wbItem.get("dropAction").value;
+		Log.i("Mistake", "SuperDuber " + dropAction.toString());
 		if (dropAction != null) {
 			// jede Action ausführen
 			for(String action : dropAction.keySet()) {
-				Log.i("Mistake", "Action ist " + action);
+				Log.e("Mistake", "Action ist " + action);
 				Whiteboard wbAction = (Whiteboard)dropAction.get(action).value;
 				// get Params of Action
 				HashMap<String, Object> params = new HashMap<String, Object>();
@@ -401,6 +400,7 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 		
 		// Item aus dem Backpack removen
 		deleteBackpackItem(item);
+		actionParser.changeMapEntities(gui, whiteboard, fsmManager.getOwnGroup());
 	}
 
 
@@ -490,23 +490,43 @@ public class Interpreter implements InterpreterInterface, ClientInterpreterInter
 	 */
 	private void deleteDummy(Whiteboard wb, List<String> keys) {
 		// go through whiteboard
-		for(String key : wb.keySet()) {
-			Log.i("Mistake", "Key is " + key);
-			if(wb.get(key).value instanceof Whiteboard) {
-				keys.add(key);
-				deleteDummy((Whiteboard)wb.get(key).value, keys);
-			// if value is String and equals dummy remove it
-			} else if(key.equals("dummy")) {
-				Log.i("Mistake", "Whiteboard " + wb.toString());
-				wb.remove(key);
-				Log.i("Mistake", "WB is now " + wb.toString());
-				// tell server
-				try {
-					serverInterpreter.onWhiteboardUpdate(keys, new WhiteboardEntry("delete", "none"));
-				} catch (InvalidWhiteboardEntryException e) {
-					Log.e(LOGTAG, "Could not delete " + keys.get(keys.size()-1));
-				}
-			}
+//		for(String key : wb.keySet()) {
+//			if(wb.get(key).value instanceof Whiteboard) {
+//				keys.add(key);
+//				deleteDummy((Whiteboard)wb.get(key).value, keys);
+//			// if value is String and equals dummy remove it
+//			} else if(key.equals("dummy")) {
+//				Log.i("Mistake", "Whiteboard " + wb.toString());
+//				keys.add(key);
+//				wb.remove(key);
+//				Log.i("Mistake", "WB is now " + wb.toString());
+//				// tell server
+//				try {
+//					Log.i("Mistake", "Deleting Dummy ");
+//					for(String keyElem : keys) {
+//						Log.i("Mistake", "Key" + keyElem);
+//					}
+//					serverInterpreter.onWhiteboardUpdate(keys, new WhiteboardEntry("delete", "none"));
+//				} catch (InvalidWhiteboardEntryException e) {
+//					Log.e(LOGTAG, "Could not delete " + keys.get(keys.size()-1));
+//				}
+//			}
+//		}
+		Log.i("Mistake", "Deleting Dummy");
+		Whiteboard inventory = (Whiteboard)wb.getAttribute(fsmManager.getOwnGroup(), ""+myId, "inventory").value;
+		inventory.remove("dummy");
+		
+		List<String> keysToValue = new Vector<String>();
+		for(String key : fsmManager.getOwnGroup())
+			keysToValue.add(key);
+		keysToValue.add(""+myId);
+		keysToValue.add("inventory");
+		keysToValue.add("dummy");
+		try {
+			serverInterpreter.onWhiteboardUpdate(keysToValue, new WhiteboardEntry("delete", "none"));
+		} catch (InvalidWhiteboardEntryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
