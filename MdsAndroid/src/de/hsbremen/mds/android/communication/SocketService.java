@@ -129,11 +129,13 @@ public class SocketService extends Service {
 
 	public void onConnectionClosed(int code, String reason, boolean remote) {
 		// TODO Auto-generated method stub
-		webServices.onConnectionClosed(code, reason, remote);
+		if(webServices != null)
+			webServices.onConnectionClosed(code, reason, remote);
 	}
 
 	public void onConnnectionHandshake() {
-		webServices.onConnectionHandshake();
+		if(webServices != null)
+			webServices.onConnectionHandshake();
 	}
 
 }

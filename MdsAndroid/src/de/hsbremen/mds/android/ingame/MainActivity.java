@@ -208,17 +208,32 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void showMap(ArrayList<MdsItem> items2display) {
-		mapFragment.setItemLocations(items2display);
-		Location l = new Location("dummie");
-		mapFragment.gmapsUpdate(l);
+	public void showMap(final ArrayList<MdsItem> items2display) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				mapFragment.setItemLocations(items2display);
+				Location l = new Location("dummie");
+				mapFragment.gmapsUpdate(l);
+
+			}
+		});
 	}
 
 	@Override
-	public void addToBackpack(MdsItem item) {
-		FragmentInventory f = (FragmentInventory) swipeAdapter
-				.getFragment("inventory");
-		f.addItem(item);
+	public void addToBackpack(final MdsItem item) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				FragmentInventory f = (FragmentInventory) swipeAdapter
+						.getFragment("inventory");
+				f.addItem(item);
+			}
+		});
 	}
 
 	public void getServerData(String type, int id) {
@@ -239,21 +254,29 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void onWebSocketMessage(String message) {
+	public void onWebSocketMessage(final String message) {
+		new Thread(new Runnable() {
 
-		try {
-			final JSONObject json = new JSONObject(message);
+			@Override
+			public void run() {
 
-			// TODO Abfrage ob message für Interpreter wichtig ist, oder z.B.
-			// Spieler Disconnect o.Ä.
-			// json.get("updatemode").equals("full");
+				try {
+					final JSONObject json = new JSONObject(message);
 
-			Log.d("Socket", "MainActivity: JSSSSSSSOOOOON: " + json.toString());
-			interpreterCom.onWebsocketMessage(json);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+					// TODO Abfrage ob message für Interpreter wichtig ist, oder
+					// z.B.
+					// Spieler Disconnect o.Ä.
+					// json.get("updatemode").equals("full");
 
+					Log.d("Socket",
+							"MainActivity: JSSSSSSSOOOOON: " + json.toString());
+					interpreterCom.onWebsocketMessage(json);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+			}
+		}).start();
 	}
 
 	public CharSequence getUsername() {
@@ -265,25 +288,33 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void nextFragment(MdsInfoObject mds) {
+	public void nextFragment(final MdsInfoObject mds) {
+		runOnUiThread(new Runnable() {
 
-		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
-		if (!(mds.getName().equals("showMap"))
-				&& !(mds.getName().equals("backToMap"))) {
+			@Override
+			public void run() {
 
-			if (!(mds.getName().equals("showMap"))) {
-				swipeAdapter.setFragmentInformation(mds);
-				swipeAdapter.addFragment(mds.getName());
+				System.out.println("NextFragment aufgerufen mit: "
+						+ mds.getName());
+				if (!(mds.getName().equals("showMap"))
+						&& !(mds.getName().equals("backToMap"))) {
+
+					if (!(mds.getName().equals("showMap"))) {
+						swipeAdapter.setFragmentInformation(mds);
+						swipeAdapter.addFragment(mds.getName());
+					}
+					viewPager.setCurrentItem(
+							swipeAdapter.getFragmentName(mds.getName()), true);
+				}
+
+				if ((mds.getName().equals("backToMap"))) {
+					if (swipeAdapter.getCount() == 3) {
+						updateSwipeAdapter(swipeAdapter.getLastFragmentName());
+					}
+				}
+
 			}
-			viewPager.setCurrentItem(
-					swipeAdapter.getFragmentName(mds.getName()), true);
-		}
-
-		if ((mds.getName().equals("backToMap"))) {
-			if (swipeAdapter.getCount() == 3) {
-				updateSwipeAdapter(swipeAdapter.getLastFragmentName());
-			}
-		}
+		});
 	}
 
 	public int getStyleNumber() {
@@ -291,10 +322,17 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void removeFromBackpack(String itemPathKey) {
-		FragmentInventory f = (FragmentInventory) swipeAdapter
-				.getFragment("inventory");
-		f.removeItem(itemPathKey);
+	public void removeFromBackpack(final String itemPathKey) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				FragmentInventory f = (FragmentInventory) swipeAdapter
+						.getFragment("inventory");
+				f.removeItem(itemPathKey);
+			}
+		});
 	}
 
 	@Override
@@ -319,27 +357,37 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	@Override
-	public void setPlayerData(HashMap<String, Object> dataMap) {
-		FragmentMap f = (FragmentMap) swipeAdapter.getFragment("showMap");
+	public void setPlayerData(final HashMap<String, Object> dataMap) {
+		runOnUiThread(new Runnable() {
 
-		validateDataMap(dataMap);
-		Log.i("image", "Size von Hashmap: " + dataMap.size());
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
 
-		int iterator = 0;
+				FragmentMap f = (FragmentMap) swipeAdapter
+						.getFragment("showMap");
 
-		for (String key : dataMap.keySet()) {
-			if (iterator < 3) {
-				if (key.equals("health")) {
-					f.setHealthbar(((int[]) dataMap.get(key))[1],
-							((int[]) dataMap.get(key))[0]);
-				} else if (iterator == 2) {
-					f.setOptional(key, ((String) dataMap.get(key)));
-				} else {
-					f.setScore(key, ((String) dataMap.get(key)));
+				validateDataMap(dataMap);
+				Log.i("image", "Size von Hashmap: " + dataMap.size());
+
+				int iterator = 0;
+
+				for (String key : dataMap.keySet()) {
+					if (iterator < 3) {
+						if (key.equals("health")) {
+							f.setHealthbar(((int[]) dataMap.get(key))[1],
+									((int[]) dataMap.get(key))[0]);
+						} else if (iterator == 2) {
+							f.setOptional(key, ((String) dataMap.get(key)));
+						} else {
+							f.setScore(key, ((String) dataMap.get(key)));
+						}
+						iterator++;
+					}
 				}
-				iterator++;
+
 			}
-		}
+		});
 	}
 
 	private void validateDataMap(HashMap<String, Object> dataMap) {
@@ -404,7 +452,14 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void endGame() {
-		showEndDialog();
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				showEndDialog();
+			}
+		});
 	}
 
 	private void showEndDialog() {
