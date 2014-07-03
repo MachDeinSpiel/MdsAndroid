@@ -91,11 +91,11 @@ public class WebServices {
 			@Override
 			public void run() {
 				try {
-					Log.e("Socket", "WebServices: Nachricht angekommen bei: "+ actInterface.getClass().toString());
+					Log.d("Socket", "WebServices: Nachricht angekommen bei: "+ actInterface.getClass().toString());
 					if (new JSONObject(message).has("mode"))
 						actInterface.onWebSocketMessage(message);
 					else
-						Log.e("Socket", "WebServices: Kein Mode in JSON: "
+						Log.d("Socket", "WebServices: Kein Mode in JSON: "
 								+ message);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block

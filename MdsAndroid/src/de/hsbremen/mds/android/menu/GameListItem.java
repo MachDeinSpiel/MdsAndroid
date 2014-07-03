@@ -18,9 +18,11 @@ public class GameListItem extends ArrayAdapter<String> {
 	private final Integer[] activePlayers;
 	private final Integer[] id;
 	private final String[] clienturl;
+	private final Integer[] minplayers;
 
-	public GameListItem(Activity context, String[] name, String[] subtext, Integer[] imageId,
-			Integer[] maxPlayers, Integer[] players, Integer[] id, String[] clienturl) {
+	public GameListItem(Activity context, String[] name, String[] subtext,
+			Integer[] imageId, Integer[] maxPlayers, Integer[] minPlayers,
+			Integer[] players, Integer[] id, String[] clienturl) {
 		super(context, R.layout.gamelistitem, name);
 		this.context = context;
 		this.name = name;
@@ -30,6 +32,7 @@ public class GameListItem extends ArrayAdapter<String> {
 		this.activePlayers = players;
 		this.id = id;
 		this.clienturl = clienturl;
+		this.minplayers = minPlayers;
 	}
 
 	@Override
@@ -37,7 +40,8 @@ public class GameListItem extends ArrayAdapter<String> {
 		LayoutInflater inflater = context.getLayoutInflater();
 		View rowView = inflater.inflate(R.layout.gamelistitem, null, true);
 		TextView txtTitle = (TextView) rowView.findViewById(R.id.gameText);
-		TextView txtSubTitle = (TextView) rowView.findViewById(R.id.gameSubtext);
+		TextView txtSubTitle = (TextView) rowView
+				.findViewById(R.id.gameSubtext);
 		ImageView imageView = (ImageView) rowView.findViewById(R.id.gameIcon);
 		txtTitle.setText(name[position]);
 		txtSubTitle.setText(subtext[position]);
@@ -46,16 +50,12 @@ public class GameListItem extends ArrayAdapter<String> {
 		TextView maxPlayers = (TextView) rowView
 				.findViewById(R.id.labelMaxPlayers);
 
-			if(this.activePlayers[position] == null){
-				this.activePlayers[position] = 0;
-			}
-		
-			maxPlayers.setText(this.activePlayers[position] + " / "
-					+ this.maxplayers[position]);
+		int max = this.maxplayers[position];
 
-		// TextView maxplayersLabel = (TextView)
-		// view.findViewById(R.id.labelMaxPlayers);
-		// maxplayersLabel.setText(maxplayers);
+		if (this.activePlayers[position] == null || this.activePlayers[position] == 0)
+			maxPlayers.setText("Min " + this.minplayers[position] + " / Max " + max);
+		else
+			maxPlayers.setText(this.activePlayers[position] + " / " + max);
 
 		return rowView;
 	}
@@ -67,13 +67,17 @@ public class GameListItem extends ArrayAdapter<String> {
 	public String getName(int pos) {
 		return name[pos];
 	}
-	
+
 	public String getSubtext(int pos) {
 		return subtext[pos];
 	}
 
 	public Integer getMaxplayers(int pos) {
 		return maxplayers[pos];
+	}
+	
+	public Integer getMinplayers(int pos) {
+		return minplayers[pos];
 	}
 
 	public Integer getPlayers(int pos) {
@@ -87,5 +91,5 @@ public class GameListItem extends ArrayAdapter<String> {
 	public String getClienturl(int pos) {
 		return clienturl[pos];
 	}
-	
+
 }

@@ -49,21 +49,25 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	Vector<Button> btnTeams;
 	Vector<ListView> listTeams;
 	int maxplayers;
+	int minplayers;
+	boolean teamsHavePlayers;
 
 	PlayerListItem playerAdapter;
 
 	private ProgressDialog progressDial;
 	private WebServices webServ;
 	private File spielejson;
+	private int numberPlayers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    //Remove title bar
-	    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		// Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-	    //Remove notification bar
-	    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		// Remove notification bar
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		setContentView(R.layout.gamelobby);
 
@@ -84,6 +88,8 @@ public class GameLobby extends Activity implements WebServicesInterface,
 			public void onClick(View v) {
 				JSONObject json = new JSONObject();
 				try {
+					progressDial = ProgressDialog.show(getActivity(),
+							"Game Lobby", "Leaving Game Lobby...");
 					json.put("mode", "gamelobby");
 					json.put("action", "leave");
 				} catch (JSONException e) {
@@ -100,20 +106,33 @@ public class GameLobby extends Activity implements WebServicesInterface,
 		if (isInitialPlayer) {
 			startBtn.setOnClickListener(new OnClickListener() {
 
-
 				@Override
 				public void onClick(View v) {
-					progressDial = ProgressDialog.show(getActivity(), "Game Lobby", "Starting Game...");
-					
-					JSONObject json = new JSONObject();
-					try {
-						json.put("mode", "gamelobby");
-						json.put("action", "start");
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+
+					if (numberPlayers < minplayers) {
+						Toast.makeText(
+								getActivity(),
+								"You need " + (minplayers - numberPlayers)
+										+ " more Players to start the Game",
+								Toast.LENGTH_LONG).show();
+					} else if (!teamsHavePlayers) {
+						Toast.makeText(getActivity(),
+								"At least 2 Teams need to have Players",
+								Toast.LENGTH_LONG).show();
+					} else {
+						progressDial = ProgressDialog.show(getActivity(),
+								"Game Lobby", "Starting Game...");
+
+						JSONObject json = new JSONObject();
+						try {
+							json.put("mode", "gamelobby");
+							json.put("action", "start");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						webServ.send(json.toString());
 					}
-					webServ.send(json.toString());
 				}
 			});
 		} else {
@@ -126,8 +145,9 @@ public class GameLobby extends Activity implements WebServicesInterface,
 
 		username = (CharSequence) extras.get("username");
 		CharSequence game = (CharSequence) extras.get("game");
-		int players = (Integer) extras.get("players");
 		maxplayers = (Integer) extras.get("maxplayers");
+		if (isInitialPlayer)
+			minplayers = (Integer) extras.get("minplayers");
 
 		webServ = WebServices.createWebServices(this);
 
@@ -168,14 +188,13 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	protected void onResume() {
 		super.onResume();
 	}
-	
+
 	protected void onDestroy() {
-		if(progressDial != null)
+		if (progressDial != null)
 			progressDial.dismiss();
 		webServ.unbindService();
 		super.onDestroy();
 	}
-
 
 	@Override
 	public Activity getActivity() {
@@ -198,8 +217,9 @@ public class GameLobby extends Activity implements WebServicesInterface,
 					}
 					if (json.getString("mode").equals("full")) {
 
-						if(progressDial == null)
-							progressDial = ProgressDialog.show(getActivity(), "Game Lobby", "Starting Game...");
+						if (progressDial == null)
+							progressDial = ProgressDialog.show(getActivity(),
+									"Game Lobby", "Starting Game...");
 						// Fullwhiteboardupdate (Spiel wurde gestartet)
 						Intent intent = new Intent(GameLobby.this,
 								MainActivity.class);
@@ -207,7 +227,7 @@ public class GameLobby extends Activity implements WebServicesInterface,
 						intent.putExtra("json", json.toString());
 						intent.putExtra("spielejson", spielejson);
 						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						getApplicationContext().startActivity(intent);						
+						getApplicationContext().startActivity(intent);
 						finish();
 					}
 					if (json.get("mode").equals("gametemplates")
@@ -228,7 +248,8 @@ public class GameLobby extends Activity implements WebServicesInterface,
 								Toast toast;
 								try {
 									toast = Toast.makeText(
-											getApplicationContext(), json.getString("message"),
+											getApplicationContext(),
+											json.getString("message"),
 											Toast.LENGTH_LONG);
 									toast.show();
 								} catch (JSONException e) {
@@ -377,8 +398,9 @@ public class GameLobby extends Activity implements WebServicesInterface,
 	private void teamUpdate(JSONObject json) throws JSONException {
 		JSONArray jsonArray = json.getJSONArray("players");
 		JSONObject team;
-		int numberPlayers = 0;
+		numberPlayers = 0;
 		if (json.getBoolean("isteamgame")) {
+			int teamsWithPlayers = 0;
 			for (int i = 0; i < jsonArray.length(); i++) {
 				team = (JSONObject) jsonArray.get(i);
 
@@ -391,12 +413,18 @@ public class GameLobby extends Activity implements WebServicesInterface,
 				Log.d("Menu",
 						"Gamelobby: Teamupdate wurde ausgeführt. ArrayLength: "
 								+ jsonArray.length());
+				if (team.getJSONArray("players").length() > 0)
+					teamsWithPlayers++;
 			}
+			if (teamsWithPlayers >= 2)
+				teamsHavePlayers = true;
 		} else {
 			btnTeams.get(0).setText(username);
 			playerUpdate(jsonArray, listTeams.get(0));
 			numberPlayers = jsonArray.length();
+			teamsHavePlayers = true;
 		}
+		Log.d("Menu", "GameLobby: TeamsHavePlayers = " + teamsHavePlayers);
 
 		// Hier müssen die aktuellen Spieler und das Maximum an Spielern rein
 		lblPlayers.setText(numberPlayers + "/" + maxplayers);

@@ -36,11 +36,11 @@ public class SocketClient extends WebSocketClient {
 
 	@Override
 	public void onError(Exception ex) {
-		Log.d("Socket", "Error: [" + ex.getMessage() + "] ["
+		Log.e("Socket", "Error: [" + ex.getMessage() + "] ["
 				+ ex.getStackTrace().toString() + "]");
 		ex.printStackTrace();
 		if (ex instanceof ClassCastException) {
-			Log.d("Socket", "Error Details:[ ClasCastException]");
+			Log.e("Socket", "Error Details:[ ClasCastException]");
 		}
 		
 		ex.printStackTrace();

@@ -2,6 +2,8 @@ package de.hsbremen.mds.android.menu;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -106,7 +110,9 @@ public class GameChooser extends Activity implements WebServicesInterface {
 												.getClienturl(pos));
 								Log.d("Menu", "GameChooser: ClientURL: "
 										+ activeGamesAdapter.getClienturl(pos));
-								if (f!= null && f.exists()) {
+
+								if (f != null && f.exists()
+										&& isJSONValid(f)) {
 
 									lobbyIntent = new Intent(GameChooser.this,
 											GameLobby.class);
@@ -167,7 +173,10 @@ public class GameChooser extends Activity implements WebServicesInterface {
 												+ gametemplatesAdapter
 														.getClienturl(pos));
 
-								if (f!=null && f.exists()) {
+								System.out.println(f.toString());
+
+								if (f != null && f.exists()
+										&& isJSONValid(f)) {
 									lobbyIntent = new Intent(GameChooser.this,
 											GameLobby.class);
 									lobbyIntent.putExtra("isInitial", true);
@@ -177,6 +186,9 @@ public class GameChooser extends Activity implements WebServicesInterface {
 									lobbyIntent.putExtra("maxplayers",
 											gametemplatesAdapter
 													.getMaxplayers(pos));
+									lobbyIntent.putExtra("minplayers",
+											gametemplatesAdapter
+													.getMinplayers(pos));
 									lobbyIntent.putExtra("players",
 											gametemplatesAdapter
 													.getPlayers(pos));
@@ -207,7 +219,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 													+ pos);
 								} else {
 									Log.d("Menu",
-											"NULLPOINTEREXCEPTION f.exists");
+											"GameChooser: JSON konnte nicht geladen werden");
 									stopLoadingScreen(
 											"Failed to load GameJSON", false);
 
@@ -247,6 +259,47 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		}
 	}
 
+	protected boolean isJSONValid(File test) {
+
+		try {
+			JSONParser parser = new JSONParser();
+
+			Object obj = parser.parse(new FileReader(test));
+
+			return isJSONValid(obj.toString());
+			
+
+		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
+		} catch (ParseException e) {
+			return false;
+		} 
+	}
+	
+	public boolean isJSONValid(String test)
+	{
+	    try 
+	    {
+	        new JSONObject(test);
+	    } 
+	    catch(JSONException ex) 
+	    {
+	        // edited, to include @Arthur's comment
+	        // e.g. in case JSONArray is valid as well...
+	        try 
+	        {
+	            new JSONArray(test);
+	        } 
+	        catch(JSONException ex2) 
+	        {
+	            return false;
+	        }
+	    }
+	    return true;
+	}
+
 	protected void startLoadingScreen(final String message) {
 
 		progress = ProgressDialog.show(getActivity(), "Initializing Lobby",
@@ -255,31 +308,25 @@ public class GameChooser extends Activity implements WebServicesInterface {
 	}
 
 	protected void stopLoadingScreen(final String message, final boolean success) {
-		if (success) {
-//			new Thread(new Runnable() {
-//				@Override
-//				public void run() {
-//					progress.setMessage(message);
-//					progress.setIcon(R.drawable.bomb);
-//					progress.setIconAttribute(RESULT_OK);
-//					try {
-//						Thread.sleep(2000);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					progress.dismiss();
-//				}
-//			}).start();
 
-			progress.dismiss();
-		} else {
-			progress.dismiss();
+		runOnUiThread(new Runnable() {
 
-			Toast toast = Toast.makeText(getApplicationContext(), message,
-					Toast.LENGTH_LONG);
-			toast.show();
-		}
+			@Override
+			public void run() {
+				if (success) {
+
+					if (progress != null)
+						progress.dismiss();
+				} else {
+					if (progress != null)
+						progress.dismiss();
+
+					Toast toast = Toast.makeText(getApplicationContext(),
+							message, Toast.LENGTH_LONG);
+					toast.show();
+				}
+			}
+		});
 
 	}
 
@@ -381,56 +428,65 @@ public class GameChooser extends Activity implements WebServicesInterface {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onWebSocketMessage(String message) {
+	public void onWebSocketMessage(final String message) {
 
 		msg = message;
 
-		try {
-			final JSONObject json = new JSONObject(message);
-			swipeLayout.setRefreshing(false);
-			if (json.getString("mode").equals("gametemplates")) {
-				onGameTemplatesUpdate(json.getJSONArray("games"));
-			} else if (json.getString("mode").equals("activegames")) {
-				onActiveGamesUpdate(json.getJSONArray("games"));
-			} else if (json.getString("mode").equals("gamelobby")) {
-				lobbyIntent.putExtra("json", json.toString());
-//				webServ.unbindService();
-				runOnUiThread(new Runnable() {
+		new Thread(new Runnable() {
 
-					@Override
-					public void run() {
-						if (lobbyIntent.getExtras().get("spielejson") != null) {
-							stopLoadingScreen("Lobby erstellt", true);
-							getApplicationContext().startActivity(lobbyIntent);
-						}
-					}
-				});
-			} // TODO Eigentlich soll hier nur die Lobby erstellt werden
-			else if (json.getString("mode").equals("full")) {
-				runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
 
-					@Override
-					public void run() {
-						stopLoadingScreen("Spiel startet", true);
-						Intent intent = new Intent(GameChooser.this,
-								MainActivity.class);
-						intent.putExtra("username", user);
-						intent.putExtra("json", json.toString());
-						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						getApplicationContext().startActivity(intent);
+				try {
+					final JSONObject json = new JSONObject(message);
+
+					swipeLayout.setRefreshing(false);
+					if (json.getString("mode").equals("gametemplates")) {
+						onGameTemplatesUpdate(json.getJSONArray("games"));
+					} else if (json.getString("mode").equals("activegames")) {
+						onActiveGamesUpdate(json.getJSONArray("games"));
+					} else if (json.getString("mode").equals("gamelobby")) {
+						lobbyIntent.putExtra("json", json.toString());
+						// webServ.unbindService();
+						runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								if (lobbyIntent.getExtras().get("spielejson") != null) {
+									stopLoadingScreen("Lobby erstellt", true);
+									getApplicationContext().startActivity(
+											lobbyIntent);
+								}
+							}
+						});
+					} // TODO Eigentlich soll hier nur die Lobby erstellt werden
+					else if (json.getString("mode").equals("full")) {
+						runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								stopLoadingScreen("Spiel startet", true);
+								Intent intent = new Intent(GameChooser.this,
+										MainActivity.class);
+								intent.putExtra("username", user);
+								intent.putExtra("json", json.toString());
+								intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								getApplicationContext().startActivity(intent);
+							}
+						});
+					} else if (json.getString("mode").equals("error")) {
+						if (loadingThread != null)
+							loadingThread.stop();
+						stopLoadingScreen(json.getString("message"), false);
 					}
-				});
-			} else if (json.getString("mode").equals("error")) {
-				if (loadingThread != null)
-					loadingThread.stop();
-				stopLoadingScreen(json.getString("message"), false);
+
+					;
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-
-			;
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		}).start();
 
 	}
 
@@ -443,6 +499,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		Integer[] gameIds;
 		Integer[] players;
 		Integer[] maxplayers;
+		Integer[] minplayers;
 		String[] clientUrl;
 
 		gameNames = new String[jsonArray.length()];
@@ -451,16 +508,18 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		gameIds = new Integer[jsonArray.length()];
 		players = new Integer[jsonArray.length()];
 		maxplayers = new Integer[jsonArray.length()];
+		minplayers = new Integer[jsonArray.length()];
 		clientUrl = new String[jsonArray.length()];
 
 		Log.d("Socket", "GameChooser: OnGameUpdate");
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			jsonObj = jsonArray.getJSONObject(i);
-			if (jsonObj.getInt("maxplayers") != 0) {
 
+			if (jsonObj.getInt("maxplayers") != 0)
 				maxplayers[i] = jsonObj.getInt("maxplayers");
-			}
+
+			minplayers[i] = jsonObj.getInt("minplayers");
 
 			gameNames[i] = jsonObj.getString("name");
 			gamePlayerNames[i] = "Players: " + jsonObj.getString("players");
@@ -473,7 +532,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		}
 
 		activeGamesAdapter = new GameListItem(this, gameNames, gamePlayerNames,
-				gameImages, maxplayers, players, gameIds, clientUrl);
+				gameImages, maxplayers, minplayers, players, gameIds, clientUrl);
 
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -494,6 +553,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		Integer[] gameIds;
 		Integer[] players;
 		Integer[] maxplayers;
+		Integer[] minplayers;
 		String[] clientUrl;
 
 		gameNames = new String[jsonArray.length()];
@@ -502,6 +562,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		gameIds = new Integer[jsonArray.length()];
 		players = new Integer[jsonArray.length()];
 		maxplayers = new Integer[jsonArray.length()];
+		minplayers = new Integer[jsonArray.length()];
 		clientUrl = new String[jsonArray.length()];
 
 		Log.d("Socket", "GameChooser: OnGameUpdate");
@@ -511,6 +572,7 @@ public class GameChooser extends Activity implements WebServicesInterface {
 			if (jsonObj.getInt("maxplayers") != 0) {
 				maxplayers[i] = jsonObj.getInt("maxplayers");
 			}
+			minplayers[i] = jsonObj.getInt("minplayers");
 
 			gameNames[i] = jsonObj.getString("name");
 			gameIds[i] = jsonObj.getInt("id");
@@ -522,8 +584,8 @@ public class GameChooser extends Activity implements WebServicesInterface {
 		}
 
 		gametemplatesAdapter = new GameListItem(this, gameNames,
-				gameSubinformation, gameImages, maxplayers, players, gameIds,
-				clientUrl);
+				gameSubinformation, gameImages, maxplayers, minplayers,
+				players, gameIds, clientUrl);
 
 		this.runOnUiThread(new Runnable() {
 			@Override

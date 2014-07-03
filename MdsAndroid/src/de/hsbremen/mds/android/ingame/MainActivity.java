@@ -58,22 +58,23 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	private CharSequence username;
 
 	public WebServices webServ;
-	
+
 	private int style = 0;
-	
-	private LocationManager manager; 
+
+	private LocationManager manager;
 
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//Remove title bar
-	    this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-	    //Remove notification bar
-	    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
+		// Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		// Remove notification bar
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		setContentView(R.layout.activity_main);
 
 		Bundle extras = getIntent().getExtras();
@@ -90,10 +91,10 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		mapFragment = (GoogleMapFragment) fm.findFragmentById(R.id.map);
 
 		styleFragment();
-		
+
 		// Interpreter Erstellung
 		File jsonDatei = (File) extras.get("spielejson");
-		
+
 		Log.d("Menu", "JSON: " + jsonDatei.toString());
 
 		// Hier wird der Interpreter erstellt und wir mitgegeben und als
@@ -103,60 +104,61 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 		// Initiater für die Listener registrierung
 		interpreterCom = new InterpreterCommunicator(interpreter, 5);
-		
+
 		try {
-			interpreterCom.onWebsocketMessage(new JSONObject(extras.getString("json")));
+			interpreterCom.onWebsocketMessage(new JSONObject(extras
+					.getString("json")));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		gpsInit();
 	}
-	
+
 	private void setOnPageChangedListener() {
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			
+
 			@Override
 			public void onPageSelected(int arg0) {
 				LinearLayout l = (LinearLayout) findViewById(R.id.containerMap);
 				LinearLayout l2 = (LinearLayout) findViewById(R.id.containerPager);
-				if(arg0 == 0){
+				if (arg0 == 0) {
 					l.setLayoutParams(new TableLayout.LayoutParams(
 							LayoutParams.WRAP_CONTENT, 0, 4f));
 					l2.setLayoutParams(new TableLayout.LayoutParams(
-							LayoutParams.WRAP_CONTENT, 0, 1f));			
-				}else{
+							LayoutParams.WRAP_CONTENT, 0, 1f));
+				} else {
 					l.setLayoutParams(new TableLayout.LayoutParams(
 							LayoutParams.WRAP_CONTENT, 0, 1f));
 					l2.setLayoutParams(new TableLayout.LayoutParams(
 							LayoutParams.WRAP_CONTENT, 0, 4f));
-				}	
+				}
 			}
-			
+
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
 			}
-			
+
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
 			}
 		});
-		
+
 	}
 
-	private void styleFragment(){
-		
-		FrameLayout f = (FrameLayout)findViewById(R.id.container);
-		
-		switch(style){
-			case 0: 
-				f.setBackgroundColor(Color.parseColor("#fafafa"));
-				break;
-			case 1:
-				f.setBackgroundColor(Color.parseColor("#6e6e6e"));
-				break;
-			default:
-				break;
+	private void styleFragment() {
+
+		FrameLayout f = (FrameLayout) findViewById(R.id.container);
+
+		switch (style) {
+		case 0:
+			f.setBackgroundColor(Color.parseColor("#fafafa"));
+			break;
+		case 1:
+			f.setBackgroundColor(Color.parseColor("#6e6e6e"));
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -168,7 +170,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void onLocationChanged(Location loc) {
-		
+
 		mapFragment.gmapsUpdate(loc);
 
 		interpreterCom.locationChanged(loc);
@@ -214,7 +216,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void addToBackpack(MdsItem item) {
-		FragmentInventory f = (FragmentInventory) swipeAdapter.getFragment("inventory");
+		FragmentInventory f = (FragmentInventory) swipeAdapter
+				.getFragment("inventory");
 		f.addItem(item);
 	}
 
@@ -226,7 +229,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	}
 
 	public void updateSwipeAdapter(String currFragment) {
-		viewPager.setCurrentItem(swipeAdapter.getFragmentName("showMap"));	
+		viewPager.setCurrentItem(swipeAdapter.getFragmentName("showMap"));
 		swipeAdapter.removeFragment(currFragment);
 	}
 
@@ -244,13 +247,9 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			// TODO Abfrage ob message fŸr Interpreter wichtig ist, oder z.B.
 			// Spieler Disconnect o.€.
 			// json.get("updatemode").equals("full");
-			this.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					Log.d("Socket", "MainActivity: JSSSSSSSOOOOON: " + json.toString());
-					interpreterCom.onWebsocketMessage(json);
-				}
-			});
+
+			Log.d("Socket", "MainActivity: JSSSSSSSOOOOON: " + json.toString());
+			interpreterCom.onWebsocketMessage(json);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -267,33 +266,34 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	@Override
 	public void nextFragment(MdsInfoObject mds) {
-		
-		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
-		if(!(mds.getName().equals("showMap")) && !(mds.getName().equals("backToMap"))){
-		
 
-			
-			if(!(mds.getName().equals("showMap"))){
+		System.out.println("NextFragment aufgerufen mit: " + mds.getName());
+		if (!(mds.getName().equals("showMap"))
+				&& !(mds.getName().equals("backToMap"))) {
+
+			if (!(mds.getName().equals("showMap"))) {
 				swipeAdapter.setFragmentInformation(mds);
 				swipeAdapter.addFragment(mds.getName());
 			}
-			viewPager.setCurrentItem(swipeAdapter.getFragmentName(mds.getName()), true);
+			viewPager.setCurrentItem(
+					swipeAdapter.getFragmentName(mds.getName()), true);
 		}
-		
-		if((mds.getName().equals("backToMap"))){
-			if(swipeAdapter.getCount() == 3){
+
+		if ((mds.getName().equals("backToMap"))) {
+			if (swipeAdapter.getCount() == 3) {
 				updateSwipeAdapter(swipeAdapter.getLastFragmentName());
 			}
 		}
 	}
-	
-	public int getStyleNumber(){
+
+	public int getStyleNumber() {
 		return this.style;
 	}
 
 	@Override
 	public void removeFromBackpack(String itemPathKey) {
-		FragmentInventory f = (FragmentInventory) swipeAdapter.getFragment("inventory");
+		FragmentInventory f = (FragmentInventory) swipeAdapter
+				.getFragment("inventory");
 		f.removeItem(itemPathKey);
 	}
 
@@ -301,39 +301,41 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	public void onWebserviceConnectionClosed(int code, String reason,
 			boolean remote) {
 	}
-	
+
 	public void gpsInit() {
-	
+
 		MainActivity activity = (MainActivity) getActivity();
-	
-		manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-	
-		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, activity);
+
+		manager = (LocationManager) getActivity().getSystemService(
+				Context.LOCATION_SERVICE);
+
+		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10,
+				activity);
 	}
 
 	@Override
 	public void onWebSocketConnected() {
-		
+
 	}
 
 	@Override
 	public void setPlayerData(HashMap<String, Object> dataMap) {
-		FragmentMap f = (FragmentMap)swipeAdapter.getFragment("showMap");
-		
+		FragmentMap f = (FragmentMap) swipeAdapter.getFragment("showMap");
+
 		validateDataMap(dataMap);
 		Log.i("image", "Size von Hashmap: " + dataMap.size());
-		
+
 		int iterator = 0;
-		
-		for(String key : dataMap.keySet()){
-			if(iterator < 3){
-				if(key.equals("health")){
-					f.setHealthbar(((int[])dataMap.get(key))[1], ((int[])dataMap.get(key))[0]);
-				}
-				else if(iterator == 2){
-					f.setOptional(key, ((String)dataMap.get(key)));
-				}else{
-					f.setScore(key, ((String)dataMap.get(key)));
+
+		for (String key : dataMap.keySet()) {
+			if (iterator < 3) {
+				if (key.equals("health")) {
+					f.setHealthbar(((int[]) dataMap.get(key))[1],
+							((int[]) dataMap.get(key))[0]);
+				} else if (iterator == 2) {
+					f.setOptional(key, ((String) dataMap.get(key)));
+				} else {
+					f.setScore(key, ((String) dataMap.get(key)));
 				}
 				iterator++;
 			}
@@ -342,62 +344,82 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
 	private void validateDataMap(HashMap<String, Object> dataMap) {
 
-		LinearLayout healthlayout = (LinearLayout)findViewById(R.id.healthBarCont);
-		LinearLayout scoreLayout = (LinearLayout)findViewById(R.id.scoreContainer);
-		LinearLayout optionalLayout = (LinearLayout)findViewById(R.id.optionalContainer);
-		
-		if(healthlayout != null || scoreLayout != null || optionalLayout != null) {
-			if(dataMap.size() >= 3 && dataMap.containsKey("health")){
+		LinearLayout healthlayout = (LinearLayout) findViewById(R.id.healthBarCont);
+		LinearLayout scoreLayout = (LinearLayout) findViewById(R.id.scoreContainer);
+		LinearLayout optionalLayout = (LinearLayout) findViewById(R.id.optionalContainer);
+
+		if (healthlayout != null || scoreLayout != null
+				|| optionalLayout != null) {
+			if (dataMap.size() >= 3 && dataMap.containsKey("health")) {
 				Log.i("image", "1");
-				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			}else if(dataMap.size() == 2 && dataMap.containsKey("health")){
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+			} else if (dataMap.size() == 2 && dataMap.containsKey("health")) {
 				Log.i("image", "2");
-				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-			}else if(dataMap.size() == 1 && dataMap.containsKey("health")){
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 0f));
+			} else if (dataMap.size() == 1 && dataMap.containsKey("health")) {
 				Log.i("image", "3");
-				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-			}else if(dataMap.size() == 1 && !dataMap.containsKey("health")){
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 0f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 0f));
+			} else if (dataMap.size() == 1 && !dataMap.containsKey("health")) {
 				Log.i("image", "4");
-				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-			}else if(dataMap.size() == 2 && !dataMap.containsKey("health")){
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 0f));
+			} else if (dataMap.size() == 2 && !dataMap.containsKey("health")) {
 				Log.i("image", "5");
-				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-			}else if(dataMap.size() >= 3 && !dataMap.containsKey("health")){
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+			} else if (dataMap.size() >= 3 && !dataMap.containsKey("health")) {
 				Log.i("image", "6");
-				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 0f));
-				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+				healthlayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 0f));
+				scoreLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
+				optionalLayout.setLayoutParams(new LinearLayout.LayoutParams(0,
+						LayoutParams.MATCH_PARENT, 1f));
 			}
 		}
 	}
-	
+
 	@Override
 	public void endGame() {
 		showEndDialog();
 	}
-	
-	private void showEndDialog(){
+
+	private void showEndDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Game ended")
-               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                	   finish();
-                   }
-               })
-               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                	   finish();
-                   }
-               }).show();
+		builder.setMessage("Game ended")
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								finish();
+							}
+						}).show();
 	}
 }
