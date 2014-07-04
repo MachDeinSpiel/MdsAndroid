@@ -483,12 +483,12 @@ public class ActionParser {
 					}
 				}
 			}
-			Log.i("Mistake", "OnwGroup Title ist: " + root.getAttribute(playerGroup, "title").value);
-			String vGroup = (String)wb.get("visibility").value;
-			if (vGroup.equals((String)root.getAttribute(playerGroup, "title").value)) {
-				Log.i("Mistake", "Adding an OwnGroup Object");
-				addMe = true;
-			}
+//			Log.i("Mistake", "OnwGroup Title ist: " + root.getAttribute(playerGroup, "title").value);
+//			String vGroup = (String)wb.get("visibility").value;
+//			if (vGroup.equals((String)root.getAttribute(playerGroup, "title").value)) {
+//				Log.i("Mistake", "Adding an OwnGroup Object");
+//				addMe = true;
+//			}
 		}
 		if(addMe && pathKey != "object"){
 			Log.d(Interpreter.LOGTAG, "EntriesAsItem: adding to List:"+pathKey);
